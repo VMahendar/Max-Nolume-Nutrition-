@@ -5,7 +5,7 @@
     "category": "Protein",
     "subtitle": "Your daily training companion",
     "description": "Unicorn Pro Series whey protein. Check the pack label for ingredients, nutrition and allergen information. Contains milk ingredients.",
-    "image": "https://revakanya.com/assets/imgs/Potency%20Whey.png",
+    "image": "assets/potency-whey.png",
     "variants": [
       {
         "id": "whey-chocolate",
@@ -51,7 +51,7 @@
     "category": "Creatine",
     "subtitle": "Make every session count",
     "description": "Unicorn Pro Series creatine supplement in 100 g packs. Choose Blueberry or Cranberry. Read the pack label for ingredients and directions.",
-    "image": "https://revakanya.com/assets/imgs/Pro%20Creatine.png",
+    "image": "assets/pro-creatine.png",
     "variants": [
       {
         "id": "creatine-blueberry",
@@ -73,7 +73,7 @@
     "category": "Pre-Workout",
     "subtitle": "For your pre-training routine",
     "description": "Unicorn Pro Series pre-workout. Read the product label for caffeine content, directions and warnings. Confirm suitability before use.",
-    "image": "https://revakanya.com/assets/imgs/Sturdy%20Pre%20Workout.png",
+    "image": "assets/sturdy-pre-workout.png",
     "variants": [
       {
         "id": "pre-watermelon",

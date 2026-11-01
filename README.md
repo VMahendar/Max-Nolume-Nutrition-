@@ -1,43 +1,48 @@
-# Max Volume Nutrition store
+# Max Volume Nutrition
 
-Responsive retail storefront and server-side Razorpay integration, built from the existing catalogue. Online payment is intentionally off until the owner supplies prices, stock, delivery charges, business details and provider credentials. No credentials or invented retail prices are included.
+Continues PR #1 (`codex/complete-store-review`) using the original retail storefront and a single Node.js 24 / SQLite commerce backend. No WooCommerce, second inventory store, live activation, or deployment is included.
 
-## Run
-
-Node 24 or later. No third-party runtime packages are required.
+## Local development
 
 ```
 cp .env.example .env
 npm start
+npm run check
+npm test
 ```
 
-Open http://localhost:3000. Use `npm run check` and `npm test` before release.
+Open the configured `PUBLIC_ORIGIN`. Payments and shipping default to disabled. Real payment credentials are unnecessary for the automated suite: provider requests are intercepted by isolated subprocess fixtures.
 
-## Structure
+## Accounts and administration
 
-- `public/`: homepage, product detail hash routes, accessible shopping bag, delivery form, payment status screen and policy drafts.
-- `data/products.json`: authoritative variant prices in paise and stock quantities. Null means unconfirmed, never zero-price checkout.
-- `data/store.json`: shipping charge in paise, delivery region and business contact details.
-- `server.mjs`: checkout orders, SQLite order storage, signature verification and captured-payment checks.
-- `runtime/orders.sqlite`: private order database; excluded from Git and static hosting.
+- `/account.html`: register, sign in/out, change password, view your orders and apply for gym/wholesale pricing.
+- `/admin.html`: review dealer applications; manage products, prices, inventory, orders, delivery settings and GST; reconcile payments and create/track Shiprocket orders.
+- `/invoice.html?order=ORDER_ID`: access-controlled GST invoice with browser print/save PDF.
 
-Static GitHub Pages can show the storefront and cart but cannot execute the payment backend. Serve the complete project with Node on an HTTPS host with a persistent disk for real checkout. Never upload the project root or runtime folder as a public static directory. The workflow uploads `public/` only.
+The first administrator must register normally. A trusted operator then runs on the application host:
 
-## Owner activation requirements
+```
+node --env-file-if-exists=.env manage.mjs promote-admin OWNER_EMAIL
+```
 
-1. Supply the approved retail price, precise size/flavour and available stock for every SKU. Prices must be final customer amounts, including any applicable tax. Update `data/products.json`, then synchronise its public copy: `cp data/products.json public/catalog.json`.
-2. Confirm shipping fee and service area, full business address, support email and final policy terms. Update `data/store.json`, sync to `public/store.json`, remove policy draft notices only after approval.
-3. Confirm the final MV grid logo. A historical saved emblem is included for reference but the interface currently uses a clean wordmark to avoid substituting an incorrect logo.
-4. The actual 5 kg Nitro Mass bucket photo is included. Manufacturer reference URLs are used for whey, creatine and pre-workout with designed fallbacks. Replace them with approved local pack images; confirm 3 kg and multivitamin photography.
-5. Set Razorpay test key ID and secret in the server environment, plus webhook secret. Do not paste secrets into source, chat, public files or GitHub. Configure `PUBLIC_ORIGIN` to the exact HTTPS origin.
-6. Configure Razorpay webhook events `payment.captured` and `order.paid` to `https://YOUR_DOMAIN/api/webhook`, using the configured webhook secret. Enable automatic capture in the provider account.
-7. After approving business details and policy text, set `POLICIES_APPROVED=true` and `PAYMENTS_ENABLED=true`. These flags are server-only. Complete a test payment, cancellation, failure and webhook test before replacing test keys with live keys.
-8. Checkout reserves inventory atomically in SQLite. Paid and pending orders consume stock. Abandoned orders and uncertain provider failures intentionally keep their reservations until an operator reconciles the provider status; automatic reservation expiry and a fulfilment dashboard are not implemented. Keep a single persistent database and reconcile pending orders before restocking. Live provider tests and operational setup are still required.
+This invalidates that account's existing sessions. Sign in again. There is no public administrator bootstrap endpoint or default password.
 
-Orders are stored privately in SQLite. Back up the persistent volume. View recent orders locally with `node orders.mjs`; do not publish customer exports. No customer order email or courier integration is configured.
+## One source of commerce data
 
-## Verification
+`DATA_DIR/orders.sqlite` stores users, hashed sessions, dealer applications, product definitions, physical inventory, orders, invoices, shipment references and audit records. `data/*.json` is imported **once** when an existing or new database is first upgraded. Subsequent changes use the administrator dashboard, not edits to seed files. Existing orders are retained; legacy paid quantities are deducted once when importing physical stock. Take a backup before upgrading an existing database.
 
-Tests cover corrupt/stale cart data, quantity validation, server-calculated amounts, unpriced and unavailable products, incomplete delivery configuration, signature tampering and invalid delivery details. Mocked integration tests cover order creation, provider verification and duplicate webhooks. Live provider tests require the owner's payment account.
+`public/catalog.json` and `public/store.json` are retail-only static browsing fallbacks, not order/inventory systems. Static GitHub Pages cannot provide accounts, checkout, administration or real payments. The Node host serves `/api/catalog` from SQLite; static fallback disables payment. Never publish the project root or private database.
 
-Razorpay integration reference: https://razorpay.com/docs/payments/payment-gateway/web-integration/standard/integration-steps/
+Approved retail prices remain unchanged: whey ₹4,999; Nitro Mass 5 kg ₹3,499 and 3 kg ₹2,599; creatine ₹899; pre-workout ₹1,399; Musclevite ₹699. Business prices are unset until entered explicitly. Approval alone does not invent a discount; missing tier prices block checkout for that tier.
+
+## Safety and operations
+
+- Passwords use unique salted scrypt hashes. Session identifiers are random, hashed in storage, HttpOnly/SameSite cookies and Secure on HTTPS. Password change invalidates every session.
+- Mutating browser requests require the exact `PUBLIC_ORIGIN`; administrator access and order ownership are enforced server-side. Payment webhooks use the raw-body HMAC signature.
+- Server-calculated prices, quantity checks and SQLite transactions prevent overselling. Payment retries with the same browser request key reuse the same order.
+- Definite provider rejection releases its hold. Unknown provider outcomes retain stock, preventing late captured payments from overselling. Never release reservations merely because the checkout window closed.
+- In the order dashboard, recover an unknown provider order ID only after the API confirms its receipt, amount and currency; then reconcile captured payment. Unknown webhook orders request retries instead of silently acknowledging capture.
+- Paid quantities are deducted exactly once. Existing order/tax/price snapshots are immutable through product settings. Inventory adjustments require a reason and reject stale edits.
+- Enable GST only after seller details, product HSN/rates and invoice format are approved. Existing customer prices are **inclusive**; enabling GST extracts the tax without increasing their price. Invoices are issued once on captured payment, with Indian financial-year numbering. Browser print can save PDF; this is not GST e-invoice/IRN or e-way-bill integration.
+
+See [implementation status](docs/IMPLEMENTATION.md), [production runbook](docs/PRODUCTION.md) and [media checklist](docs/MEDIA.md). Do not merge, deploy, or enable live payments without owner approval.

@@ -1,0 +1,3 @@
+import {resolve} from 'node:path';
+import {openCommerce,email} from './commerce.mjs';
+const [action,value]=process.argv.slice(2);if(action!=='promote-admin'||!value){console.error('Usage: node --env-file-if-exists=.env manage.mjs promote-admin EMAIL');process.exit(1);}const C=openCommerce(resolve(process.env.DATA_DIR||'runtime'));const user=C.db.prepare('SELECT id FROM users WHERE email=?').get(email(value));if(!user){console.error('Register the account first. No account changed.');process.exit(1);}C.tx(()=>{C.db.prepare("UPDATE users SET role='admin' WHERE id=?").run(user.id);C.db.prepare('DELETE FROM sessions WHERE user_id=?').run(user.id);C.audit('host-operator','admin.promote',user.id);});C.db.close();console.log('Administrator granted. Sign in again.');
