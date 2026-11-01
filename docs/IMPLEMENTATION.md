@@ -15,7 +15,7 @@ Work continues on `codex/complete-store-review` from `edf0e3710429bd189659945df5
 | 6. Shiprocket | Credential/test gates; API-user authentication; prepaid custom orders; serviceability/rates; AWB, pickup, label, manifest and tracking; duplicate/uncertain operation guards | Valid API user, pickup configuration, real parcel measurements and account-specific tests. Dynamic checkout rate quotation, automated tracking updates and uncertain-shipment recovery are outstanding |
 | 7. GST / invoices | Configurable seller and product data; inclusive-price extraction; CGST/SGST or IGST; shipping tax; one invoice per capture; immutable snapshots; India financial-year numbering; access-controlled printable invoice / browser PDF | Accountant-approved classifications and invoice layout. GST is disabled by default. GST e-invoice/IRN, e-way bills, credit notes and accounting exports are not implemented |
 | 8. Order management / fulfilment | Administrator order/customer/item details; payment reconciliation/recovery; processing/shipped/delivered transitions; tracking references; shipping actions and audit trail | Automated refund/return workflow, transactional email notifications and pagination beyond the most recent 100 orders are outstanding |
-| 9. Images / product facts | Existing actual Nitro Mass 5 kg photo retained; three original manufacturer references checked and copied unchanged into local assets; catalogue/variant/price regression test | Approved original MV logo missing; no replacement designed. Nitro Mass 3 kg and Musclevite photos/details and exact flavour-specific photography still need confirmation. Manufacturer nutrition/ingredients need approved label data |
+| 9. Images / product facts | Existing actual Nitro Mass 5 kg photo retained; three original manufacturer references checked and copied unchanged into local assets; catalogue/variant/price regression test | Owner-approved gold MV PNG now used unchanged in the header/footer/favicon; no replacement designed. Nitro Mass 3 kg and Musclevite photos/details and exact flavour-specific photography still need confirmation. Manufacturer nutrition/ingredients need approved label data |
 | 10. Production configuration | Non-root container template, read-only root, persistent private DB, TLS reverse-proxy configuration, health check, shutdown handling, online backup utility, explicit live-payment approval gate; PR branch cannot run Pages deployment | No host provisioned or deployed. Docker images/compose not built here. DNS, HTTPS, secrets, monitoring, scheduled encrypted backups and staging-to-production acceptance need the selected hosting account |
 
 ## Verification
@@ -39,7 +39,7 @@ Work continues on `codex/complete-store-review` from `edf0e3710429bd189659945df5
 
 ## Required external inputs
 
-1. Approved original MV logo and missing verified pack assets/label data.
+1. Missing verified pack assets/label data; the approved gold logo is now supplied and integrated.
 2. Real stock, approved gym/wholesale prices, delivery fee and service region.
 3. Business address, support email, approved policies and accountant-reviewed GST configuration.
 4. Razorpay test/live merchant accounts and server-held key pairs/webhook secret. Live activation requires separate owner approval.
