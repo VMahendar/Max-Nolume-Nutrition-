@@ -1,0 +1,2 @@
+// Isolated subprocess fixture. Never imported by the application.
+globalThis.fetch=async(url,options)=>{if(url.endsWith('/orders')){const b=JSON.parse(options.body);return {ok:true,json:async()=>({id:'order_fixture',amount:b.amount,currency:b.currency})};}if(url.includes('/payments/pay_fixture'))return {ok:true,json:async()=>({id:'pay_fixture',order_id:'order_fixture',amount:10500,currency:'INR',status:'captured'})};throw Error('Unexpected provider request');};
