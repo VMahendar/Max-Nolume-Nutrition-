@@ -48,3 +48,7 @@ Work continues on `codex/complete-store-review` from `edf0e3710429bd189659945df5
 7. Transactional-email service/account for the outstanding email verification, password recovery and notification stage.
 
 Enter secrets through the host's secret manager or private environment settings, never source control or chat. Keep `PAYMENTS_ENABLED`, `RAZORPAY_TESTED`, `LIVE_PAYMENTS_APPROVED`, `SHIPROCKET_ENABLED` and `SHIPROCKET_TESTED` false until the corresponding controlled tests and owner approvals are complete.
+
+## Password-protected staging preparation
+
+A separate staging entry point, whole-site password protection, isolated synthetic-data initialization and exact Render deployment runbook are prepared in [STAGING.md](STAGING.md). The expanded suite has 27 passing tests, including staging authentication and integration-disable checks. No hosting resources, real HTTPS URL or live integrations have been provisioned.

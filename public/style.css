@@ -12,3 +12,5 @@ footer .brand-logo{height:96px}
 @media(max-width:650px){header .brand{gap:10px}header .brand-logo{height:56px}header .brand strong{font-size:18px}header .brand strong span{font-size:11px}header .brand small{font-size:5.5px}footer .brand-logo{height:80px}footer .brand strong{font-size:20px}footer .brand strong span{font-size:13px}}
 @media(max-width:380px){header{gap:10px}header .brand{gap:8px}header .brand-logo{height:48px}header .brand strong{font-size:15px}header .brand strong span{font-size:9px}header .brand small{font-size:5px}}
 @media(max-width:380px){.hero{grid-template-columns:minmax(0,1fr)}.hero-copy{min-width:0}.hero h1{font-size:clamp(44px,15vw,56px)}.product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.product{min-width:0}.product-info h3{overflow-wrap:anywhere}.wholesale{grid-template-columns:minmax(0,1fr)}.wholesale h2{font-size:44px}}
+
+.staging-banner{padding:8px 16px;text-align:center;background:#fff1bd;color:#392b00;font:700 11px/1.5 Arial,sans-serif;letter-spacing:.04em}

@@ -1,7 +1,7 @@
 FROM node:24.19.0-bookworm-slim
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000 DATA_DIR=/var/lib/mvn
 WORKDIR /app
-COPY --chown=node:node package.json server.mjs lib.mjs commerce.mjs integrations.mjs manage.mjs orders.mjs ./
+COPY --chown=node:node package.json server.mjs staging.mjs staging-server.mjs lib.mjs commerce.mjs integrations.mjs manage.mjs orders.mjs ./
 COPY --chown=node:node public ./public
 COPY --chown=node:node data ./data
 COPY --chown=node:node deploy/backup.mjs ./deploy/backup.mjs

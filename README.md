@@ -46,3 +46,7 @@ Approved retail prices remain unchanged: whey ₹4,999; Nitro Mass 5 kg ₹3,499
 - Enable GST only after seller details, product HSN/rates and invoice format are approved. Existing customer prices are **inclusive**; enabling GST extracts the tax without increasing their price. Invoices are issued once on captured payment, with Indian financial-year numbering. Browser print can save PDF; this is not GST e-invoice/IRN or e-way-bill integration.
 
 See [implementation status](docs/IMPLEMENTATION.md), [production runbook](docs/PRODUCTION.md) and [media checklist](docs/MEDIA.md). Do not merge, deploy, or enable live payments without owner approval.
+
+## Password-protected staging preparation
+
+See [the exact staging plan](docs/STAGING.md). `npm run start:staging` seeds an isolated test database and starts the existing app behind a site-wide password gate. It requires host-provided staging secrets and forces payment/courier integrations off. No hosted service has been created; account connection and owner deployment/cost approval are still required.
