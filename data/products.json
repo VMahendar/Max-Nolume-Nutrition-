@@ -9,14 +9,14 @@
     "variants": [
       {
         "id": "whey-chocolate",
-        "label": "5 lb \u00b7 Chocolate",
-        "pricePaise": null,
+        "label": "5 lb · Chocolate",
+        "pricePaise": 499900,
         "stock": null
       },
       {
         "id": "whey-coffee",
-        "label": "5 lb \u00b7 Coffee",
-        "pricePaise": null,
+        "label": "5 lb · Coffee",
+        "pricePaise": 499900,
         "stock": null
       }
     ]
@@ -31,15 +31,15 @@
     "variants": [
       {
         "id": "mass-5kg",
-        "label": "5 kg bucket \u00b7 Double Rich Chocolate",
-        "pricePaise": null,
+        "label": "5 kg bucket · Double Rich Chocolate",
+        "pricePaise": 349900,
         "stock": null,
         "image": "assets/nitro-mass-5kg.jpg"
       },
       {
         "id": "mass-3kg",
-        "label": "3 kg \u00b7 Pack to confirm",
-        "pricePaise": null,
+        "label": "3 kg · Pack to confirm",
+        "pricePaise": 259900,
         "stock": null,
         "image": null
       }
@@ -50,19 +50,19 @@
     "name": "Pro Creatine",
     "category": "Creatine",
     "subtitle": "Make every session count",
-    "description": "Unicorn Pro Series creatine supplement. Pack size and available flavours must be confirmed before online sales are enabled.",
+    "description": "Unicorn Pro Series creatine supplement in 100 g packs. Choose Blueberry or Cranberry. Read the pack label for ingredients and directions.",
     "image": "https://revakanya.com/assets/imgs/Pro%20Creatine.png",
     "variants": [
       {
         "id": "creatine-blueberry",
-        "label": "Blueberry \u00b7 Size to confirm",
-        "pricePaise": null,
+        "label": "100 g · Blueberry",
+        "pricePaise": 89900,
         "stock": null
       },
       {
         "id": "creatine-cranberry",
-        "label": "Cranberry \u00b7 Size to confirm",
-        "pricePaise": null,
+        "label": "100 g · Cranberry",
+        "pricePaise": 89900,
         "stock": null
       }
     ]
@@ -77,8 +77,8 @@
     "variants": [
       {
         "id": "pre-watermelon",
-        "label": "250 g \u00b7 Watermelon",
-        "pricePaise": null,
+        "label": "250 g · Watermelon",
+        "pricePaise": 139900,
         "stock": null
       }
     ]
@@ -94,7 +94,7 @@
       {
         "id": "musclevite-pack",
         "label": "Pack details to confirm",
-        "pricePaise": null,
+        "pricePaise": 69900,
         "stock": null
       }
     ]
