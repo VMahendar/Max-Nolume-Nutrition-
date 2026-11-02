@@ -1,5 +1,7 @@
 # Password-protected staging — prepared, not deployed
 
+**Superseded hosting proposal:** The owner now requires zero payment. Use [FREE_PREVIEW.md](FREE_PREVIEW.md) for the current Free-only plan. The paid-instance/disk instructions below are retained for reference and are NOT authorized.
+
 ## Hosting availability checked
 
 The existing GitHub repository/PR is accessible. Render and Railway integrations were discovered, but neither is installed/connected. No cloud account credentials, outbound cloud identity or hosting account are configured in this environment. The existing development server is temporary and has no shareable HTTPS URL.

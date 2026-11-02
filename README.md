@@ -50,3 +50,5 @@ See [implementation status](docs/IMPLEMENTATION.md), [production runbook](docs/P
 ## Password-protected staging preparation
 
 See [the exact staging plan](docs/STAGING.md). `npm run start:staging` seeds an isolated test database and starts the existing app behind a site-wide password gate. It requires host-provided staging secrets and forces payment/courier integrations off. No hosted service has been created; account connection and owner deployment/cost approval are still required.
+
+The current owner requirement is **zero payment**. The paid-disk proposal is cancelled; use [the Free-only preview plan](docs/FREE_PREVIEW.md). Payment collection, delivery integrations and GST invoicing remain disabled for preview.
