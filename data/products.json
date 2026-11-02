@@ -30,14 +30,14 @@
     "category": "Mass Gainer",
     "subtitle": "Build your nutrition routine",
     "description": "Unicorn Pro Series mass gainer. The 5 kg pack is supplied in a bucket. Check available flavours and the label before purchase.",
-    "image": "assets/nitro-mass-5kg.jpg",
+    "image": "assets/Screenshot_2026_1103_003852.jpg",
     "variants": [
       {
         "id": "mass-5kg",
         "label": "5 kg bucket \u00b7 Double Rich Chocolate",
         "pricePaise": 349900,
         "stock": null,
-        "image": "assets/nitro-mass-5kg.jpg"
+        "image": "assets/Screenshot_2026_1103_003852.jpg"
       },
       {
         "id": "mass-3kg",

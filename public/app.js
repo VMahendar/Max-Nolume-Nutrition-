@@ -38,7 +38,7 @@ function priceBlock(v){
  const label=pricingTier==='gym'?'Gym price':pricingTier==='wholesale'?'Wholesale price':'Selling price';
  return `${mrp===null?'':`<span class="mrp-line">MRP ${discounted?`<del>${money(mrp)}</del>`:money(mrp)}</span>`}<span class="selling-price-label">${label}</span><strong class="selling-price">${price(v)}</strong>`;
 }
-function image(p,v,hero=false){const src=variantImage(p,v);return src?`<img class="${src.includes('nitro-mass-5kg')?'real-photo':''}" src="${esc(src)}" alt="${esc(p.name+' '+(v?.label||''))}" ${hero?'':'loading="lazy"'} data-product-image="${esc(src)}">`:'';}
+function image(p,v,hero=false){const src=variantImage(p,v);return src?`<img class="${(v?.id==='mass-5kg'||src.includes('nitro-mass-5kg'))?'real-photo':''}" src="${esc(src)}" alt="${esc(p.name+' '+(v?.label||''))}" ${hero?'':'loading="lazy"'} data-product-image="${esc(src)}">`:'';}
 function fallbacks(){document.querySelectorAll('.retail-hero-art>img').forEach(img=>{img.onerror=()=>{img.hidden=true;};if(img.complete&&img.naturalWidth===0)img.hidden=true;});document.querySelectorAll('img[data-product-image]').forEach(img=>{
  img.onerror=()=>{
   const source=img.dataset.productImage;

@@ -25,7 +25,7 @@ Legacy catalogues can read these reference MRPs only when product ID, variant ID
 
 The customer storefront excludes products with no image and variants with explicit null images. Variant images otherwise inherit the product image. If a photo fails to load, affected variants/cards are removed and saved-cart lines are sanitized. No empty photo placeholders are displayed. Backend products, inventory and historical order records are retained for administration.
 
-The clean 5 kg bucket photo supplied in chat still needs its original file uploaded to the PR branch. The current existing 5 kg photograph remains until the exact replacement is available; the new image has not been invented or regenerated.
+The owner's clean 5 kg bucket upload, `public/assets/Screenshot_2026_1103_003852.jpg`, is now used unchanged. Both product and 5 kg variant references are updated. Existing catalogues using the exact old photo path read the new reference without resetting prices, stock or historical data; custom image overrides and the explicitly image-less 3 kg pack are preserved.
 
 ## Verification
 

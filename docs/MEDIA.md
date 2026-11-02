@@ -36,6 +36,8 @@ The header/footer now apply `brand-cutout.svg#gold-on-transparent` to the existi
 The official distributor section uses the owner's unchanged upload `public/assets/IMG-20261102-WA0019.jpg`, added in commit bb527dbf38f1043bbaa784261df73885e58889f6. It displays the complete document, with a full-size link. No image generation, crop, background filter or text edit is applied. The original public asset is served by the existing Node.js backend; no external image origin is needed.
 
 
-## Requested clean Nitro Mass 5 kg photograph — file pending
+## Approved clean Nitro Mass 5 kg photograph
 
-The owner supplied a clean 5 kg Double Rich Chocolate bucket image in chat. Its original file bytes are not present in the workspace, PR comments or assets folder. The previous actual bucket photo remains in use pending that exact upload; no generated/reconstructed product photo is substituted. Add the original image to public/assets on codex/complete-store-review, as with the certificate, then update the product and 5 kg variant image paths. The explicitly image-less 3 kg variant and Musclevite card are hidden from the storefront.
+The owner uploaded `public/assets/Screenshot_2026_1103_003852.jpg` in commit e63bf4191dc034e178cdc63b69d06bf5a934414e. The 708×707 JPEG is used unchanged for Nitro Mass and its 5 kg Double Rich Chocolate variant in cards and product details. Its uploaded Git blob is `173e8340abc3fb77a47fb7a1d1f0550f0217e562`.
+
+The original store photograph remains in the repository. Existing catalogues using exactly that old Nitro/5 kg image path read the approved image reference without changing stored prices, stock, orders or custom photo overrides. The 3 kg image stays null and that pack remains hidden. The new bucket image is contained in its frame, with no crop, background blend or colour filter. The selling price remains ₹3,499.

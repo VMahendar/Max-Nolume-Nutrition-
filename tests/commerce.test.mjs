@@ -25,3 +25,17 @@ test('legacy MRP references preserve explicit overrides, selling prices and stoc
   assert.equal(visible.variants[0].mrpPaise,149900);assert.equal(visible.variants[0].pricePaise,89900);assert.equal(visible.variants[0].stock,7);assert.equal(visible.variants[1].mrpPaise,null);
  }finally{C.db.close();rmSync(dir,{recursive:true,force:true});}
 });
+test('approved 5 kg image replaces legacy references while retaining stock, prices and custom pack images',()=>{
+ const dir=mkdtempSync(resolve(tmpdir(),'mvn-mass-photo-')),C=openCommerce(dir);
+ try{
+  const p=C.catalogue(null,true).find(p=>p.id==='nitro-mass'),old='assets/nitro-mass-5kg.jpg',approved='assets/Screenshot_2026_1103_003852.jpg';
+  p.image=old;p.variants.find(v=>v.id==='mass-5kg').image=old;
+  C.db.prepare('UPDATE products SET data=? WHERE id=?').run(JSON.stringify(p),p.id);
+  C.db.prepare('UPDATE inventory SET on_hand=7 WHERE variant_id=?').run('mass-5kg');
+  const updated=C.catalogue(null).find(p=>p.id==='nitro-mass');
+  assert.equal(updated.image,approved);assert.equal(updated.variants[0].image,approved);assert.equal(updated.variants[0].pricePaise,349900);assert.equal(updated.variants[0].stock,7);assert.equal(updated.variants[1].image,null);
+  p.image='assets/custom.jpg';p.variants[0].image='assets/custom-pack.jpg';C.db.prepare('UPDATE products SET data=? WHERE id=?').run(JSON.stringify(p),p.id);
+  const custom=C.catalogue(null).find(p=>p.id==='nitro-mass');assert.equal(custom.image,'assets/custom.jpg');assert.equal(custom.variants[0].image,'assets/custom-pack.jpg');
+  assert.equal(C.db.prepare('SELECT COUNT(*) n FROM orders').get().n,0);
+ }finally{C.db.close();rmSync(dir,{recursive:true,force:true});}
+});
