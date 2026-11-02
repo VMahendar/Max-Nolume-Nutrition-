@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <!-- Display only: keep original RGB; discard the neutral charcoal backdrop.
+       sRGB keeps the gold/background separation consistent across browsers. -->
+  <filter id="gold-on-transparent" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  7 0 -7 0 -0.03"/>
+  </filter>
+</svg>

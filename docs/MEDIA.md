@@ -26,3 +26,6 @@ Logo verification: served PNG bytes match the approved upload; header/footer ret
 ## Owner-requested logo text removal
 
 The current header/footer use `public/max-volume-logo-wide.png`, an image-edited derivative of the owner-shared full lockup. It contains the gold MV emblem and MAX VOLUME NUTRITION only. WHOLESALE & DISTRIBUTION, EST. 2026 and the lower-right star were removed at the owner's request. The original gold PNG is preserved separately and remains the favicon. The edited derivative is not byte-identical to the original attachment.
+
+
+The header/footer now apply `brand-cutout.svg#gold-on-transparent` to the existing wide PNG. This display filter retains the gold RGB values and removes the neutral textured backdrop, so each logo blends with the full charcoal surface. The wide PNG itself is unchanged by this fix. A generative background-removal candidate was rejected because it altered lettering; it is not used by the website.

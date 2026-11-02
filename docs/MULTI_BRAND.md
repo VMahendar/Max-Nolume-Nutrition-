@@ -11,7 +11,7 @@ The existing store now uses charcoal, warm gold and ivory with a compact shoppin
 
 ## Logo and media
 
-The owner requested removing “WHOLESALE & DISTRIBUTION”, “EST. 2026” and the lower-right star from the newly shared full logo. `public/max-volume-logo-wide.png` is the resulting image edit, used as one image containing the gold MV symbol and MAX VOLUME NUTRITION lettering in the header and footer. No separate HTML tagline is displayed. Responsive frames hide blank outer background while retaining the artwork's proportions.
+The owner requested removing “WHOLESALE & DISTRIBUTION”, “EST. 2026” and the lower-right star from the newly shared full logo. `public/max-volume-logo-wide.png` is the resulting image edit, used as one image containing the gold MV symbol and MAX VOLUME NUTRITION lettering in the header and footer. No separate HTML tagline is displayed. Responsive frames hide blank outer background while retaining the artwork's proportions. A local SVG display filter (`public/brand-cutout.svg`) makes the neutral textured backdrop transparent, so the logo sits directly on the header/footer charcoal without a rectangular panel. It retains the source RGB values and does not rewrite the logo PNG.
 
 This is an image-edited derivative, not a byte-identical copy of the chat attachment. The earlier approved source and `public/max-volume-logo.png` remain unchanged as retained originals; the latter is still the gold MV favicon.
 
