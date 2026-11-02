@@ -5,6 +5,7 @@
 2026-11-02, Node 24.19.0 and system Chromium via Python Playwright:
 
 - `npm run check`: JS syntax check, Node tests and static/plugin package build passed.
+- Artifact isolation test passed: only the five public files enter the Pages artifact; plugin/backend files stay separate.
 - `node tests/storefront.test.js`: six named tests passed: issue prices, corrupted/untrusted storage, valid quote reload/quantity bounds, search/category/empty results, variant price/stock messaging, drawer/storage failure.
 - `python3 tests/browser.py`: desktop 1440px and mobile 390px; browse, mass 5 kg price, quote add, localStorage reload, search/no matches, Escape, no horizontal overflow and no JS page errors. External image traffic intentionally blocked in browser tests.
 - Existing three revakanya.com image URLs returned HTTP 200 via configured network. This confirms reachability only, not approval/authenticity.
