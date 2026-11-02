@@ -9,11 +9,11 @@ The existing store now uses charcoal, warm gold and ivory with a compact shoppin
 - `public/brands.json` supplies presentation copy and explicit distributor flags. A stocked product's brand controls availability and the brand filter. Additional product brands receive a generic card automatically, without a distributor badge.
 - The administrator product editor includes a Brand field. The API validates and persists it and retains it on legacy edits that omit the field. Original seeded products receive their legacy Unicorn brand when loaded from an older database, without resetting inventory or orders.
 
-## Distributor certificate — original asset pending
+## Distributor certificate
 
-The owner supplied a chat preview of a Unicorn Pro Series authorized distributor certificate naming Max Volume Nutrition and Revakanya Industries Pvt. Ltd. The original attachment bytes are unavailable in this execution workspace and the PR branch, so the certificate has not been regenerated, reconstructed or published.
+The owner uploaded `public/assets/IMG-20261102-WA0019.jpg` to this branch in commit bb527dbf38f1043bbaa784261df73885e58889f6. The website uses that exact repository image, configured in the Unicorn entry's `certificateImage` field in `public/brands.json`.
 
-A responsive certificate figure and full-size image link are prepared in the official distributor section. It remains hidden, with no image request or broken link, while the Unicorn entry's `certificateImage` in `public/brands.json` is null. To activate it, add the original image as `public/assets/unicorn-authorized-distributor-certificate.png` (or the actual JPG/WebP filename) and set `certificateImage` to its `assets/...` path. The preview appears only after the original image loads; missing or external images remain hidden. The certificate receives no logo color filter, crop or image edit.
+The official distributor section displays the complete image and a full-size link. The certificate is not regenerated, reconstructed, cropped or filtered. The served JPEG is byte-identical to the owner's uploaded file. The viewer accepts local image paths and stays hidden if the asset is absent or fails to load. No external image host or image-policy change is required.
 
 ## Logo and media
 

@@ -29,3 +29,8 @@ The current header/footer use `public/max-volume-logo-wide.png`, an image-edited
 
 
 The header/footer now apply `brand-cutout.svg#gold-on-transparent` to the existing wide PNG. This display filter retains the gold RGB values and removes the neutral textured backdrop, so each logo blends with the full charcoal surface. The wide PNG itself is unchanged by this fix. A generative background-removal candidate was rejected because it altered lettering; it is not used by the website.
+
+
+## Distributor certificate original
+
+The official distributor section uses the owner's unchanged upload `public/assets/IMG-20261102-WA0019.jpg`, added in commit bb527dbf38f1043bbaa784261df73885e58889f6. It displays the complete document, with a full-size link. No image generation, crop, background filter or text edit is applied. The original public asset is served by the existing Node.js backend; no external image origin is needed.
