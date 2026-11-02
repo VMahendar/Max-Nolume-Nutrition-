@@ -35,3 +35,14 @@ Free services can sleep after inactivity; the first page load can take about one
 Wait for the deployment to become live. Confirm the returned HTTPS URL works and prompts for the staging password; anonymous HTML/images/API requests must not reveal the website. Confirm the exact gold PNG is served, test account login/admin access works, cart works, and payment/shipping readiness are both false. Supply the actual verified URL to the owner. Do not report a URL before it exists.
 
 Official references: https://render.com/docs/free and https://render.com/docs/outbound-bandwidth.
+
+## Created Free preview
+
+- Actual HTTPS URL: https://max-volume-nutrition-preview.onrender.com
+- Render service: `srv-dbk8a33bc2fs73enbmf0`, Max Volume Nutrition workspace, Singapore.
+- Explicit plan: `free`; no disk or paid resources; auto-deploy off.
+- Deployment `dep-dbk8a3rbc2fs73enbojg` reached `live` from commit `e46b74ba9a0a909f6af02552c512fd34414edf0f`.
+- Render build passed the 27 tests; runtime logs confirm isolated test-data initialization and the staging entry point.
+- Owner confirmed Hobby with no payment method before service creation.
+- Staging access and test-account passwords are held privately; never commit them to the repository or PR.
+- Direct external browser/HTTP checks from this execution environment were blocked by its network policy; hosted UI verification must not be claimed as completed. Render reports the service live.
