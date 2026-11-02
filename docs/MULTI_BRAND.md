@@ -9,6 +9,12 @@ The existing store now uses charcoal, warm gold and ivory with a compact shoppin
 - `public/brands.json` supplies presentation copy and explicit distributor flags. A stocked product's brand controls availability and the brand filter. Additional product brands receive a generic card automatically, without a distributor badge.
 - The administrator product editor includes a Brand field. The API validates and persists it and retains it on legacy edits that omit the field. Original seeded products receive their legacy Unicorn brand when loaded from an older database, without resetting inventory or orders.
 
+## Distributor certificate — original asset pending
+
+The owner supplied a chat preview of a Unicorn Pro Series authorized distributor certificate naming Max Volume Nutrition and Revakanya Industries Pvt. Ltd. The original attachment bytes are unavailable in this execution workspace and the PR branch, so the certificate has not been regenerated, reconstructed or published.
+
+A responsive certificate figure and full-size image link are prepared in the official distributor section. It remains hidden, with no image request or broken link, while the Unicorn entry's `certificateImage` in `public/brands.json` is null. To activate it, add the original image as `public/assets/unicorn-authorized-distributor-certificate.png` (or the actual JPG/WebP filename) and set `certificateImage` to its `assets/...` path. The preview appears only after the original image loads; missing or external images remain hidden. The certificate receives no logo color filter, crop or image edit.
+
 ## Logo and media
 
 The owner requested removing “WHOLESALE & DISTRIBUTION”, “EST. 2026” and the lower-right star from the newly shared full logo. `public/max-volume-logo-wide.png` is the resulting image edit, used as one image containing the gold MV symbol and MAX VOLUME NUTRITION lettering in the header and footer. No separate HTML tagline is displayed. Responsive frames hide blank outer background while retaining the artwork's proportions. A local SVG display filter (`public/brand-cutout.svg`) makes the neutral textured backdrop transparent, so the logo sits directly on the header/footer charcoal without a rectangular panel. It retains the source RGB values and does not rewrite the logo PNG.

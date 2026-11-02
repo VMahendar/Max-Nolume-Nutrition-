@@ -344,3 +344,10 @@ footer .brand.brand-lockup{width:280px;height:147.6px}
 
 /* The original gold artwork sits directly on each surface, with no image panel. */
 .brand.brand-lockup .brand-logo{filter:url("brand-cutout.svg#gold-on-transparent")}
+
+/* Display the supplied certificate in full; its document pixels are never filtered. */
+.distributor-certificate{margin:25px 0 0;max-width:760px;width:100%}
+.certificate-preview{display:block;padding:9px;background:#fffdf8;border:1px solid #ccba94;border-radius:4px;color:#785e2c}
+.certificate-preview img{display:block;width:100%;height:auto;object-fit:contain;filter:none}
+.certificate-preview>span{display:block;padding:10px 4px 3px;font-size:12px;font-weight:700}
+.distributor-certificate figcaption{margin-top:8px;font-size:10px;color:#727361}

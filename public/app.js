@@ -16,6 +16,18 @@ function renderBrands(){
     return `<article class="brand-card ${available?'':'is-planned'}"><span class="brand-symbol" aria-hidden="true">${esc(b.initials)}</span><div class="brand-copy"><h3>${esc(b.name)}</h3><span class="brand-tag ${available?'':'planned'}">${b.tamilNaduDistributor?'Tamil Nadu Distributor':available?'Current range':'Coming soon'}</span><p>${esc(description)}</p>${available?`<button data-brand="${esc(b.name)}">Shop the range →</button>`:''}</div></article>`;
   }).join('');
   $('brandFilter').innerHTML='<option value="All">All brands</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  renderCertificate();
+}
+function renderCertificate(){
+  const figure=$('distributorCertificate'),image=$('certificateImage'),link=$('certificateLink');
+  figure.hidden=true;
+  const source=brands.find(b=>b.id==='unicorn')?.certificateImage;
+  // The original document must be supplied as a local image asset.
+  if(typeof source!=='string'||!/^assets\/[a-z0-9][a-z0-9._-]*\.(?:png|jpe?g|webp)$/i.test(source))return;
+  image.onload=()=>{figure.hidden=false;};
+  image.onerror=()=>{figure.hidden=true;link.removeAttribute('href');};
+  link.href=source;
+  image.src=source;
 }
 const variant=id=>{for(const p of products){const v=p.variants.find(v=>v.id===id);if(v)return {p,v};}return null;};
 const price=v=>Number.isSafeInteger(v.pricePaise)&&v.pricePaise>0?money(v.pricePaise):pricingTier==='retail'?'Price being updated':'Business price awaiting confirmation';
