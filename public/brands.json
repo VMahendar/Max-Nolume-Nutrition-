@@ -1,0 +1,5 @@
+[
+  {"id":"unicorn","name":"Unicorn Pro Series","initials":"U","status":"available","tamilNaduDistributor":true,"description":"Explore our current protein, mass gainer, creatine and training range."},
+  {"id":"muscletech","name":"MuscleTech","initials":"MT","status":"coming-soon","tamilNaduDistributor":false,"description":"Planned for our growing multi-brand collection. Product availability will be announced."},
+  {"id":"on","name":"ON","initials":"ON","status":"coming-soon","tamilNaduDistributor":false,"description":"A future brand addition. Range and availability will be confirmed before listing."}
+]

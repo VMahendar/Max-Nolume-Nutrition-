@@ -27,3 +27,27 @@ test('mocked Shiprocket creates one shipment and records tracking; duplicate cre
 test('uncertain provider reference is recovered only after receipt and amount verification',async()=>{const f=await fixture({FIXTURE_PROVIDER_FAILURE:'timeout'});try{const a=f.client();await a('/api/register',{name:'Admin',email:customer.email,password});f.db.prepare("UPDATE users SET role='admin' WHERE email=?").run(customer.email);const p={items:[{variantId:'a',quantity:1}],customer,acceptedTerms:true},headers={'Idempotency-Key':randomUUID()};assert.equal((await a('/api/checkout',p,headers)).status,500);const row=f.db.prepare('SELECT * FROM orders').get();assert.equal((await a('/api/admin/recover-order',{id:row.id,providerOrderId:'order_lost'})).status,200);const retry=await a('/api/checkout',p,headers);assert.equal(retry.status,200);assert.equal(retry.body.providerOrderId,'order_lost');assert.equal(f.db.prepare('SELECT COUNT(*) n FROM orders').get().n,1);}finally{await f.close();}});
 test('guest order import requires both its secret and matching account email',async()=>{const f=await fixture();try{const guest=f.client(),p={items:[{variantId:'a',quantity:1}],customer,acceptedTerms:true};const created=await guest('/api/checkout',p);const a=f.client();await a('/api/register',{name:'Customer',email:customer.email,password});assert.equal((await a('/api/me/claim-order',{id:created.body.id,token:'wrong'})).status,404);assert.equal((await a('/api/me/orders')).body.orders.length,0);assert.equal((await a('/api/me/claim-order',{id:created.body.id,token:created.body.token})).status,200);assert.equal((await a('/api/me/orders')).body.orders.length,1);const b=f.client();await b('/api/register',{name:'Other',email:'other@example.com',password});assert.equal((await b('/api/me/claim-order',{id:created.body.id,token:created.body.token})).status,404);}finally{await f.close();}});
 test('valid-shaped credentials cannot activate integrations without testing flags',async()=>{const f=await fixture({RAZORPAY_TESTED:'false',SHIPROCKET_ENABLED:'true',SHIPROCKET_TESTED:'false',SHIPROCKET_EMAIL:'fixture@example.com',SHIPROCKET_PASSWORD:'fixture-only',SHIPROCKET_PICKUP:'Fixture'});try{const a=f.client();assert.equal((await a('/api/catalog')).body.paymentReady,false);assert.equal((await a('/api/checkout',{items:[{variantId:'a',quantity:1}],customer,acceptedTerms:true})).status,503);await a('/api/register',{name:'Admin',email:customer.email,password});f.db.prepare("UPDATE users SET role='admin' WHERE email=?").run(customer.email);assert.equal((await a('/api/admin/overview')).body.shippingReady,false);assert.equal((await a('/api/admin/shipping-rates',{id:'anything',pickupPostcode:'600001',weight:1})).status,503);}finally{await f.close();}});
+test('product brands survive administrator edits without changing retail or trade prices',async()=>{
+  const f=await fixture();
+  try{
+    const admin=f.client(),guest=f.client();
+    await admin('/api/register',{name:'Admin',email:'admin@example.com',password});
+    f.db.prepare("UPDATE users SET role='admin' WHERE email='admin@example.com'").run();
+    const p=(await admin('/api/admin/overview')).body.products[0];
+    const originalPrices=structuredClone(p.variants);
+    assert.equal((await guest('/api/admin/product',{...p,brand:'Unapproved edit'})).status,401);
+    assert.equal((await admin('/api/admin/product',{...p,brand:'MuscleTech'})).status,200);
+    let publicProduct=(await guest('/api/catalog')).body.products[0];
+    assert.equal(publicProduct.brand,'MuscleTech');
+    assert.equal(publicProduct.variants[0].pricePaise,10000);
+    assert.equal(publicProduct.variants[0].prices,undefined);
+    const saved=(await admin('/api/admin/overview')).body.products[0];
+    assert.deepEqual(saved.variants.map(v=>({pricePaise:v.pricePaise,prices:v.prices})),originalPrices.map(v=>({pricePaise:v.pricePaise,prices:v.prices})));
+    delete saved.brand;
+    assert.equal((await admin('/api/admin/product',{...saved,description:'Updated pack information'})).status,200);
+    publicProduct=(await guest('/api/catalog')).body.products[0];
+    assert.equal(publicProduct.brand,'MuscleTech');
+    assert.equal(publicProduct.description,'Updated pack information');
+    assert.equal((await admin('/api/admin/product',{...saved,brand:'x'.repeat(101)})).status,400);
+  }finally{await f.close();}
+});

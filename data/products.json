@@ -19,7 +19,8 @@
         "pricePaise": 499900,
         "stock": null
       }
-    ]
+    ],
+    "brand": "Unicorn Pro Series"
   },
   {
     "id": "nitro-mass",
@@ -43,7 +44,8 @@
         "stock": null,
         "image": null
       }
-    ]
+    ],
+    "brand": "Unicorn Pro Series"
   },
   {
     "id": "pro-creatine",
@@ -65,7 +67,8 @@
         "pricePaise": 89900,
         "stock": null
       }
-    ]
+    ],
+    "brand": "Unicorn Pro Series"
   },
   {
     "id": "sturdy-pre",
@@ -81,7 +84,8 @@
         "pricePaise": 139900,
         "stock": null
       }
-    ]
+    ],
+    "brand": "Unicorn Pro Series"
   },
   {
     "id": "musclevite",
@@ -97,6 +101,7 @@
         "pricePaise": 69900,
         "stock": null
       }
-    ]
+    ],
+    "brand": "Unicorn Pro Series"
   }
 ]
