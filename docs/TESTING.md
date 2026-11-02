@@ -20,6 +20,10 @@ find commerce -name '*.php' -exec php -l {} \;
 
 The checked-in tests cover public/approved tier prices, inherited product restrictions, unauthorized price denial, MOQ, invalid private price fallback, revocation, tier SQL query conditions, variation cache partitioning, public metadata stripping, denied Store API and signed-out application/quote denial. Build and `git diff --check` must also pass. CI lint failures fail the job.
 
+## GitHub CI
+
+Commerce checks passed on implementation commit `d1c6d7382c62d0eff542f353044276bed2c08ee0`: https://github.com/VMahendar/Max-Volume-Nutrition-/actions/runs/41448968656 . This includes native PHP lint/contract tests, Node checks/build and plugin artifact upload. It does not run a WordPress database or provider integration.
+
 ## Staging matrix — not yet executed
 
 | Area | Required cases and expected evidence |
