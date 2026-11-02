@@ -51,3 +51,18 @@ test('product brands survive administrator edits without changing retail or trad
     assert.equal((await admin('/api/admin/product',{...saved,brand:'x'.repeat(101)})).status,400);
   }finally{await f.close();}
 });
+test('admin MRP edits preserve selling prices, survive omitted fields and reject prices above MRP',async()=>{
+ const f=await fixture();try{
+  const admin=f.client(),guest=f.client();await admin('/api/register',{name:'Admin',email:'admin@example.com',password});f.db.prepare("UPDATE users SET role='admin' WHERE email='admin@example.com'").run();
+  let p=(await admin('/api/admin/overview')).body.products[0];p.variants[0].mrpPaise=15000;
+  assert.equal((await guest('/api/admin/product',p)).status,401);
+  assert.equal((await admin('/api/admin/product',p)).status,200);
+  let v=(await guest('/api/catalog')).body.products[0].variants[0];assert.equal(v.mrpPaise,15000);assert.equal(v.pricePaise,10000);assert.equal(v.prices,undefined);
+  for(const mrpPaise of [0,-1,9999,15000.5])assert.equal((await admin('/api/admin/product',{...p,variants:[{...p.variants[0],mrpPaise}]})).status,400);
+  assert.equal((await admin('/api/admin/product',{...p,variants:[{...p.variants[0],prices:{gym:16000}}]})).status,400);
+  p=(await admin('/api/admin/overview')).body.products[0];delete p.variants[0].mrpPaise;
+  assert.equal((await admin('/api/admin/product',p)).status,200);assert.equal((await guest('/api/catalog')).body.products[0].variants[0].mrpPaise,15000);
+  p.variants[0].mrpPaise=null;assert.equal((await admin('/api/admin/product',p)).status,200);
+  v=(await guest('/api/catalog')).body.products[0].variants[0];assert.equal(v.mrpPaise,null);assert.equal(v.pricePaise,10000);
+ }finally{await f.close();}
+});

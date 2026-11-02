@@ -1,6 +1,6 @@
 # Existing catalogue and brand asset checklist
 
-The existing PR storefront, navy/royal-blue and silver design, wordmark, actual Nitro Mass 5 kg photograph, descriptions, product IDs, variants and retail prices are retained. No replacement logo was drawn or generated. The owner approved `ChatGPT Image Oct 30, 2026, 04_06_49 PM.png` as the official gold MV logo. `public/max-volume-logo.png` is a byte-for-byte copy of that upload and is used in the header, footer and PNG favicon. CSS scales the complete image proportionally without cropping, filters or colour changes. The gold colour, black background and circular design are preserved. The owner superseded the earlier blue/silver inner-grid logo instructions; the surrounding storefront theme is otherwise unchanged.
+The existing storefront uses the owner's gold MV logo, a charcoal/gold/ivory theme, the approved catalogue and original selling prices. The original logo upload is preserved as `public/max-volume-logo.png` and remains the favicon; the header/footer use the owner-requested wide derivative described below.
 
 Three unchanged manufacturer-reference images were downloaded after their existing URLs returned HTTP 200 with PNG content:
 
@@ -18,7 +18,7 @@ Owner inputs still required:
 - Confirmed photographs matching each whey, creatine and pre-workout flavour/size.
 - Verified manufacturer ingredients, nutrition, allergens, directions and warnings from the relevant labels.
 
-Unknown packs retain their existing honest placeholder. No ingredient facts, pack sizes, stock quantities or discounts have been invented.
+Products and variants without a usable image are hidden from the customer storefront. Their backend records, inventory and historical orders are retained. Broken product images are hidden too, and affected saved-cart lines are removed. No ingredient facts, pack sizes, stock quantities or discounts have been invented.
 
 Logo verification: served PNG bytes match the approved upload; header/footer retain the original 1291:1218 aspect ratio. Browser checks cover desktop, tablet and narrow-mobile sizes; favicon links reference the same PNG on every HTML page.
 
@@ -34,3 +34,8 @@ The header/footer now apply `brand-cutout.svg#gold-on-transparent` to the existi
 ## Distributor certificate original
 
 The official distributor section uses the owner's unchanged upload `public/assets/IMG-20261102-WA0019.jpg`, added in commit bb527dbf38f1043bbaa784261df73885e58889f6. It displays the complete document, with a full-size link. No image generation, crop, background filter or text edit is applied. The original public asset is served by the existing Node.js backend; no external image origin is needed.
+
+
+## Requested clean Nitro Mass 5 kg photograph — file pending
+
+The owner supplied a clean 5 kg Double Rich Chocolate bucket image in chat. Its original file bytes are not present in the workspace, PR comments or assets folder. The previous actual bucket photo remains in use pending that exact upload; no generated/reconstructed product photo is substituted. Add the original image to public/assets on codex/complete-store-review, as with the certificate, then update the product and 5 kg variant image paths. The explicitly image-less 3 kg variant and Musclevite card are hidden from the storefront.

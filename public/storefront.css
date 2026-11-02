@@ -351,3 +351,10 @@ footer .brand.brand-lockup{width:280px;height:147.6px}
 .certificate-preview img{display:block;width:100%;height:auto;object-fit:contain;filter:none}
 .certificate-preview>span{display:block;padding:10px 4px 3px;font-size:12px;font-weight:700}
 .distributor-certificate figcaption{margin-top:8px;font-size:10px;color:#727361}
+
+/* Printed MRP is shown only when confirmed; actual selling prices stay unchanged. */
+.product-price .mrp-line{display:block;font-size:11px;font-weight:400;color:#6b6c5f;line-height:1.5;margin-bottom:3px}
+.product-price .mrp-line del{color:#77786b;text-decoration-thickness:1px}
+.product-price .selling-price-label{display:block;font-size:9px;font-weight:400;color:#676a59;line-height:1.4}
+.product-price .selling-price{display:block;font-size:19px;line-height:1.5;font-weight:700}
+@media(max-width:650px){.product-price .mrp-line{font-size:10px}.product-price .selling-price{font-size:17px}}

@@ -9,15 +9,17 @@
     "variants": [
       {
         "id": "whey-chocolate",
-        "label": "5 lb · Chocolate",
+        "label": "5 lb \u00b7 Chocolate",
         "pricePaise": 499900,
-        "stock": null
+        "stock": null,
+        "mrpPaise": 859900
       },
       {
         "id": "whey-coffee",
-        "label": "5 lb · Coffee",
+        "label": "5 lb \u00b7 Coffee",
         "pricePaise": 499900,
-        "stock": null
+        "stock": null,
+        "mrpPaise": 859900
       }
     ],
     "brand": "Unicorn Pro Series"
@@ -32,14 +34,14 @@
     "variants": [
       {
         "id": "mass-5kg",
-        "label": "5 kg bucket · Double Rich Chocolate",
+        "label": "5 kg bucket \u00b7 Double Rich Chocolate",
         "pricePaise": 349900,
         "stock": null,
         "image": "assets/nitro-mass-5kg.jpg"
       },
       {
         "id": "mass-3kg",
-        "label": "3 kg · Pack to confirm",
+        "label": "3 kg \u00b7 Pack to confirm",
         "pricePaise": 259900,
         "stock": null,
         "image": null
@@ -57,15 +59,17 @@
     "variants": [
       {
         "id": "creatine-blueberry",
-        "label": "100 g · Blueberry",
+        "label": "100 g \u00b7 Blueberry",
         "pricePaise": 89900,
-        "stock": null
+        "stock": null,
+        "mrpPaise": 149900
       },
       {
         "id": "creatine-cranberry",
-        "label": "100 g · Cranberry",
+        "label": "100 g \u00b7 Cranberry",
         "pricePaise": 89900,
-        "stock": null
+        "stock": null,
+        "mrpPaise": 149900
       }
     ],
     "brand": "Unicorn Pro Series"
@@ -80,7 +84,7 @@
     "variants": [
       {
         "id": "pre-watermelon",
-        "label": "250 g · Watermelon",
+        "label": "250 g \u00b7 Watermelon",
         "pricePaise": 139900,
         "stock": null
       }
