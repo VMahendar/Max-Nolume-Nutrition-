@@ -14,7 +14,7 @@ The owner has cancelled the paid hosting proposal. Do not create a paid service,
 - Start: `npm run start:staging`.
 - `NODE_ENV=production`, `NODE_VERSION=24.19.0`, `HOST=0.0.0.0`, `STAGING_MODE=true`.
 - `DATA_DIR=/tmp/mvn-free-preview` (temporary SQLite/test data).
-- Set separate strong site-access, test-admin and test-customer passwords through private hosting settings. Store only the site-access password hash in `STAGING_PASSWORD_HASH`.
+- Set strong test-admin and test-customer passwords through private hosting settings. The owner approved public browsing: set `STAGING_PUBLIC_BROWSING=true`; customers do not need a site-wide username/password. App accounts and administrator permissions remain protected.
 - `PUBLIC_ORIGIN` is derived by the staging entry point from Render's actual `RENDER_EXTERNAL_URL`; do not invent a preview hostname.
 - Keep `PAYMENTS_ENABLED`, `RAZORPAY_TESTED`, `LIVE_PAYMENTS_APPROVED`, `POLICIES_APPROVED`, `SHIPROCKET_ENABLED` and `SHIPROCKET_TESTED` false. Do not configure Razorpay/Shiprocket credentials.
 
@@ -46,3 +46,7 @@ Official references: https://render.com/docs/free and https://render.com/docs/ou
 - Owner confirmed Hobby with no payment method before service creation.
 - Staging access and test-account passwords are held privately; never commit them to the repository or PR.
 - Direct external browser/HTTP checks from this execution environment were blocked by its network policy; hosted UI verification must not be claimed as completed. Render reports the service live.
+
+## Owner-approved public browsing
+
+The owner explicitly approved removing the site-wide preview password. `STAGING_PUBLIC_BROWSING=true` opens the storefront, assets, cart, customer registration and login without HTTP Basic Authentication. Customer order history still requires its account session, and administrative APIs require an administrator session. Payment and courier integrations remain disabled. The test-data marker remains mandatory. This access change does not merge main or change the Free plan.

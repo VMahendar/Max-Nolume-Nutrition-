@@ -5,8 +5,9 @@ import {passwordMatches} from './commerce.mjs';
 
 export function stagingGate(env=process.env){
   if(env.STAGING_MODE!=='true')return async()=>true;
+  const publicBrowsing=env.STAGING_PUBLIC_BROWSING==='true';
   const username=env.STAGING_USERNAME,stored=env.STAGING_PASSWORD_HASH;
-  if(!username||!/^[a-zA-Z0-9._-]{1,64}$/.test(username)||!/^([a-f0-9]{32}):([a-f0-9]{128})$/.test(stored||''))throw Error('Staging requires a username and a valid password hash.');
+  if(!publicBrowsing&&(!username||!/^[a-zA-Z0-9._-]{1,64}$/.test(username)||!/^([a-f0-9]{32}):([a-f0-9]{128})$/.test(stored||'')))throw Error('Staging requires a username and a valid password hash.');
   const directory=env.DATA_DIR;
   let marker;try{marker=JSON.parse(readFileSync(resolve(directory||'', 'staging-only.json'),'utf8'));}catch{}
   if(!directory||marker?.purpose!=='mvn-staging-test-data'||marker.version!==1)throw Error('Staging requires an isolated, initialized test-data directory.');
@@ -15,6 +16,8 @@ export function stagingGate(env=process.env){
   return async(req,res)=>{
     res.setHeader('X-Robots-Tag','noindex, nofollow, noarchive');
     res.setHeader('Cache-Control','no-store');
+    // Customer/admin authorization remains enforced by the application's own routes.
+    if(publicBrowsing)return true;
     if(req.url==='/healthz'&&['GET','HEAD'].includes(req.method))return true;
     const header=req.headers.authorization||'';
     const reject=(status=401)=>{res.writeHead(status,{'Content-Type':'text/plain; charset=utf-8',...(status===401?{'WWW-Authenticate':'Basic realm="Max Volume Nutrition staging", charset="UTF-8"'}:{'Retry-After':'60'})});res.end(status===401?'Staging access requires a password.':'Too many attempts. Try again in a minute.');return false;};
