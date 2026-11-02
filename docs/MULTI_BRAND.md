@@ -11,7 +11,9 @@ The existing store now uses charcoal, warm gold and ivory with a compact shoppin
 
 ## Logo and media
 
-The approved original upload, `ChatGPT Image Oct 30, 2026, 04_06_49 PM.png`, and the served `public/max-volume-logo.png` remain byte-identical and unmodified. The header, footer and favicon retain the existing approved PNG. No new brand logos were invented. The new horizontal reference shown in chat is not present as a repository file; this revision preserves the existing approved emblem asset.
+The owner requested removing “WHOLESALE & DISTRIBUTION”, “EST. 2026” and the lower-right star from the newly shared full logo. `public/max-volume-logo-wide.png` is the resulting image edit, used as one image containing the gold MV symbol and MAX VOLUME NUTRITION lettering in the header and footer. No separate HTML tagline is displayed. Responsive frames hide blank outer background while retaining the artwork's proportions.
+
+This is an image-edited derivative, not a byte-identical copy of the chat attachment. The earlier approved source and `public/max-volume-logo.png` remain unchanged as retained originals; the latter is still the gold MV favicon.
 
 Nitro Mass keeps the owner's actual bucket photograph. A clean pack image is still needed. Musclevite and Nitro Mass 3 kg assets/details remain pending as documented in MEDIA.md.
 

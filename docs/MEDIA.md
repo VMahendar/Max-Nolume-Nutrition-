@@ -21,3 +21,8 @@ Owner inputs still required:
 Unknown packs retain their existing honest placeholder. No ingredient facts, pack sizes, stock quantities or discounts have been invented.
 
 Logo verification: served PNG bytes match the approved upload; header/footer retain the original 1291:1218 aspect ratio. Browser checks cover desktop, tablet and narrow-mobile sizes; favicon links reference the same PNG on every HTML page.
+
+
+## Owner-requested logo text removal
+
+The current header/footer use `public/max-volume-logo-wide.png`, an image-edited derivative of the owner-shared full lockup. It contains the gold MV emblem and MAX VOLUME NUTRITION only. WHOLESALE & DISTRIBUTION, EST. 2026 and the lower-right star were removed at the owner's request. The original gold PNG is preserved separately and remains the favicon. The edited derivative is not byte-identical to the original attachment.

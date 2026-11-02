@@ -330,3 +330,14 @@ footer>div a{font-size:10px}
 .wholesale>div>p:not(.eyebrow){font-size:12px}
 }
 
+
+/* Owner-requested mark: MV emblem and MAX VOLUME NUTRITION only.
+   The frame hides excess blank background. The artwork keeps its aspect ratio. */
+.brand.brand-lockup{display:block;position:relative;overflow:hidden;width:235px;height:124px;flex-shrink:0;line-height:0}
+.brand.brand-lockup .brand-logo{position:absolute;display:block;width:108.68%;height:auto;max-width:none;left:-4.65%;top:-35.29%;object-fit:contain;transform:none;filter:none}
+header:has(.brand-lockup){height:150px;flex-wrap:nowrap}
+footer .brand.brand-lockup{width:280px;height:147.6px}
+@media(max-width:1100px){.brand.brand-lockup{width:210px;height:110.7px}header:has(.brand-lockup){height:137px}}
+@media(max-width:800px){.brand.brand-lockup{width:190px;height:100.2px}header:has(.brand-lockup){height:127px}}
+@media(max-width:650px){header.store-header:has(.brand-lockup){height:auto;min-height:0}header:has(.brand-lockup){height:122px}.brand.brand-lockup{width:190px;height:100.2px}footer .brand.brand-lockup{width:245px;height:129.2px}}
+@media(max-width:360px){.brand.brand-lockup{width:170px;height:89.6px}}
