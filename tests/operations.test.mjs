@@ -131,3 +131,37 @@ test('official hosted pack photos are accepted only from manufacturer image path
   }
  }finally{await f.close();}
 });
+
+test('wishlists are account-owned and genuine reviews require authenticated submission and administrator approval',async()=>{
+ const f=await fixture();try{
+  const guest=f.client(),a=f.client(),b=f.client(),admin=f.client();
+  assert.equal((await guest('/api/wishlist')).status,401);
+  assert.equal((await guest('/api/wishlist',{ids:['a']})).status,401);
+  assert.equal((await guest('/api/reviews',{productId:'product',rating:4,title:'Genuine feedback',body:'This is a detailed customer review.'})).status,401);
+  await a('/api/register',{name:'Alice Customer',email:'alice@example.com',password});
+  await b('/api/register',{name:'Bob Customer',email:'bob@example.com',password});
+  await admin('/api/register',{name:'Admin',email:'admin@example.com',password});
+  f.db.prepare("UPDATE users SET role='admin' WHERE email='admin@example.com'").run();
+  assert.equal((await a('/api/wishlist',{ids:['a','a'],userId:'someone-else'})).status,200);
+  assert.deepEqual((await a('/api/wishlist')).body.ids,['a']);assert.deepEqual((await b('/api/wishlist')).body.ids,[]);
+  assert.equal((await b('/api/wishlist',{ids:['unknown']})).status,400);
+  const payload={productId:'product',rating:4,title:'My product experience',body:'A real test review with enough detail.'};
+  assert.equal((await guest('/api/reviews?productId=product')).body.count,0);
+  assert.equal((await a('/api/reviews',{...payload,rating:6})).status,400);
+  assert.equal((await a('/api/reviews',{...payload,body:'Short'})).status,400);
+  assert.equal((await a('/api/reviews',{...payload,productId:'missing'})).status,404);
+  assert.equal((await a('/api/reviews',payload)).body.status,'pending');
+  let own=(await a('/api/reviews?productId=product')).body;assert.equal(own.myReview.status,'pending');assert.equal(own.count,0);
+  assert.equal((await b('/api/reviews?productId=product')).body.myReview,null);
+  assert.equal((await b('/api/admin/review',{id:own.myReview.id,status:'approved'})).status,403);
+  assert.equal((await admin('/api/admin/overview')).body.reviews.length,1);
+  assert.equal((await admin('/api/admin/review',{id:own.myReview.id,status:'approved'})).status,200);
+  let published=(await guest('/api/reviews?productId=product')).body;assert.equal(published.count,1);assert.equal(published.average,4);assert.equal(published.reviews[0].author,'Alice');assert.equal(published.reviews[0].email,undefined);assert.equal(published.reviews[0].user_id,undefined);
+  assert.equal((await a('/api/reviews',{...payload,rating:5,title:'Updated experience'})).status,200);
+  assert.equal((await guest('/api/reviews?productId=product')).body.count,0);
+  assert.equal(f.db.prepare('SELECT COUNT(*) count FROM product_reviews').get().count,1);
+  assert.equal((await admin('/api/admin/review',{id:own.myReview.id,status:'approved'})).status,200);
+  assert.equal((await guest('/api/reviews?productId=product')).body.average,5);
+  const product=(await guest('/api/catalog')).body.products[0];assert.equal(product.variants[0].pricePaise,10000);assert.equal(product.variants[0].stock,10);
+ }finally{await f.close();}
+});

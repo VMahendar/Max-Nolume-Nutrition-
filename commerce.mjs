@@ -24,6 +24,10 @@ CREATE TABLE IF NOT EXISTS audit(id INTEGER PRIMARY KEY,actor TEXT NOT NULL,acti
 CREATE TABLE IF NOT EXISTS invoices(order_id TEXT PRIMARY KEY REFERENCES orders(id),number TEXT UNIQUE NOT NULL,data TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS shipments(order_id TEXT PRIMARY KEY REFERENCES orders(id),status TEXT NOT NULL,data TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS counters(key TEXT PRIMARY KEY,value INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS user_wishlist(user_id TEXT NOT NULL REFERENCES users(id),variant_id TEXT NOT NULL,created TEXT NOT NULL,PRIMARY KEY(user_id,variant_id));
+CREATE TABLE IF NOT EXISTS product_reviews(id TEXT PRIMARY KEY,product_id TEXT NOT NULL REFERENCES products(id),user_id TEXT NOT NULL REFERENCES users(id),rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),title TEXT NOT NULL,body TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),created TEXT NOT NULL,updated TEXT NOT NULL,UNIQUE(product_id,user_id));
+CREATE INDEX IF NOT EXISTS product_review_status ON product_reviews(product_id,status);
+
 `);
 const columns=new Set(db.prepare('PRAGMA table_info(orders)').all().map(x=>x.name));for(const [name,type] of [['user_id','TEXT'],['request_key','TEXT'],['request_hash','TEXT'],['fulfilment',"TEXT NOT NULL DEFAULT 'unfulfilled'"]])if(!columns.has(name))db.exec(`ALTER TABLE orders ADD COLUMN ${name} ${type}`);
 db.exec('CREATE UNIQUE INDEX IF NOT EXISTS order_request ON orders(request_key); CREATE INDEX IF NOT EXISTS user_orders ON orders(user_id);');
