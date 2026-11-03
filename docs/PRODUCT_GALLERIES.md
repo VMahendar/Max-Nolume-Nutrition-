@@ -1,45 +1,38 @@
-# Product galleries — current-pack media import pending
+# Original product photos and galleries
 
-The requested manufacturer source is https://unicornproseries.com/. The owner confirmed that current Potency Whey stock uses white-and-blue packaging only and requested full original front/back/other views for the existing products. No replacement packaging or label images are generated.
+## Current white-and-blue Whey pack
 
-## Implemented in PR #1 and the Free preview
+The owner confirmed this exact official photograph as the current white-and-blue Potency Whey packaging:
 
-- Pack-specific `images` arrays at product or variant level; local/previous single-image catalogues continue to work.
-- Thumbnail selection, original-size dialog, zoom/panning, previous/next controls, keyboard arrows, Escape and an original-file link.
-- Full photo proportions and normal image colours; no cropping, logo filter or background blending on product photos.
-- Duplicate views removed. Failed secondary views are omitted while a working photo remains. Products are hidden only when the selected pack has no usable photos.
+https://unicornproseries.com/wp-content/uploads/2026/05/Potency-Whey-600x501-1.png
+
+The seeded catalogue, static catalogue and homepage use that original hosted image directly. It has not been downloaded, recoloured, cropped, regenerated or upscaled. The original host remains responsible for availability; normal image-failure handling hides a failed photo/product instead of restoring the retired black-and-gold pack.
+
+The administrator image policy accepts HTTPS raster files under the official host's dated WordPress uploads paths, including its www hostname. The browser content policy allows those image hosts only; scripts and API connection destinations are unchanged. Other hosts, deceptive URLs, traversal, encoded path segments, non-image extensions and query redirects are rejected.
+
+Existing saved Whey product/known-variant references to the exact retired local asset read the approved current image. Custom image overrides and explicit image-less overrides remain intact. Archived originals stay in source history, but the storefront continues excluding the retired local Whey artwork. Prices, stock, product/variant IDs and orders are unchanged.
+
+## Product gallery behavior
+
+- Pack-specific product/variant image arrays; duplicate and failed views are omitted.
+- Thumbnail selection, original-size dialog, zoom/panning, previous/next, keyboard arrows, Escape and an original-image link.
+- Complete image proportions and normal colours.
 - Explicit image-less variants do not inherit another pack's gallery. Variant-specific galleries do not inherit a different flavour's primary photo.
-- Administrator product gallery JSON field and per-variant gallery support. Image sources are validated using the existing approved local/manufacturer policy, limited to 20 photos, and retained when omitted from legacy product updates.
-- Selling prices, MRP rules, inventory, orders, dealer approval, the gold MV logo and the original distributor certificate are unchanged.
+- Admin gallery fields accept up to 20 validated sources and preserve omitted metadata.
 
-Example gallery metadata (illustrative paths, not imported manufacturer photos):
+The confirmed Whey file is labelled “Pack photo” and does not claim an exact flavour or an unseen angle. Only this original current-pack photo has been verified. The official back/side galleries could not be retrieved in this task. They have not been invented, generated, guessed or represented by duplicate copies of the same photo.
 
-```json
-{
-  "images": [
-    {"src": "assets/product-front.jpg", "label": "Front", "alt": "Original front of selected pack"},
-    {"src": "assets/product-back.jpg", "label": "Back", "alt": "Original back label of selected pack"}
-  ]
-}
-```
+A true 360° rotation needs a complete ordered sequence of original angles. The current gallery provides image viewing and zoom; it is not a 360° capture.
 
-The main image remains first unless it is explicitly included in the gallery order. A variant's own `images` array follows only that variant; explicit `image: null` with no own photos remains hidden. Clear arrays explicitly to remove gallery views.
+The original owner-uploaded Nitro Mass 5 kg bucket photo and authorized-distributor certificate remain unchanged. Image-less Musclevite and Nitro 3 kg packs stay hidden.
 
-## Blocked original-photo import
+## Validation and delivery
 
-The official product-page text can be read through the web tool. Earlier direct downloads returned proxy HTTP 403; the current task's proxy connection is unavailable. Current Cloud Environment observations report an enforced network allowlist containing only `revakanya.com`; `unicornproseries.com` is absent. Supplying the website URL does not change that environment setting.
+- 27 focused checks pass locally: 14 HTTP operations, seven commerce and six catalogue tests.
+- New coverage accepts original official-host image paths, rejects alternate/deceptive sources, verifies browser image policy and confirms legacy photo replacement without price/stock/order resets.
+- Syntax checks pass for the changed server and commerce modules.
+- Initial HTTP tests encountered the local sandbox's listen restriction; rerunning with the supported network permission passed all 14 operations checks.
+- Full-suite build, deployed revision and current deployment status are recorded in PR #1.
+- No new hosting resources, main merge or live payment/courier activation.
 
-The owner needs to add `unicornproseries.com` to the Cloud Environment network allowlist, or provide the original pack photographs in the existing PR assets folder. Then the original official gallery files can be downloaded, inspected for current white-and-blue packaging and exact pack/flavour matching, and added without image processing. Only views actually supplied by the manufacturer will be labelled front/back; no missing views or new product prices are invented.
-
-The white-and-blue Potency Whey image replacement and official multi-view imports have **not** been applied yet. The owner explicitly retired the black-and-gold Whey pack: seed catalogue image references are cleared, the storefront excludes the exact retired local artwork even in saved catalogues, and the hero uses the previously approved Nitro Mass 5 kg bucket instead. Whey remains hidden until usable current-pack photos are supplied. The archived asset and product/variant records are retained; no replacement packaging is invented. The gallery and old-pack retirement are deployed to the existing Free preview at revision `271767faba35a67dc5c5f5f592a748d0970db049` (Render deploy `dep-dbko9h67bikc73fetgcg`, status `live`). The white-and-blue replacement remains pending. The previously approved Nitro Mass 5 kg upload remains intact.
-
-## Validation
-
-- All 39 automated Node tests passed in the Render build for the retirement revision, covering retired artwork, gallery selection/isolation, source validation, omitted-field preservation, MRP, stock, checkout, accounts and staging. Six focused catalogue tests also passed locally.
-- Local Chromium covers real existing pack images and explicitly labelled secondary-view fixtures: thumbnails, full-size original link, zoom/reset, previous/next, arrow keys, Escape, missing secondary views and 320–1440px layout.
-- Existing cart, customer registration/login, wholesale application/approval, administrator MRP saves, the exact Nitro bucket and distributor certificate still pass with no page JavaScript errors.
-- No payment/courier activation, new hosting resource or main-branch merge.
-
-## Retired Whey artwork check
-
-The six focused catalogue tests pass, including old images in saved product and variant galleries, new front/back gallery fallback, record preservation and unchanged selling prices. Current-pack paths in this test are fixtures only; no white-and-blue photos have been imported. Render confirmed the retirement deployment live and logged successful isolated staging initialization and server startup. A direct hosted-page read remains inaccessible in this execution environment; no fresh hosted visual inspection is claimed. A true 360° rotation needs a complete ordered sequence of original angles; existing gallery navigation does not invent missing sides.
+The task's cloud download policy is still separate from the storefront browser image policy. Original photo downloads remain unavailable here; direct use of the owner-confirmed official image permits the storefront to display it without a copied asset.

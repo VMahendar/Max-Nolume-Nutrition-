@@ -39,3 +39,20 @@ test('approved 5 kg image replaces legacy references while retaining stock, pric
   assert.equal(C.db.prepare('SELECT COUNT(*) n FROM orders').get().n,0);
  }finally{C.db.close();rmSync(dir,{recursive:true,force:true});}
 });
+
+test('current Whey photo replaces retired saved references without changing prices, stock or custom images',()=>{
+ const dir=mkdtempSync(resolve(tmpdir(),'mvn-whey-photo-')),C=openCommerce(dir),source="https://unicornproseries.com/wp-content/uploads/2026/05/Potency-Whey-600x501-1.png";
+ try{
+  const p=C.catalogue(null,true).find(p=>p.id==='potency-whey');
+  p.image='assets/potency-whey.png';p.variants[0].image='assets/potency-whey.png';
+  C.db.prepare('UPDATE products SET data=? WHERE id=?').run(JSON.stringify(p),p.id);
+  C.db.prepare('UPDATE inventory SET on_hand=7 WHERE variant_id=?').run('whey-chocolate');
+  const updated=C.catalogue(null).find(p=>p.id==='potency-whey');
+  assert.equal(updated.image,source);assert.equal(updated.variants[0].image,source);assert.equal(updated.variants[0].pricePaise,499900);assert.equal(updated.variants[0].stock,7);assert.equal(updated.variants[0].mrpPaise,859900);
+  p.image='assets/custom.jpg';p.variants[0].image='assets/custom-pack.jpg';C.db.prepare('UPDATE products SET data=? WHERE id=?').run(JSON.stringify(p),p.id);
+  const custom=C.catalogue(null).find(p=>p.id==='potency-whey');assert.equal(custom.image,'assets/custom.jpg');assert.equal(custom.variants[0].image,'assets/custom-pack.jpg');
+  p.image=null;p.variants[0].image=null;C.db.prepare('UPDATE products SET data=? WHERE id=?').run(JSON.stringify(p),p.id);
+  const hidden=C.catalogue(null).find(p=>p.id==='potency-whey');assert.equal(hidden.image,null);assert.equal(hidden.variants[0].image,null);
+  assert.equal(C.db.prepare('SELECT COUNT(*) n FROM orders').get().n,0);
+ }finally{C.db.close();rmSync(dir,{recursive:true,force:true});}
+});
