@@ -134,10 +134,165 @@ aside{width:min(470px,100%);box-shadow:-20px 0 55px #06102022}
 
 .store-notice{margin:0;padding:12px 20px;text-align:center;background:#edf3ff;color:#153a70;border-bottom:1px solid #d6e2f5;font-size:12px;font-weight:600}
 
-/* Account and dealer access use the storefront's navy, royal blue and silver. */
-.account-link{font-size:10px;font-weight:900;color:#1859ea;white-space:nowrap}
-.btn{background:#1859ea;color:#fff;border:0;padding:12px 18px;font-weight:800;cursor:pointer}
-.account-header{display:flex;justify-content:space-between;align-items:center;padding:18px 5%;background:#fff;border-bottom:1px solid #cbd5e1;gap:20px}
-.account-header nav{display:flex;gap:18px;flex-wrap:wrap}.account-header .brand{min-width:0}
-[hidden]{display:none!important}.dealer-prices{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}.dealer-prices article{padding:20px;border:1px solid #cbd5e1;background:#fff}
-@media(max-width:620px){.head-actions{gap:8px}.account-link{font-size:9px}.account-header{align-items:flex-start;flex-direction:column}}
+/* Flagship featured collection, inspired by polished nutrition storefront merchandising. */
+.featured-section{max-width:1280px;margin:0 auto;padding:55px 24px 15px}
+.featured-heading{display:flex;justify-content:space-between;align-items:end;gap:18px;margin-bottom:22px}
+.featured-heading h2{font-size:clamp(27px,3vw,39px);line-height:1.06;margin:8px 0 0;letter-spacing:-.035em;color:#0c1d3d}
+.featured-heading h2 strong{color:#1767d7}
+.featured-heading>a{font-size:11px;font-weight:900;letter-spacing:.04em;color:#155dbd}
+.featured-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.featured-tile{min-height:250px;display:flex;flex-direction:column;align-items:flex-start;padding:26px;border:1px solid #d7e0ee;border-radius:5px;background:linear-gradient(140deg,#fff 0%,#f4f7fd 78%);box-shadow:0 5px 22px #0b265709}
+.featured-tile:nth-child(2){background:linear-gradient(140deg,#f3f7ff,#e8f0fe)}
+.featured-tile:nth-child(3){background:linear-gradient(140deg,#edf4fd,#dce8fa)}
+.featured-number{font-size:10px;color:#1767d7;font-weight:900;letter-spacing:.12em}
+.featured-tile h3{font-size:26px;line-height:1.1;margin:22px 0 3px;letter-spacing:-.035em;color:#0d2447}
+.featured-tile p{font-size:12px;color:#60718c;margin:0 0 10px}
+.featured-tile strong{font-size:20px;color:#10284e}
+.featured-tile button{margin-top:auto;padding:12px 0 0;border:0;background:transparent;color:#145bbb;font-weight:900;letter-spacing:.06em;font-size:10px;cursor:pointer}
+.featured-tile button:hover{text-decoration:underline}
+@media(max-width:620px){.featured-section{padding:36px 12px 15px}.featured-heading{align-items:start;flex-direction:column}.featured-grid{grid-template-columns:1fr;gap:10px}.featured-tile{min-height:200px;padding:20px}.featured-tile h3{margin-top:16px;font-size:22px}}
+
+/* Customer support information */
+.information-page{max-width:1140px;margin:auto;padding:65px 22px 90px}
+.information-page h1{font-size:clamp(38px,5vw,72px);line-height:1.02;letter-spacing:-.045em;color:#0a1d3c;margin:12px 0 22px}
+.information-page h1 strong{color:#1767d7}
+.information-page>p{font-size:16px;color:#61708a;max-width:670px}
+.info-panel{background:linear-gradient(120deg,#08162d,#163d80);color:#fff;padding:32px;margin:40px 0}
+.info-panel h2{font-size:22px;margin-top:0}
+.info-panel p{margin:10px 0;color:#d6e2f5}
+.info-panel a{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.info-faq{max-width:900px}
+.info-faq h2{font-size:28px;color:#0a1d3c}
+.info-faq details{background:#fff;border-bottom:1px solid #dce5f2;padding:20px}
+.info-faq summary{font-weight:800;cursor:pointer}
+.info-faq details p{line-height:1.6;color:#5e6d85}
+@media(max-width:620px){.information-page{padding:38px 15px 60px}.info-panel{padding:23px}}
+
+/* MVN BLACK / GOLD EDITORIAL REFINEMENT — scoped branch, no third-party brand assets */
+:root{--mvn-bg:#090909;--mvn-panel:#151411;--mvn-gold:#d3aa55;--mvn-gold-bright:#f1d18d;--mvn-border:#363024;--mvn-copy:#f3eee4;--mvn-muted:#aba497}
+body{background:var(--mvn-bg);color:var(--mvn-copy)}
+.announce{background:#000;color:#d8c8aa;border-bottom:1px solid var(--mvn-border)}
+.announce a,.wa,.nav .dealerlink,.nav a:hover{color:var(--mvn-gold-bright)}
+.storehead,.nav{background:#0d0c0b;color:#f4eee2;border-color:var(--mvn-border)}
+.brand small,.footbrand small{color:#bfa876}
+.mvmark{border-color:var(--mvn-gold);color:var(--mvn-gold-bright);border-radius:4px;box-shadow:inset 0 0 0 2px #2c2416;background:#080807;font-style:normal;letter-spacing:-.04em}
+#search{background:#1b1916;border-color:#433b2d}
+#search>span{color:var(--mvn-gold)}
+#search input{color:white}
+#search button,.head-actions button,#bag em,.primary,.add,.cats .active,.send{background:var(--mvn-gold)!important;color:#111!important;border-color:var(--mvn-gold)!important}
+#search button:hover,.primary:hover,.add:hover{background:var(--mvn-gold-bright)!important}
+.nav a{color:#e9e1d5}
+.hero{background:radial-gradient(ellipse at 78% 45%,#3b2c15 0,#14100a 35%,#050505 75%)}
+.hero h1 strong,.eyebrow,.eyebrow.dark,.section-title h2 strong,.featured-heading h2 strong{color:var(--mvn-gold-bright)}
+.hero p{color:#c6bcaa}
+.secondary{border-color:#8a7247}
+.trust{color:#cfb98e}
+.hero-visual .glow{background:#c49a4822;box-shadow:0 0 105px #cc992a21}
+.hero-visual>span{color:var(--mvn-gold-bright)}
+.hero-monogram{position:relative;width:220px;height:220px;border:2px solid #b89042;display:grid;place-items:center;color:#f1d18d;font-size:92px;font-weight:900;letter-spacing:-.08em;box-shadow:inset 0 0 0 14px #11100e,0 25px 65px #0009;margin-bottom:24px}
+.store-notice{background:#211b13;color:#e6d3af;border-color:#4a3c24}
+.brand-ribbon{background:#d5aa58;color:#15120d}
+.brand-ribbon strong,.brand-ribbon em{color:#15120d}
+.benefits{background:#11100e;border-color:var(--mvn-border)}
+.benefits div{border-color:var(--mvn-border)}
+.benefits small,.section-title p,.productbar span,.catalog-note{color:var(--mvn-muted)}
+main{background:transparent}
+.section-title h2,.productbar h3{color:#fff}
+.category-tiles button,.card,.cats button,.productbar select{background:#171512;border-color:#403627;color:#f4eada}
+.category-tiles button:hover,.card:hover{border-color:var(--mvn-gold)}
+.category-tiles span{color:#4a3d28}
+.category-tiles small,.details-link{color:var(--mvn-gold-bright)}
+.productbar{border-color:var(--mvn-gold)}
+.cats .active{color:#111}
+.editorial{background:linear-gradient(120deg,#302211,#100e0a);border:1px solid #4c3c25}
+.editorial-copy h2 strong,.editorial-copy>a{color:var(--mvn-gold-bright)}
+.brand-ribbon,.benefits,.category-tiles,.editorial,.productbar,.cats,.grid,.dealer-promo{position:relative}
+.photo{background:linear-gradient(130deg,#211d16,#0f0f0e)}
+.photo img{object-fit:contain}
+.placeholder{background:linear-gradient(135deg,#1f1a12,#0b0b0b);color:#cab47d}
+.info small,.card .badge{color:var(--mvn-gold)}
+.info h3,.info p,.price b{color:#f8f1e3}
+.variant,.info select,.detail-copy select{background:#1b1916!important;color:#f3eee4!important;border-color:#493c29!important}
+.price small{color:#a89f90}
+.dealer-promo{background:linear-gradient(120deg,#1b150d,#080808);border-top:1px solid #534227}
+.dealerbox{background:#241d12;border-color:#66502e}
+.dealerbox small{color:#d2c1a2}
+.premium-footer{background:#070706;color:#f4ead9;border-top:1px solid #58462d;padding:0}
+.footer-top{max-width:1280px;margin:auto;display:grid;grid-template-columns:.92fr 1.6fr;gap:10%;padding:74px 28px 65px}
+.footer-lead h2{font-size:clamp(32px,3.7vw,54px);line-height:1.03;letter-spacing:-.04em;margin:13px 0 18px}
+.footer-lead h2 strong{color:var(--mvn-gold-bright)}
+.footer-lead p{max-width:420px;color:#aca396;line-height:1.65}
+.footer-contact{display:inline-block;margin-top:16px;border:1px solid var(--mvn-gold);color:var(--mvn-gold-bright);padding:12px 18px;font-size:11px;font-weight:900;letter-spacing:.08em}
+.footer-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;padding-top:7px}
+.footer-links>div{display:flex;flex-direction:column;gap:14px}
+.footer-links b{color:var(--mvn-gold-bright);letter-spacing:.18em;font-size:11px;margin-bottom:12px}
+.footer-links a,.footer-links span{color:#d7cec1;font-size:13px}
+.footer-links a:hover{color:var(--mvn-gold-bright)}
+.footer-bottom{border-top:1px solid #30291e;display:flex;justify-content:space-between;gap:14px;max-width:1280px;margin:auto;padding:23px 28px;color:#a99b80;font-size:10px;letter-spacing:.065em;flex-wrap:wrap}
+footer:not(.premium-footer),.business-faq,.business-steps,.info-faq details{background:#11100e;color:#f3eee4}
+footer:not(.premium-footer) a{color:#e0ca9b}
+.business-hero,.info-panel{background:linear-gradient(120deg,#251a0c,#080808);color:#fff}
+.business-faq p,.info-faq details p{color:#c0b4a2}
+.information-page h1,.info-faq h2{color:#f4eddf}
+.information-page h1 strong{color:var(--mvn-gold-bright)}
+.info-panel a{color:#edc979}
+.info-faq summary{color:#efdfc6}
+.product-dialog{background:#14120e;color:#f4eee4;border:1px solid #6d5430}
+.detail-copy h2,.detail-copy h3{color:#f8e5bd}
+#drawer{background:#14120e;color:#f4eee4}
+.dhead,.drawerfoot{border-color:#453726}
+@media(max-width:820px){.footer-top{grid-template-columns:1fr;gap:35px}.footer-links{gap:16px}}
+@media(max-width:620px){.hero-monogram{width:140px;height:140px;font-size:58px;margin:8px 0 24px}.hero-visual{padding-bottom:28px}.footer-top{padding:50px 20px 38px}.footer-links{grid-template-columns:repeat(2,1fr);gap:30px 17px}.footer-bottom{padding:21px 20px}.storehead{background:#0d0c0b}}
+
+/* GNC-inspired product merchandising: bright retail surface, clear pack focus.
+   Max Volume Nutrition owns its black/gold brand; no GNC logos or assets. */
+#shop{background:#f4f4f1;color:#171717;max-width:none;padding:64px max(24px,calc((100% - 1232px)/2)) 84px}
+#shop .section-title{padding:0 0 16px;align-items:center}
+#shop .section-title h2{color:#111;font-size:clamp(29px,3.2vw,44px);letter-spacing:-.045em;line-height:1.08}
+#shop .section-title h2 strong{color:#a97925}
+#shop .section-title p{color:#505050;font-size:14px;line-height:1.7}
+#shop .eyebrow.dark{color:#9b711d}
+#shop .category-tiles{gap:15px;margin:24px 0 45px}
+#shop .category-tiles button{background:#fff;border:1px solid #dedad2;border-bottom:3px solid #d8b567;border-radius:5px;box-shadow:0 5px 16px #1313130a;min-height:118px;color:#1c1c1c}
+#shop .category-tiles button:hover{border-color:#b99148;box-shadow:0 8px 22px #1112}
+#shop .category-tiles button span{color:#e2e0dc}
+#shop .category-tiles button b{color:#1c1c1c;font-size:14px}
+#shop .category-tiles button small{color:#8d661c;font-weight:700}
+#shop .editorial{background:linear-gradient(110deg,#181510,#40311a);border:1px solid #766038;border-radius:4px;margin-bottom:48px;color:#f7f1e9}
+#shop .editorial-copy h2{color:#fff}
+#shop .editorial-copy p{color:#e6ddce}
+#shop .productbar{border-bottom:2px solid #1d1d1d;margin-bottom:3px;gap:16px}
+#shop .productbar h3{color:#181818;font-size:27px;letter-spacing:-.025em}
+#shop .productbar span{font-size:12px;color:#575757}
+#shop .productbar select{background:#fff;color:#171717;border:1px solid #bbb5a8;min-height:42px;border-radius:3px;font-weight:600}
+#shop .cats{padding:17px 0 25px;gap:9px}
+#shop .cats button{background:#fff;color:#242424;border:1px solid #c9c9c6;padding:12px 15px;border-radius:3px;font-size:11px}
+#shop .cats button:hover{border-color:#a77c2b}
+#shop .cats button.active{background:#171717!important;color:#f8e6ba!important;border-color:#171717!important}
+#shop .grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;align-items:stretch}
+#shop .card{display:flex;flex-direction:column;background:#fff!important;border:1px solid #d8d6d0!important;border-radius:6px;overflow:hidden;box-shadow:0 6px 20px #16161610;transition:transform .2s,box-shadow .2s,border-color .2s;color:#1c1c1c}
+#shop .card:hover{transform:translateY(-5px);border-color:#b78d3a!important;box-shadow:0 16px 38px #16161623}
+#shop .card .badge{background:#202020;color:#f5dca9;border-radius:2px;font-size:9px;letter-spacing:.08em;padding:7px 9px}
+#shop .photo{height:270px;background:#fff!important;border-bottom:1px solid #efede9;display:grid;place-items:center;padding:25px 20px 17px}
+#shop .photo img{display:block;max-height:235px;max-width:95%;width:auto;height:auto;object-fit:contain;filter:drop-shadow(0 13px 12px #00000015)}
+#shop .placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#59534b;text-align:center;background:linear-gradient(135deg,#f7f4ec,#f1ede4)!important;border:1px dashed #d3c29b;min-height:196px;width:100%;padding:22px 12px}
+#shop .placeholder:before{content:"MV";width:70px;height:70px;border:2px solid #bf9952;border-radius:8px;display:grid;place-items:center;color:#8d681f;font-size:24px;font-weight:900;margin:0 0 5px}
+#shop .placeholder b{font-size:17px!important;color:#27221b!important}
+#shop .placeholder small{color:#9c742f;font-size:9px;letter-spacing:.1em;font-weight:900}
+#shop .placeholder span{font-size:11px;color:#6b6255}
+#shop .info{padding:20px 19px 19px;background:#fff;display:flex;flex-direction:column;flex:1}
+#shop .info>small{font-size:10px;color:#9b762f!important;letter-spacing:.07em;font-weight:800}
+#shop .info h3{font-size:22px;letter-spacing:-.035em;line-height:1.2;color:#171717!important;margin:8px 0 8px}
+#shop .info p{font-size:12px;line-height:1.55;color:#5a5a5a!important;min-height:40px;margin:0 0 15px}
+#shop .variant-label{color:#555;font-size:10px;margin-bottom:7px;letter-spacing:.06em}
+#shop .info select{color:#141414!important;background:#fff!important;border:1px solid #bcb9b2!important;min-height:44px;border-radius:4px;padding:0 9px;font-size:12px}
+#shop .price{margin-top:17px;padding-top:14px;border-top:1px solid #e4e2de}
+#shop .price b{color:#161616!important;font-size:29px;letter-spacing:-.04em;line-height:1.15}
+#shop .price small{display:block;margin-top:5px;color:#766d5d!important;font-size:11px}
+#shop .details-link{color:#815b18;font-size:10px;margin-top:15px;font-weight:900;letter-spacing:.055em}
+#shop .add{background:#d4ad5c!important;color:#101010!important;border:1px solid #c39b48!important;border-radius:3px;min-height:48px;font-size:11px;font-weight:900;letter-spacing:.06em;margin-top:12px}
+#shop .add:hover{background:#f2d58c!important;border-color:#d7b263!important}
+#shop .catalog-note{margin-top:23px;color:#666;line-height:1.65;font-size:11px}
+@media(max-width:1120px){#shop .grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:790px){#shop{padding:45px 18px 65px}#shop .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}#shop .category-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}#shop .photo{height:230px}#shop .photo img{max-height:205px}#shop .info{padding:15px}#shop .info h3{font-size:18px}#shop .price b{font-size:25px}}
+@media(max-width:480px){#shop{padding:34px 12px 50px}#shop .grid{gap:10px}#shop .photo{height:178px;padding:19px 9px 9px}#shop .photo img{max-height:145px}#shop .info{padding:13px 10px}#shop .info h3{font-size:16px}#shop .info p{font-size:11px;min-height:50px}#shop .price b{font-size:22px}#shop .details-link{font-size:9px}#shop .add{font-size:10px;min-height:44px}#shop .card .badge{font-size:7px;padding:5px 6px}#shop .placeholder{padding:10px 4px;min-height:130px}#shop .placeholder:before{width:45px;height:45px;font-size:17px}#shop .placeholder b{font-size:13px!important}#shop .category-tiles{gap:9px}#shop .category-tiles button{padding:12px;min-height:100px}#shop .productbar h3{font-size:21px}}

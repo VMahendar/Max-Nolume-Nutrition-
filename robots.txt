@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /
+# Temporary free staging site; remove this restriction on the official domain launch.
