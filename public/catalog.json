@@ -1,0 +1,118 @@
+[
+  {
+    "id": "potency-whey",
+    "name": "Potency Whey",
+    "category": "Protein",
+    "subtitle": "Your daily training companion",
+    "description": "Unicorn Pro Series whey protein. Check the pack label for ingredients, nutrition and allergen information. Contains milk ingredients.",
+    "image": "https://unicornproseries.com/wp-content/uploads/2026/05/Potency-Whey-600x501-1.png",
+    "variants": [
+      {
+        "id": "whey-chocolate",
+        "label": "5 lb · Chocolate",
+        "pricePaise": 499900,
+        "stock": null,
+        "mrpPaise": 859900
+      },
+      {
+        "id": "whey-coffee",
+        "label": "5 lb · Coffee",
+        "pricePaise": 499900,
+        "stock": null,
+        "mrpPaise": 859900
+      }
+    ],
+    "brand": "Unicorn Pro Series",
+    "images": [
+      {
+        "src": "https://unicornproseries.com/wp-content/uploads/2026/05/Potency-Whey-600x501-1.png",
+        "label": "Pack photo",
+        "alt": "Unicorn Pro Series Potency Whey in the owner-confirmed white-and-blue packaging"
+      }
+    ]
+  },
+  {
+    "id": "nitro-mass",
+    "name": "Nitro Mass",
+    "category": "Mass Gainer",
+    "subtitle": "Build your nutrition routine",
+    "description": "Unicorn Pro Series mass gainer. The 5 kg pack is supplied in a bucket. Check available flavours and the label before purchase.",
+    "image": "assets/Screenshot_2026_1103_003852.jpg",
+    "variants": [
+      {
+        "id": "mass-5kg",
+        "label": "5 kg bucket · Double Rich Chocolate",
+        "pricePaise": 349900,
+        "stock": null,
+        "image": "assets/Screenshot_2026_1103_003852.jpg"
+      },
+      {
+        "id": "mass-3kg",
+        "label": "3 kg · Pack to confirm",
+        "pricePaise": 259900,
+        "stock": null,
+        "image": null
+      }
+    ],
+    "brand": "Unicorn Pro Series"
+  },
+  {
+    "id": "pro-creatine",
+    "name": "Pro Creatine",
+    "category": "Creatine",
+    "subtitle": "Make every session count",
+    "description": "Unicorn Pro Series creatine supplement in 100 g packs. Choose Blueberry or Cranberry. Read the pack label for ingredients and directions.",
+    "image": "assets/pro-creatine.png",
+    "variants": [
+      {
+        "id": "creatine-blueberry",
+        "label": "100 g · Blueberry",
+        "pricePaise": 89900,
+        "stock": null,
+        "mrpPaise": 149900
+      },
+      {
+        "id": "creatine-cranberry",
+        "label": "100 g · Cranberry",
+        "pricePaise": 89900,
+        "stock": null,
+        "mrpPaise": 149900
+      }
+    ],
+    "brand": "Unicorn Pro Series"
+  },
+  {
+    "id": "sturdy-pre",
+    "name": "Sturdy Pre-Workout",
+    "category": "Pre-Workout",
+    "subtitle": "For your pre-training routine",
+    "description": "Unicorn Pro Series pre-workout. Read the product label for caffeine content, directions and warnings. Confirm suitability before use.",
+    "image": "assets/sturdy-pre-workout.png",
+    "variants": [
+      {
+        "id": "pre-watermelon",
+        "label": "250 g · Watermelon",
+        "pricePaise": 139900,
+        "stock": null
+      }
+    ],
+    "brand": "Unicorn Pro Series"
+  },
+  {
+    "id": "musclevite",
+    "name": "Musclevite Multivitamin",
+    "category": "Vitamins",
+    "subtitle": "Everyday nutritional support",
+    "description": "Unicorn Pro Series multivitamin. Confirm pack count, ingredients and availability with the store.",
+    "image": null,
+    "variants": [
+      {
+        "id": "musclevite-pack",
+        "label": "Pack details to confirm",
+        "pricePaise": 69900,
+        "stock": null
+      }
+    ],
+    "brand": "Unicorn Pro Series"
+  }
+]

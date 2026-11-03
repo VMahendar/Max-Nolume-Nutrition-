@@ -1,0 +1,19 @@
+[
+  {
+    "id": "unicorn",
+    "name": "Unicorn Pro Series",
+    "initials": "U",
+    "status": "available",
+    "tamilNaduDistributor": true,
+    "description": "Explore our current protein, mass gainer, creatine and training range.",
+    "certificateImage": "assets/IMG-20261102-WA0019.jpg"
+  },
+  {
+    "id": "more-brands",
+    "name": "Multi-brand store",
+    "initials": "+",
+    "status": "coming-soon",
+    "tamilNaduDistributor": false,
+    "description": "More brands coming soon."
+  }
+]
