@@ -15,7 +15,7 @@ try{const v=JSON.parse(localStorage.getItem("mvn-cart-v2")||"{}");if(v&&typeof v
 function getItem(k){const [id,i]=k.split("|");const p=P.find(x=>x.id===id),v=p&&p.variants[Number(i)];return p&&v?{p,v}:null}
 function persist(){localStorage.setItem("mvn-cart-v2",JSON.stringify(cart));drawCart()}
 function card(p){
-const pic=p.img?'<img loading="lazy" src="'+p.img+'" alt="'+p.name+'" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><div class="placeholder" hidden><b>'+p.name+'</b>Photo coming soon</div>':'<div class="placeholder"><b>'+p.name+'</b>Verified pack photo coming soon</div>';
+const pic=p.img?'<img loading="lazy" src="'+p.img+'" alt="'+p.name+'" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><div class="placeholder" hidden><small>UNICORN PRO SERIES</small><b>'+p.name+'</b><span>Request current pack photographs</span></div>':'<div class="placeholder"><small>UNICORN PRO SERIES</small><b>'+p.name+'</b><span>Request current pack photographs</span></div>';
 return '<article class="card"><span class="badge">UNICORN PRO SERIES</span><div class="photo">'+pic+'</div><div class="info"><small>UNICORN PRO SERIES</small><h3>'+p.name+'</h3><p>'+p.desc+'</p><label class="variant-label" for="v-'+p.id+'">FLAVOUR / PACK SIZE</label><select id="v-'+p.id+'" class="variant">'+p.variants.map((v,i)=>'<option value="'+i+'">'+v.label+'</option>').join("")+'</select><div class="price"><b id="price-'+p.id+'">'+money(p.variants[0].price)+'</b><small>Retail selling price</small></div><button class="details-link" type="button" data-detail="'+p.id+'">VIEW PRODUCT DETAILS →</button><button class="add" data-id="'+p.id+'">ADD TO CART +</button></div></article>';
 }
 function render(){
@@ -62,7 +62,7 @@ render();drawCart();
 function showDetail(id){
  const p=P.find(x=>x.id===id);if(!p)return;
  const dlg=$("productDialog"),root=$("productDetail");
- const photo=p.img?'<img src="'+p.img+'" alt="'+p.name+'" loading="lazy" onerror="this.hidden=true">':'<div class="placeholder"><b>'+p.name+'</b>Verified product image pending</div>';
+ const photo=p.img?'<img src="'+p.img+'" alt="'+p.name+'" loading="lazy" onerror="this.hidden=true">':'<div class="placeholder"><b>'+p.name+'</b>Request current pack photographs</div>';
  root.innerHTML='<div class="detail-layout"><div class="detail-photo">'+photo+'</div><div class="detail-copy"><span class="eyebrow dark">UNICORN PRO SERIES</span><h2>'+p.name+'</h2><p>'+p.desc+'</p><p class="detail-note">Product pack and flavour availability are confirmed before fulfilment. Front/back pack-label and ingredient photos will be added after verification; please request the current label when ordering.</p><label for="detail-variant">FLAVOUR / PACK SIZE</label><select id="detail-variant">'+p.variants.map((v,i)=>'<option value="'+i+'">'+v.label+'</option>').join("")+'</select><h3 id="detail-price">'+money(p.variants[0].price)+'</h3><button class="primary" id="detail-add">ADD TO CART +</button></div></div>';
  const sel=$("detail-variant");sel.onchange=()=>{$("detail-price").textContent=money(p.variants[Number(sel.value)].price)};
  $("detail-add").onclick=()=>{const k=p.id+"|"+sel.value;cart[k]=(cart[k]||0)+1;persist();dlg.close();openBag()};
@@ -70,5 +70,4 @@ function showDetail(id){
 }
 $("detailClose").onclick=()=>$("productDialog").close();
 
-// Featured cards use the same verified catalogue and public retail variants.
-document.querySelectorAll("[data-feature]").forEach(button=>button.addEventListener("click",()=>showDetail(button.dataset.feature)));
+// No unfinished featured product tiles: the catalogue is the single product source.
