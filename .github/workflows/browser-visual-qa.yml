@@ -1,0 +1,33 @@
+name: Browser visual QA
+on:
+  push:
+    branches:
+      - integration/single-master-storefront
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out PR code
+        uses: actions/checkout@v4
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright test runner
+        run: npm install --no-save --package-lock=false playwright@1.55.0
+      - name: Install Chromium browser
+        run: npx playwright install --with-deps chromium
+      - name: Run desktop, mobile and commerce browser checks
+        run: node tests/visual-qa.mjs
+      - name: Preserve browser screenshots and QA report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: max-volume-desktop-mobile-qa
+          path: reports/visual-qa/
+          if-no-files-found: warn
+          retention-days: 7
