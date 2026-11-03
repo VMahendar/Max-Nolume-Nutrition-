@@ -184,3 +184,10 @@ body.secondary-page{background:#f8f8f6!important;color:#1b1b1b}
 .retail-home .label-enquiry{display:block;margin-top:17px;font-size:11px;font-weight:900;letter-spacing:.04em;color:#826022;text-decoration:underline;text-underline-offset:4px}
 .retail-home #drawer[aria-hidden="true"]{visibility:hidden}
 .retail-home #drawer[aria-hidden="false"]{visibility:visible}
+
+/* Source verification strip, added to the existing backend storefront. */
+.retail-home .mvn-official-product-link{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:19px 5%;background:#f3eee4;border-bottom:1px solid #e0d0b3;color:#171717}
+.retail-home .mvn-official-product-link strong{font-size:11px;letter-spacing:.08em;font-weight:900}
+.retail-home .mvn-official-product-link span{font-size:12px;line-height:1.6;flex:1;min-width:250px;color:#5d5140}
+.retail-home .mvn-official-product-link a{color:#6d4c1e;font-size:11px;font-weight:900;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:720px){.retail-home .mvn-official-product-link{padding:18px 5%;gap:10px}.retail-home .mvn-official-product-link span{flex-basis:100%}}
