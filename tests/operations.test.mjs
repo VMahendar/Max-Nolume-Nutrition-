@@ -66,3 +66,18 @@ test('admin MRP edits preserve selling prices, survive omitted fields and reject
   v=(await guest('/api/catalog')).body.products[0].variants[0];assert.equal(v.mrpPaise,null);assert.equal(v.pricePaise,10000);
  }finally{await f.close();}
 });
+test('administrator galleries validate original image sources, preserve omitted photos and leave prices/inventory unchanged',async()=>{
+ const f=await fixture();try{
+  const admin=f.client(),guest=f.client();await admin('/api/register',{name:'Admin',email:'admin@example.com',password});f.db.prepare("UPDATE users SET role='admin' WHERE email='admin@example.com'").run();
+  let p=(await admin('/api/admin/overview')).body.products[0];
+  p.image='assets/front.jpg';p.images=[{src:'assets/front.jpg',label:'Front',alt:'Front pack'},{src:'assets/back.jpg',label:'Back'}];p.variants[0].images=[{src:'assets/pack-back.jpg',label:'Pack label'}];
+  assert.equal((await guest('/api/admin/product',p)).status,401);assert.equal((await admin('/api/admin/product',p)).status,200);
+  let saved=(await admin('/api/admin/overview')).body.products[0];assert.deepEqual(saved.images.map(x=>x.src),['assets/front.jpg','assets/back.jpg']);assert.equal(saved.variants[0].images[0].src,'assets/pack-back.jpg');assert.equal(saved.variants[0].pricePaise,10000);assert.equal(saved.variants[0].onHand,10);
+  for(const images of [[{src:'javascript:alert(1)'}],Array(21).fill('assets/a.jpg'),[{src:'assets/../private.jpg'}],[null]])assert.equal((await admin('/api/admin/product',{...p,images})).status,400);
+  assert.equal((await admin('/api/admin/product',{...p,variants:[{...p.variants[0],images:['https://evil.example/a.jpg']}]})).status,400);
+  delete p.images;delete p.variants[0].images;assert.equal((await admin('/api/admin/product',p)).status,200);
+  saved=(await guest('/api/catalog')).body.products[0];assert.equal(saved.images.length,2);assert.equal(saved.variants[0].images.length,1);assert.equal(saved.variants[0].pricePaise,10000);assert.equal(saved.variants[0].prices,undefined);
+  assert.equal((await admin('/api/admin/product',{...p,images:[],variants:[{...p.variants[0],images:[]}]})).status,200);
+  saved=(await guest('/api/catalog')).body.products[0];assert.deepEqual(saved.images,[]);assert.deepEqual(saved.variants[0].images,[]);
+ }finally{await f.close();}
+});
