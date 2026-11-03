@@ -16,7 +16,7 @@ function getItem(k){const [id,i]=k.split("|");const p=P.find(x=>x.id===id),v=p&&
 function persist(){localStorage.setItem("mvn-cart-v2",JSON.stringify(cart));drawCart()}
 function card(p){
 const pic=p.img?'<img loading="lazy" src="'+p.img+'" alt="'+p.name+'" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><div class="placeholder" hidden><b>'+p.name+'</b>Photo coming soon</div>':'<div class="placeholder"><b>'+p.name+'</b>Verified pack photo coming soon</div>';
-return '<article class="card"><span class="badge">UNICORN PRO SERIES</span><div class="photo">'+pic+'</div><div class="info"><small>UNICORN PRO SERIES</small><h3>'+p.name+'</h3><p>'+p.desc+'</p><label class="variant-label" for="v-'+p.id+'">FLAVOUR / PACK SIZE</label><select id="v-'+p.id+'" class="variant">'+p.variants.map((v,i)=>'<option value="'+i+'">'+v.label+'</option>').join("")+'</select><div class="price"><b id="price-'+p.id+'">'+money(p.variants[0].price)+'</b><small>Retail selling price</small></div><button class="add" data-id="'+p.id+'">ADD TO CART +</button></div></article>';
+return '<article class="card"><span class="badge">UNICORN PRO SERIES</span><div class="photo">'+pic+'</div><div class="info"><small>UNICORN PRO SERIES</small><h3>'+p.name+'</h3><p>'+p.desc+'</p><label class="variant-label" for="v-'+p.id+'">FLAVOUR / PACK SIZE</label><select id="v-'+p.id+'" class="variant">'+p.variants.map((v,i)=>'<option value="'+i+'">'+v.label+'</option>').join("")+'</select><div class="price"><b id="price-'+p.id+'">'+money(p.variants[0].price)+'</b><small>Retail selling price</small></div><button class="details-link" type="button" data-detail="'+p.id+'">VIEW PRODUCT DETAILS →</button><button class="add" data-id="'+p.id+'">ADD TO CART +</button></div></article>';
 }
 function render(){
 const items=P.filter(p=>(cat==="all"||p.cat===cat)&&((p.name+" "+p.variants.map(v=>v.label).join(" ")).toLowerCase().includes(q.toLowerCase())));
@@ -25,6 +25,7 @@ if($("sort").value==="low")items.sort((a,b)=>a.variants[0].price-b.variants[0].p
 $("grid").innerHTML=items.map(card).join("");
 $("resultText").textContent=items.length+" product"+(items.length===1?"":"s")+" available";
 document.querySelectorAll(".variant").forEach(s=>s.addEventListener("change",()=>{const p=P.find(x=>x.id===s.id.slice(2));$("price-"+p.id).textContent=money(p.variants[Number(s.value)].price)}));
+document.querySelectorAll(".details-link").forEach(b=>b.addEventListener("click",()=>showDetail(b.dataset.detail)));
 document.querySelectorAll(".add").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.id+"|"+$("v-"+b.dataset.id).value;cart[k]=(cart[k]||0)+1;persist();openBag()}));
 }
 function setCat(c){cat=c;document.querySelectorAll(".cats [data-cat]").forEach(b=>b.classList.toggle("active",b.dataset.cat===c));render();$("shop").scrollIntoView({behavior:"smooth"})}
@@ -57,3 +58,14 @@ $("search").onsubmit=e=>{e.preventDefault();q=$("q").value;cat="all";render();$(
 $("q").oninput=e=>{q=e.target.value;render()};
 $("checkoutFields").onsubmit=e=>{e.preventDefault();retailOrder()};
 render();drawCart();
+
+function showDetail(id){
+ const p=P.find(x=>x.id===id);if(!p)return;
+ const dlg=$("productDialog"),root=$("productDetail");
+ const photo=p.img?'<img src="'+p.img+'" alt="'+p.name+'" loading="lazy" onerror="this.hidden=true">':'<div class="placeholder"><b>'+p.name+'</b>Verified product image pending</div>';
+ root.innerHTML='<div class="detail-layout"><div class="detail-photo">'+photo+'</div><div class="detail-copy"><span class="eyebrow dark">UNICORN PRO SERIES</span><h2>'+p.name+'</h2><p>'+p.desc+'</p><p class="detail-note">Product pack and flavour availability are confirmed before fulfilment. Front/back pack-label and ingredient photos will be added after verification; please request the current label when ordering.</p><label for="detail-variant">FLAVOUR / PACK SIZE</label><select id="detail-variant">'+p.variants.map((v,i)=>'<option value="'+i+'">'+v.label+'</option>').join("")+'</select><h3 id="detail-price">'+money(p.variants[0].price)+'</h3><button class="primary" id="detail-add">ADD TO CART +</button></div></div>';
+ const sel=$("detail-variant");sel.onchange=()=>{$("detail-price").textContent=money(p.variants[Number(sel.value)].price)};
+ $("detail-add").onclick=()=>{const k=p.id+"|"+sel.value;cart[k]=(cart[k]||0)+1;persist();dlg.close();openBag()};
+ if(typeof dlg.showModal==="function")dlg.showModal();else dlg.setAttribute("open","");
+}
+$("detailClose").onclick=()=>$("productDialog").close();
