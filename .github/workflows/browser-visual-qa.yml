@@ -3,9 +3,11 @@ on:
   push:
     branches:
       - integration/single-master-storefront
+      - integration/unified-master-2026-11-04
   pull_request:
     branches:
       - codex/complete-store-review
+      - main
   workflow_dispatch:
 permissions:
   contents: read
