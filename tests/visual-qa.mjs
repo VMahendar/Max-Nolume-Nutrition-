@@ -1,0 +1,78 @@
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {mkdirSync,writeFileSync} from 'node:fs';
+import {setTimeout as delay} from 'node:timers/promises';
+import {chromium} from 'playwright';
+
+const origin='http://127.0.0.1:3187';
+const reportDir='reports/visual-qa';
+mkdirSync(reportDir,{recursive:true});
+const app=spawn(process.execPath,['server.mjs'],{
+  env:{...process.env,HOST:'127.0.0.1',PORT:'3187',PUBLIC_ORIGIN:origin,NODE_ENV:'test',STAGING_MODE:'false',PAYMENTS_ENABLED:'false',SHIPROCKET_ENABLED:'false',DATA_DIR:'/tmp/mvn-visual-qa-'+process.pid},
+  stdio:['ignore','pipe','pipe']
+});
+let appError='';app.stderr.on('data',d=>appError+=d.toString());
+let browser;
+const observations=[];
+try {
+  let ready=false;
+  for(let i=0;i<45;i++){
+    try{const r=await fetch(origin+'/healthz');if(r.ok){ready=true;break;}}catch{}
+    await delay(250);
+  }
+  assert.ok(ready,'Local application did not become healthy: '+appError);
+  browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+  for(const preset of [{name:'desktop',viewport:{width:1440,height:900},isMobile:false},{name:'mobile',viewport:{width:390,height:844},isMobile:true}]){
+    const page=await browser.newPage({viewport:preset.viewport,isMobile:preset.isMobile,deviceScaleFactor:1});
+    const errors=[];page.on('pageerror',e=>errors.push(e.message));
+    const response=await page.goto(origin+'/',{waitUntil:'domcontentloaded',timeout:25000});
+    assert.equal(response.status(),200,preset.name+' homepage HTTP status');
+    await page.locator('#grid article.card').first().waitFor({timeout:10000});
+    assert.equal(await page.locator('#grid article.card').count(),5,preset.name+' product family count');
+    assert.ok(await page.locator('.hero h1').isVisible(),preset.name+' hero visible');
+    assert.ok(await page.locator('body').getAttribute('class')==='retail-home',preset.name+' design class');
+    const measured=await page.evaluate(()=>{
+      const grid=document.querySelector('#grid'),hero=document.querySelector('.hero');
+      return {width:innerWidth,scrollWidth:document.documentElement.scrollWidth,columns:getComputedStyle(grid).gridTemplateColumns.split(/\\s+/).length,heroBackground:getComputedStyle(hero).backgroundColor,heroText:document.querySelector('.hero h1')?.innerText,cartPresent:!!document.querySelector('#bag'),accountPresent:!!document.querySelector('a[href="account.html"]'),dealerPresent:!!document.querySelector('a[href="dealer.html"]')};
+    });
+    assert.ok(measured.scrollWidth<=measured.width+12,preset.name+' horizontal overflow: '+JSON.stringify(measured));
+    assert.ok(measured.accountPresent&&measured.dealerPresent&&measured.cartPresent,preset.name+' shop links');
+    await page.locator('img.hero-product').scrollIntoViewIfNeeded();
+    try{await page.waitForFunction(()=>{const x=document.querySelector('img.hero-product');return x&&x.complete;},{timeout:14000});}catch{}
+    const heroImage=await page.locator('img.hero-product').evaluate(el=>({src:el.src,complete:el.complete,loaded:el.naturalWidth>0,naturalWidth:el.naturalWidth,hidden:el.hidden}));
+    await page.locator('.add[data-id="whey"]').click();
+    assert.equal(await page.locator('#count').innerText(),'1',preset.name+' add-to-cart count');
+    assert.match(await page.locator('#items').innerText(),/4,999/,preset.name+' correct cart price');
+    assert.match(await page.locator('#checkoutFields').innerText(),/payment and delivery are temporarily disabled/i,preset.name+' enquiry mode');
+    await page.locator('#close').click();
+    await page.locator('button[data-detail="mass"]').click();
+    assert.ok(await page.locator('#productDialog').isVisible(),preset.name+' product details dialog');
+    await page.locator('#detailClose').click();
+    const cards=await page.locator('#grid article.card').evaluateAll(nodes=>nodes.map(n=>({name:n.querySelector('h3')?.textContent,photo:(()=>{const x=n.querySelector('.photo img');return x?{loaded:x.naturalWidth>0,complete:x.complete,hidden:x.hidden,src:x.src}:null})(),placeholder:!!n.querySelector('.photo .placeholder')})));
+    await page.screenshot({path:reportDir+'/'+preset.name+'.png',fullPage:true,animations:'disabled'});
+    assert.deepEqual(errors,[],preset.name+' JavaScript errors');
+    observations.push({device:preset.name,measured,heroImage,cards,jsErrors:errors});
+    await page.close();
+  }
+  const page=await browser.newPage();
+  assert.equal((await page.goto(origin+'/account.html')).status(),200,'account route');
+  assert.ok(await page.locator('form#login').isVisible(),'account login visible');
+  assert.equal((await page.goto(origin+'/dealer.html')).status(),200,'dealer route');
+  assert.equal((await page.goto(origin+'/admin.html')).status(),200,'admin route served; authorization protected by API');
+  const catalog=await fetch(origin+'/api/retail/catalog');
+  assert.equal(catalog.status,200,'retail catalog API');
+  assert.equal((await catalog.json()).paymentReady,false,'payment must remain disabled');
+  const checkout=await fetch(origin+'/api/checkout',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify({items:[]})});
+  assert.equal(checkout.status,503,'checkout must remain disabled');
+  const imgIssues=observations.filter(x=>!x.heroImage.loaded);
+  assert.equal(imgIssues.length,0,'Hero image failed to load: '+JSON.stringify(imgIssues));
+  writeFileSync(reportDir+'/report.json',JSON.stringify({passed:true,observations},null,2));
+  console.log('VISUAL_QA_PASS',JSON.stringify(observations.map(({device,measured,heroImage,cards})=>({device,measured,heroImage,cards}))));
+} catch(error) {
+  writeFileSync(reportDir+'/report.json',JSON.stringify({passed:false,error:String(error),observations},null,2));
+  console.error('VISUAL_QA_FAIL',error.stack||error);
+  process.exitCode=1;
+} finally {
+  await browser?.close();
+  app.kill('SIGTERM');
+}
