@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - integration/single-master-storefront
+  pull_request:
+    branches:
+      - codex/complete-store-review
   workflow_dispatch:
 permissions:
   contents: read
