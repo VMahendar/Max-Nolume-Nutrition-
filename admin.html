@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Store administration | Max Volume Nutrition</title>
+    <link rel="stylesheet" href="retail.css" />
+  </head>
+  <body class="mvn-commerce">
+    <header class="mvn-header">
+      <a class="mvn-brand" href="/">MAX VOLUME NUTRITION</a
+      ><span>Store administration</span>
+    </header>
+    <main class="mvn-content">
+      <h1>Store administration</h1>
+      <p>
+        Use the deployment administrator token. It stays in memory for this
+        page; never paste it into a public enquiry or product field.
+      </p>
+      <form id="login">
+        <label
+          >Administrator token<input
+            id="admin-token"
+            type="password"
+            autocomplete="new-password"
+            required
+            minlength="32" /></label
+        ><button>Connect</button>
+        <button type="button" id="logout">Clear session</button>
+      </form>
+      <p id="status" role="status"></p>
+      <section id="panel" hidden>
+        <h2>Products</h2>
+        <div id="products"></div>
+        <h2>Verified shipping rule</h2>
+        <form id="shipping">
+          <label
+            >Pincode<input
+              name="pincode"
+              required
+              pattern="[1-9][0-9]{5}"
+              maxlength="6" /></label
+          ><label
+            >GST state code<input
+              name="state_code"
+              required
+              pattern="[0-9]{2}"
+              maxlength="2" /></label
+          ><label
+            >Tax-inclusive shipping fee (paise)<input
+              name="fee_paise"
+              type="number"
+              min="0"
+              required /></label
+          ><label
+            >Approved shipping tax rate in basis points (18% = 1800)<input
+              name="tax_bps"
+              type="number"
+              min="0"
+              max="10000"
+              required /></label
+          ><label
+            ><input name="verified" type="checkbox" required />Business has
+            verified serviceability, state, tariff and tax treatment</label
+          ><button>Save rule</button>
+        </form>
+        <h2>Recent orders</h2>
+        <button id="reload">Refresh</button>
+        <div id="orders"></div>
+        <h2>Reconcile an unresolved provider order</h2>
+        <p>
+          Look up the order receipt in Razorpay first. The server verifies its
+          receipt, amount and currency before linking it. Never create a second
+          provider order as a shortcut.
+        </p>
+        <form id="reconcile">
+          <label>Store order ID<input name="id" required /></label
+          ><label
+            >Existing Razorpay order ID<input
+              name="provider_order"
+              required /></label
+          ><button>Verify and link</button>
+        </form>
+        <h2>Recheck a provider payment</h2>
+        <p>
+          This queries Razorpay and only records a matching captured payment. It
+          cannot force an unpaid order to paid.
+        </p>
+        <form id="verify-payment">
+          <label>Store order ID<input name="id" required /></label
+          ><label>Razorpay payment ID<input name="payment_id" required /></label
+          ><button>Verify provider payment</button>
+        </form>
+      </section>
+    </main>
+    <script src="admin.js" defer></script>
+  </body>
+</html>
