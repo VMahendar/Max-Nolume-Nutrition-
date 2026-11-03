@@ -33,13 +33,16 @@ try {
     assert.ok(await page.locator('body').getAttribute('class')==='retail-home',preset.name+' design class');
     const measured=await page.evaluate(()=>{
       const grid=document.querySelector('#grid'),hero=document.querySelector('.hero');
-      return {width:innerWidth,scrollWidth:document.documentElement.scrollWidth,columns:getComputedStyle(grid).gridTemplateColumns.split(/\\s+/).length,heroBackground:getComputedStyle(hero).backgroundColor,heroText:document.querySelector('.hero h1')?.innerText,cartPresent:!!document.querySelector('#bag'),accountPresent:!!document.querySelector('a[href="account.html"]'),dealerPresent:!!document.querySelector('a[href="dealer.html"]')};
+      return {width:innerWidth,scrollWidth:document.documentElement.scrollWidth,columns:getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length,heroBackground:getComputedStyle(hero).backgroundColor,heroText:document.querySelector('.hero h1')?.innerText,cartPresent:!!document.querySelector('#bag'),accountPresent:!!document.querySelector('a[href="account.html"]'),dealerPresent:!!document.querySelector('a[href="dealer.html"]')};
     });
     assert.ok(measured.scrollWidth<=measured.width+12,preset.name+' horizontal overflow: '+JSON.stringify(measured));
     assert.ok(measured.accountPresent&&measured.dealerPresent&&measured.cartPresent,preset.name+' shop links');
     await page.locator('img.hero-product').scrollIntoViewIfNeeded();
     try{await page.waitForFunction(()=>{const x=document.querySelector('img.hero-product');return x&&x.complete;},{timeout:14000});}catch{}
     const heroImage=await page.locator('img.hero-product').evaluate(el=>({src:el.src,complete:el.complete,loaded:el.naturalWidth>0,naturalWidth:el.naturalWidth,hidden:el.hidden}));
+    // Capture the actual rendered viewport for external visual inspection.
+    const viewportShot=(await page.screenshot({type:'jpeg',quality:42,fullPage:false,animations:'disabled'})).toString('base64');
+    for(let i=0;i<viewportShot.length;i+=9000)console.log('MVN_VIEW_'+preset.name+'_'+String(i/9000).padStart(3,'0')+' '+viewportShot.slice(i,i+9000));
     await page.locator('.add[data-id="whey"]').click();
     assert.equal(await page.locator('#count').innerText(),'1',preset.name+' add-to-cart count');
     const cartText=await page.locator('#items').textContent();
