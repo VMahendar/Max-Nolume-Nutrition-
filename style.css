@@ -52,3 +52,82 @@ aside{width:min(470px,100%);box-shadow:-20px 0 55px #06102022}
 .dealerbox form{grid-template-columns:1fr}
 .dealerbox label:nth-child(5),.dealerbox form button{grid-column:1}
 }
+
+/* Editorial flagship storefront and separate business area */
+.brand-ribbon{background:#e8eef8;padding:17px 6%;display:flex;align-items:center;justify-content:space-between;gap:15px;text-align:center;color:#56647c;font-size:10px;font-weight:800;letter-spacing:.12em}
+.brand-ribbon strong{font-size:18px;letter-spacing:.09em;color:#0b1a35;white-space:nowrap}
+.brand-ribbon em{font-style:normal;color:#1767d7}
+.editorial{margin:36px 0 48px;background:#0a1830;color:#fff;min-height:310px;display:grid;grid-template-columns:2fr 1fr;overflow:hidden}
+.editorial-copy{padding:38px 46px}
+.editorial h2{font-size:clamp(28px,3.2vw,45px);line-height:1.03;margin:12px 0}
+.editorial h2 strong{color:#8bb4f9}
+.editorial p{color:#bbc7dc;max-width:570px}
+.editorial a{display:inline-block;margin-top:11px;font-size:11px;font-weight:900;color:#9bc4ff;letter-spacing:.08em}
+.editorial-side{background:linear-gradient(135deg,#123b80,#060e1e);display:flex;align-items:flex-start;justify-content:center;flex-direction:column;gap:18px;padding:38px;border-left:1px solid #3a6096}
+.editorial-side span{font-size:clamp(17px,2vw,27px);font-weight:900;color:#eaf1fd;letter-spacing:.04em}
+.catalog-note{font-size:11px;color:#66758d;margin-top:22px}
+.details-link{display:block;width:100%;border:1px solid #cddbf0;background:#fff;color:#174da0;text-align:center;padding:10px;cursor:pointer;margin-top:13px;font-size:10px;letter-spacing:.06em;font-weight:900}
+.details-link:hover{background:#f2f6fe}
+.detail-close{position:absolute;top:9px;right:15px;border:0;background:transparent;font-size:30px;cursor:pointer;color:#203757}
+.product-dialog{width:min(840px,calc(100% - 20px));border:0;border-radius:12px;padding:38px;box-shadow:0 25px 90px #0005}
+.product-dialog::backdrop{background:#061324b8}
+.detail-layout{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:30px}
+.detail-photo{height:360px;background:#f0f4fa;display:grid;place-items:center}
+.detail-photo img{max-width:90%;max-height:330px;object-fit:contain}
+.detail-copy h2{font-size:36px;margin:11px 0}
+.detail-copy p{color:#526176}
+.detail-copy .detail-note{font-size:12px}
+.detail-copy label{display:block;font-size:10px;font-weight:900;margin-top:22px}
+.detail-copy select{display:block;width:100%;padding:12px;margin-top:8px;border:1px solid #ccd7e6}
+.detail-copy h3{font-size:28px;color:#0a2856}
+.detail-copy button{cursor:pointer}
+.dealer-promo .dealerbox{display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+.dealer-promo .dealerbox>small{display:block}
+.portal-return{background:#0b1d3a;color:#fff;padding:12px 18px;font-size:11px;font-weight:900}
+.business-main{max-width:none;padding:0}
+.business-hero{padding:95px max(6%,calc((100% - 1260px)/2));background:radial-gradient(circle at 90% 5%,#18478d,#0b1e42 52%,#051020);color:#fff;min-height:470px}
+.business-hero h1{font-size:clamp(48px,7vw,100px);line-height:.92;letter-spacing:-.05em;margin:19px 0}
+.business-hero h1 strong{color:#91baff}
+.business-hero p{font-size:17px;max-width:600px;color:#becfe9;margin-bottom:27px}
+.business-note{display:block;font-size:10px;color:#a9bedb;letter-spacing:.12em;margin-top:25px}
+.business-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:50px max(6%,calc((100% - 1260px)/2));background:#f4f7fc}
+.business-steps>div{background:#fff;padding:30px;border:1px solid #e0e7f0}
+.business-steps small{color:#1767d7;letter-spacing:.08em;font-weight:900}
+.business-steps h2{font-size:19px;color:#0d213f}
+.business-steps p{color:#6c7890}
+.business-form-wrap{display:grid;grid-template-columns:1fr 1.25fr;gap:65px;padding:75px max(6%,calc((100% - 1260px)/2))}
+.business-form-wrap h2,.business-faq h2{font-size:clamp(28px,3vw,40px);line-height:1.1}
+.business-form-wrap p{color:#627089}
+.business-points{display:flex;flex-direction:column;gap:12px;margin-top:25px;color:#164b94;font-size:13px;font-weight:800}
+.business-form{display:grid;grid-template-columns:1fr 1fr;gap:18px;background:#fff;border:1px solid #dfe8f3;padding:28px;box-shadow:0 15px 40px #0a25520a}
+.business-form label{font-size:12px;font-weight:850;color:#243a59}
+.business-form input,.business-form textarea,.business-form select{display:block;width:100%;padding:12px;background:#f8fafd;border:1px solid #cad5e5;margin-top:8px;border-radius:3px;font:inherit}
+.business-form textarea{min-height:100px;resize:vertical}
+.business-form .wide{grid-column:1/-1}
+.business-form button{cursor:pointer}
+.business-form .legal-text{font-size:11px;margin:0;color:#67758c}
+.business-faq{background:#ecf1f9;padding:55px max(6%,calc((100% - 1260px)/2))}
+.business-faq details{background:#fff;border-bottom:1px solid #dae3f0;padding:19px;font-size:14px}
+.business-faq summary{cursor:pointer;font-weight:800;color:#12294c}
+.business-faq p{color:#65748b}
+@media(max-width:900px){.business-form-wrap{gap:20px}.business-steps{gap:10px}}
+@media(max-width:620px){
+.brand-ribbon{flex-direction:column;padding:13px 8px;gap:5px}
+.brand-ribbon span{font-size:8px}
+.editorial{grid-template-columns:1fr}
+.editorial-copy{padding:32px 24px}
+.editorial-side{padding:21px;flex-direction:row;gap:13px;justify-content:space-between}
+.editorial-side span{font-size:12px}
+.detail-layout{grid-template-columns:1fr}
+.detail-photo{height:210px}
+.detail-photo img{max-height:190px}
+.product-dialog{padding:35px 18px 20px;max-height:90vh;overflow:auto}
+.detail-copy h2{font-size:25px}
+.business-hero{padding:65px 21px;min-height:auto}
+.business-steps{grid-template-columns:1fr;padding:24px 14px}
+.business-form-wrap{grid-template-columns:1fr;padding:45px 15px}
+.business-form{grid-template-columns:1fr;padding:18px}
+.business-form .wide{grid-column:auto}
+.business-faq{padding:35px 15px}
+.portal-return{padding:11px 9px;font-size:9px}
+}
