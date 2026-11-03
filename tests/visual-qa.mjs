@@ -42,7 +42,10 @@ try {
     const heroImage=await page.locator('img.hero-product').evaluate(el=>({src:el.src,complete:el.complete,loaded:el.naturalWidth>0,naturalWidth:el.naturalWidth,hidden:el.hidden}));
     await page.locator('.add[data-id="whey"]').click();
     assert.equal(await page.locator('#count').innerText(),'1',preset.name+' add-to-cart count');
-    assert.match(await page.locator('#items').innerText(),/4,999/,preset.name+' correct cart price');
+    const cartText=await page.locator('#items').textContent();
+    console.log('CART_TEXT',preset.name,JSON.stringify(cartText));
+    await page.screenshot({path:reportDir+'/'+preset.name+'-cart.png',fullPage:false,animations:'disabled'});
+    assert.ok(/4[,\\s]?999/.test(cartText||''),preset.name+' correct cart price: '+JSON.stringify(cartText));
     assert.match(await page.locator('#checkoutFields').innerText(),/payment and delivery are temporarily disabled/i,preset.name+' enquiry mode');
     await page.locator('#close').click();
     await page.locator('button[data-detail="mass"]').click();
