@@ -1,5 +1,7 @@
 # Launch dependencies and acceptance gates
 
+**Free hosting selected:** start with [FREE-HOSTING.md](FREE-HOSTING.md) for the Worker/D1 path and its account/setup checklist. WordPress hosting is an alternative, not a requirement for that path. Merchant/tax/legal/stock verification and explicit live approval still apply. Do not run two authoritative checkouts.
+
 All unchecked items remain open. Credentials are absent, not placeholders for working services. Do not enable online checkout until the applicable gates pass.
 
 ## Owner / infrastructure

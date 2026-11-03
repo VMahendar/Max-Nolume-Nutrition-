@@ -5,12 +5,17 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      WRANGLER_SEND_METRICS: "false"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+      - run: npm ci
       - run: npm run check
+      - run: npm run worker:migrate:local
+      - run: npm run worker:bundle
       - run: |
           while IFS= read -r file; do php -l "$file"; done < <(find commerce -name '*.php')
       - run: php tests/pricing.php
@@ -18,3 +23,13 @@ jobs:
         with:
           name: max-volume-commerce
           path: dist/max-volume-commerce
+      - uses: actions/upload-artifact@v4
+        with:
+          name: max-volume-free-hosting
+          path: |
+            dist/site
+            worker
+            wrangler.jsonc
+            package.json
+            package-lock.json
+            docs/FREE-HOSTING.md

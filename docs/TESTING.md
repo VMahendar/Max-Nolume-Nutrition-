@@ -1,5 +1,13 @@
 # Test evidence and acceptance matrix
 
+## Free-tier Worker/D1 addition
+
+- `node tests/worker.test.js`: 16 database-backed tests passed using Node SQLite with a D1-compatible adapter. Razorpay HTTP responses are mocked. Covers public metadata isolation, configuration/live gates, CSRF origin, idempotency, authoritative totals, guest ownership, admin denial, invalid address/quantity/stock/tax, atomic stock rollback after a race, HMAC verification, provider amount mismatch, webhook replay, cancellation/late capture, ambiguous timeouts, optimistic stock edits, cancellation during provider creation, malformed/oversized JSON and verified Turnstile challenges.
+- Wrangler 4.156.1 applied both migrations to **local D1** and bundled the Worker via `--dry-run`, without deployment. The real local Worker returned eight public products with zero/unverified stock.
+- `python3 tests/worker-browser.py`: desktop 1440px/mobile 390px pass against local Wrangler on port 8790: real catalogue bridge, disabled checkout, cart reload and responsive layout; a fixture only tests quoted total presentation/invalidation. Unconfigured real admin access was denied. No successful real payment was simulated in the browser.
+- `npm run check` passes the original storefront and public build isolation checks plus the Worker suite. No real Razorpay/Cloudflare account activation, provider test-mode transaction, production deployment, shipping booking, email delivery or accounting invoice is claimed.
+
+
 ## Executed locally
 
 2026-11-02, Node 24.19.0 and system Chromium via Python Playwright:

@@ -1,5 +1,7 @@
 # Issue #2 coverage
 
+**Updated hosting preference:** the owner requested free hosting with online payments. [FREE-HOSTING.md](FREE-HOSTING.md) documents the new Worker/D1 guest-retail implementation, its tested payment adapter, exact free quotas and remaining gaps. The table below describes the earlier WooCommerce alternative; its features do not automatically exist in the Worker deployment. Choose one authoritative backend.
+
 This PR leaves Issue #2 open. “Implemented” means code exists; only executed checks in TESTING.md are claimed as tested. Credentials are not the only remaining work.
 
 | Requirement | Delivery / remaining work |
