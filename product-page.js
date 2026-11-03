@@ -53,6 +53,6 @@ $("productAdd").addEventListener("click",()=>{
 const key=product.id+"|"+select.value;let bag={};
 try{const v=JSON.parse(localStorage.getItem("mvn-cart-v3")||"{}");if(v&&typeof v==="object"&&!Array.isArray(v))bag=v}catch(e){}
 const safe=Number.isInteger(bag[key])&&bag[key]>0?bag[key]:0;bag[key]=Math.min(99,safe+quantity());
-try{localStorage.setItem("mvn-cart-v3",JSON.stringify(bag));$("productAdded").hidden=false;$("productAdded").textContent="Added "+quantity()+" × "+product.name+" to your enquiry bag. Return to the store and open BAG to review or send your enquiry."}catch(e){$("productAdded").hidden=false;$("productAdded").textContent="This browser blocked local storage. Please use the WhatsApp enquiry link instead."}
+try{localStorage.setItem("mvn-cart-v3",JSON.stringify(bag));$("productAdded").hidden=false;$("productAdded").textContent="Added "+quantity()+" × "+product.name+" to your enquiry bag. ";const view=document.createElement("a");view.href="index.html?cart=1#shop";view.textContent="VIEW YOUR ENQUIRY BAG →";$("productAdded").appendChild(view)}catch(e){$("productAdded").hidden=false;$("productAdded").textContent="This browser blocked local storage. Please use the WhatsApp enquiry link instead."}
 });
 })();
