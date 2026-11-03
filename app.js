@@ -1,16 +1,7 @@
 /* Max Volume Nutrition — customer storefront and dealer enquiries.
    Prices are customer-facing INR amounts. Wholesale prices must NEVER be embedded in public JS. */
 const PHONE="917708830513";
-const P=[
- {id:"whey-chocolate",name:"Potency Whey",cat:"whey",size:"5 lbs",variants:[{label:"Chocolate · 5 lbs",price:4999}],desc:"Whey protein for daily training and recovery.",img:"https://static.wixstatic.com/media/1ff000_e90a0275d7d54a2faef71492a305f3f6~mv2.png",imageNote:"Manufacturer reference image; confirm current flavour label"},
- {id:"whey-coffee",name:"Potency Whey",cat:"whey",size:"5 lbs",variants:[{label:"Coffee · 5 lbs",price:4999}],desc:"Whey protein for daily training and recovery.",img:"https://static.wixstatic.com/media/1ff000_e90a0275d7d54a2faef71492a305f3f6~mv2.png",imageNote:"Manufacturer reference image; confirm current flavour label"},
- {id:"sturdy-watermelon",name:"Sturdy Pre-Workout",cat:"pre",size:"250 g",variants:[{label:"Watermelon · 250 g",price:1399}],desc:"Pre-workout supplement in the Watermelon flavour.",img:"https://static.wixstatic.com/media/1ff000_c2a176e091a14c6a9c0bf121a2007f5c~mv2.png",imageNote:"Manufacturer reference; verify current label"},
- {id:"nitro-mass-5kg",name:"Nitro Mass",cat:"mass",size:"5 kg bucket",variants:[{label:"5 kg · Bucket",price:3499}],desc:"Mass gainer in the 5 kg bucket pack.",img:"https://static.wixstatic.com/media/1ff000_f0a98421d4c647d18591722f454076cf~mv2.png",imageNote:"5 kg bucket packaging photo"},
- {id:"nitro-mass-3kg",name:"Nitro Mass",cat:"mass",size:"3 kg box",variants:[{label:"3 kg · Box",price:2599}],desc:"Mass gainer in the 3 kg box pack.",img:"",imageNote:"3 kg box photo pending verification"},
- {id:"creatine-blueberry",name:"Pro Creatine",cat:"creatine",size:"100 g",variants:[{label:"Blueberry · 100 g",price:899}],desc:"Creatine supplement, Blueberry flavour.",img:"https://static.wixstatic.com/media/1ff000_8db16ef46b194a72b5a5657b83130626~mv2.png",imageNote:"Manufacturer reference; confirm flavour packaging"},
- {id:"creatine-cranberry",name:"Pro Creatine",cat:"creatine",size:"100 g",variants:[{label:"Cranberry · 100 g",price:899}],desc:"Creatine supplement, Cranberry flavour.",img:"https://static.wixstatic.com/media/1ff000_8db16ef46b194a72b5a5657b83130626~mv2.png",imageNote:"Manufacturer reference; confirm flavour packaging"},
- {id:"musclevite",name:"Musclevite Multivitamin",cat:"vitamins",size:"1 pack",variants:[{label:"1 pack",price:699}],desc:"Daily multivitamin supplement.",img:"",imageNote:"Pack photo pending verification"}
-];
+
 const $=id=>document.getElementById(id);
 const money=n=>"₹"+Number(n).toLocaleString("en-IN");
 let cat="all",q="",cart={};
@@ -19,7 +10,7 @@ function getItem(k){const [id,i]=k.split("|");const p=P.find(x=>x.id===id),v=p&&
 function persist(){try{localStorage.setItem("mvn-cart-v3",JSON.stringify(cart))}catch(e){}drawCart()}
 function card(p){
 const pic=p.img?'<img loading="lazy" src="'+p.img+'" alt="'+p.name+'" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><div class="placeholder" hidden><small>UNICORN PRO SERIES</small><b>'+p.name+'</b><span>Pack photo will be added after verification</span></div>':'<div class="placeholder"><small>UNICORN PRO SERIES</small><b>'+p.name+'</b><span>Request current pack photographs</span></div>';
-return '<article class="card"><span class="badge">UNICORN PRO SERIES</span><div class="photo">'+pic+'</div><div class="info"><small>UNICORN PRO SERIES</small><h3>'+p.name+' <span class="pack-name">'+p.size+'</span></h3><p>'+p.desc+'</p><label class="variant-label" for="v-'+p.id+'">FLAVOUR / PACK SIZE</label><select id="v-'+p.id+'" class="variant">'+p.variants.map((v,i)=>'<option value="'+i+'">'+v.label+'</option>').join("")+'</select><div class="price"><b id="price-'+p.id+'">'+money(p.variants[0].price)+'</b><small>Retail price · Including applicable taxes</small></div><button class="details-link" type="button" data-detail="'+p.id+'">VIEW PRODUCT DETAILS →</button><button class="add" data-id="'+p.id+'">ADD TO CART +</button></div></article>';
+return '<article class="card"><span class="badge">UNICORN PRO SERIES</span><div class="photo">'+pic+'</div><div class="info"><small>UNICORN PRO SERIES</small><h3>'+p.name+' <span class="pack-name">'+p.size+'</span></h3><p>'+p.desc+'</p><label class="variant-label" for="v-'+p.id+'">FLAVOUR / PACK SIZE</label><select id="v-'+p.id+'" class="variant">'+p.variants.map((v,i)=>'<option value="'+i+'">'+v.label+'</option>').join("")+'</select><div class="price"><b id="price-'+p.id+'">'+money(p.variants[0].price)+'</b><small>Retail price · Including applicable taxes</small></div><a class="details-link" href="product.html?sku='+encodeURIComponent(p.id)+'">VIEW FULL PRODUCT DETAILS →</a><button class="add" data-id="'+p.id+'">ADD TO CART +</button></div></article>';
 }
 function render(){
 const items=P.filter(p=>(cat==="all"||p.cat===cat)&&((p.name+" "+p.variants.map(v=>v.label).join(" ")).toLowerCase().includes(q.toLowerCase())));
