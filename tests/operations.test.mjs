@@ -81,3 +81,25 @@ test('administrator galleries validate original image sources, preserve omitted 
   saved=(await guest('/api/catalog')).body.products[0];assert.deepEqual(saved.images,[]);assert.deepEqual(saved.variants[0].images,[]);
  }finally{await f.close();}
 });
+
+
+test('dealer portal rejects anonymous and unapproved users while retail catalogue stays retail after approval',async()=>{
+ const f=await fixture();try{
+ const guest=f.client(),dealer=f.client(),admin=f.client();
+ assert.equal((await guest('/api/dealer/catalog')).status,401);
+ assert.equal((await guest('/api/retail/catalog')).body.products[0].variants[0].pricePaise,10000);
+ await dealer('/api/register',{name:'Portal Dealer',email:'portal@example.com',password:'portal-password-1234'});
+ assert.equal((await dealer('/api/dealer/catalog')).status,403);
+ await dealer('/api/dealer',{kind:'wholesale',business:'Portal Store',gstin:''});
+ assert.equal((await dealer('/api/dealer/catalog')).status,403);
+ await admin('/api/register',{name:'Portal Admin',email:'portal-admin@example.com',password:'portal-password-1234'});
+ f.db.prepare("UPDATE users SET role='admin' WHERE email='portal-admin@example.com'").run();
+ const userId=(await dealer('/api/session')).body.user.id;
+ await admin('/api/admin/dealer',{userId,status:'approved'});
+ const privateResult=await dealer('/api/dealer/catalog');
+ assert.equal(privateResult.status,200);assert.equal(privateResult.body.products[0].variants[0].pricePaise,8000);
+ assert.equal(privateResult.body.products[0].variants[0].prices,undefined);
+ const retail=await dealer('/api/retail/catalog');assert.equal(retail.body.tier,'retail');assert.equal(retail.body.products[0].variants[0].pricePaise,10000);
+ await dealer('/api/logout',{});assert.equal((await dealer('/api/dealer/catalog')).status,401);
+ }finally{await f.close();}
+});

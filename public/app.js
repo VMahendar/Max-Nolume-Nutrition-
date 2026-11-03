@@ -1,116 +1,76 @@
-import {sanitiseCart} from './cart.js';
-import {variantImage,variantImages,visibleCatalogue,confirmedMRP} from './catalogue.js';
-const $=id=>document.getElementById(id),money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(n/100),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let rawProducts=[],products=[],brands=[],brand='All',store={},paymentReady=false,pricingTier='retail',cart=[],category='All',query='',sort='featured',selected={};
-function storageGet(key,fallback){try{return JSON.parse(localStorage.getItem(key)||'null')??fallback;}catch{return fallback;}}
-function storageSet(key,value){try{localStorage.setItem(key,JSON.stringify(value));}catch{}}
-function notify(text){$('toast').textContent=text;$('toast').hidden=false;clearTimeout(notify.timer);notify.timer=setTimeout(()=>$('toast').hidden=true,3500);}
-async function api(path,body,headers={}){const r=await fetch(path,body?{method:'POST',headers:{'Content-Type':'application/json',...headers},body:JSON.stringify(body)}:{});const b=await r.json();if(!r.ok)throw Error(b.error||'Please try again.');return b;}
-const failedImages=new Set(),gallerySelection={};let imageViewer=null;
-const productBrand=p=>p.brand||(['potency-whey','nitro-mass','pro-creatine','sturdy-pre','musclevite'].includes(p.id)?'Unicorn Pro Series':'Brand to confirm');
-function renderBrands(){
-  const names=[...new Set(products.map(productBrand))];
-  const entries=[...brands];
-  for(const name of names)if(!entries.some(b=>b.name===name))entries.push({name,initials:name.slice(0,2).toUpperCase(),description:'Explore the current range.',tamilNaduDistributor:false});
-  $('brandCards').innerHTML=entries.map(b=>{
-    const available=names.includes(b.name);
-    const description=available&&b.status==='coming-soon'?'Explore the current range.':b.description;
-    return `<article class="brand-card ${available?'':'is-planned'}"><span class="brand-symbol" aria-hidden="true">${esc(b.initials)}</span><div class="brand-copy"><h3>${esc(b.name)}</h3><span class="brand-tag ${available?'':'planned'}">${b.tamilNaduDistributor?'Tamil Nadu Distributor':available?'Current range':'Coming soon'}</span><p>${esc(description)}</p>${available?`<button data-brand="${esc(b.name)}">Shop the range →</button>`:''}</div></article>`;
-  }).join('');
-  $('brandFilter').innerHTML='<option value="All">All brands</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
-  renderCertificate();
+/* Max Volume Nutrition — customer storefront and dealer enquiries.
+   Prices are customer-facing INR amounts. Wholesale prices must NEVER be embedded in public JS. */
+const PHONE="917708830513";
+const P=[
+{id:"whey",name:"Potency Whey",cat:"whey",size:"5 lbs",variants:[{label:"Chocolate · 5 lbs",price:4999},{label:"Coffee · 5 lbs",price:4999}],desc:"Premium whey protein for daily training and recovery.",img:"https://revakanya.com/assets/imgs/Potency%20Whey.png"},
+{id:"mass",name:"Nitro Mass",cat:"mass",variants:[{label:"3 kg",price:2599},{label:"5 kg",price:3499}],desc:"Mass gainer available in two pack sizes.",img:""},
+{id:"pre",name:"Sturdy Pre-Workout",cat:"pre",variants:[{label:"250 g",price:1399}],desc:"Pre-workout formula for your training routine.",img:"https://revakanya.com/assets/imgs/Sturdy%20Pre%20Workout.png"},
+{id:"creatine",name:"Pro Creatine",cat:"creatine",variants:[{label:"Blueberry · 100 g",price:899},{label:"Cranberry · 100 g",price:899}],desc:"Creatine supplement in two flavour options.",img:"https://revakanya.com/assets/imgs/Pro%20Creatine.png"},
+{id:"vitamins",name:"Multivitamin",cat:"vitamins",variants:[{label:"1 pack",price:699}],desc:"Daily multivitamin supplement.",img:""}
+];
+const $=id=>document.getElementById(id);
+const money=n=>"₹"+Number(n).toLocaleString("en-IN");
+let cat="all",q="",cart={},mode="retail";
+try{const v=JSON.parse(localStorage.getItem("mvn-cart-v2")||"{}");if(v&&typeof v==="object")cart=v}catch(e){}
+function getItem(k){if(!/^(whey|mass|pre|creatine|vitamins)\|[0-9]+$/.test(k))return null;const [id,i]=k.split("|");const p=P.find(x=>x.id===id),v=p&&p.variants[Number(i)];return p&&v?{p,v}:null}
+cart=Object.fromEntries(Object.entries(cart).filter(([k,v])=>getItem(k)&&Number.isSafeInteger(v)&&v>0&&v<=999));
+function persist(){localStorage.setItem("mvn-cart-v2",JSON.stringify(cart));drawCart()}
+function card(p){
+const pic=p.img?'<img loading="lazy" src="'+p.img+'" alt="'+p.name+'"><div class="placeholder" hidden><b>'+p.name+'</b>Photo coming soon</div>':'<div class="placeholder"><b>'+p.name+'</b>Verified pack photo coming soon</div>';
+return '<article class="card"><span class="badge">UNICORN PRO SERIES</span><div class="photo">'+pic+'</div><div class="info"><small>UNICORN PRO SERIES</small><h3>'+p.name+'</h3><p>'+p.desc+'</p><label class="variant-label" for="v-'+p.id+'">FLAVOUR / PACK SIZE</label><select id="v-'+p.id+'" class="variant">'+p.variants.map((v,i)=>'<option value="'+i+'">'+v.label+'</option>').join("")+'</select><div class="price"><b id="price-'+p.id+'">'+money(p.variants[0].price)+'</b><small>Retail selling price</small></div><button class="details-link" type="button" data-detail="'+p.id+'">VIEW PRODUCT DETAILS →</button><button class="add" data-id="'+p.id+'">ADD TO CART +</button></div></article>';
 }
-function renderCertificate(){
-  const figure=$('distributorCertificate'),image=$('certificateImage'),link=$('certificateLink');
-  figure.hidden=true;
-  const source=brands.find(b=>b.id==='unicorn')?.certificateImage;
-  // The original document must be supplied as a local image asset.
-  if(typeof source!=='string'||!/^assets\/[a-z0-9][a-z0-9._-]*\.(?:png|jpe?g|webp)$/i.test(source))return;
-  image.onload=()=>{figure.hidden=false;};
-  image.onerror=()=>{figure.hidden=true;link.removeAttribute('href');};
-  link.href=source;
-  image.src=source;
+function render(){
+const items=P.filter(p=>(cat==="all"||p.cat===cat)&&((p.name+" "+p.variants.map(v=>v.label).join(" ")).toLowerCase().includes(q.toLowerCase())));
+if($("sort").value==="name")items.sort((a,b)=>a.name.localeCompare(b.name));
+if($("sort").value==="low")items.sort((a,b)=>a.variants[0].price-b.variants[0].price);
+$("grid").innerHTML=items.map(card).join("");
+ document.querySelectorAll(".photo img").forEach(img=>img.addEventListener("error",()=>{img.hidden=true;if(img.nextElementSibling)img.nextElementSibling.hidden=false}));
+$("resultText").textContent=items.length+" product"+(items.length===1?"":"s")+" available";
+document.querySelectorAll(".variant").forEach(s=>s.addEventListener("change",()=>{const p=P.find(x=>x.id===s.id.slice(2));$("price-"+p.id).textContent=money(p.variants[Number(s.value)].price)}));
+document.querySelectorAll(".details-link").forEach(b=>b.addEventListener("click",()=>showDetail(b.dataset.detail)));
+document.querySelectorAll(".add").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.id+"|"+$("v-"+b.dataset.id).value;cart[k]=Math.min(999,(cart[k]||0)+1);persist();openBag()}));
 }
-const variant=id=>{for(const p of products){const v=p.variants.find(v=>v.id===id);if(v)return {p,v};}return null;};
-const price=v=>Number.isSafeInteger(v.pricePaise)&&v.pricePaise>0?money(v.pricePaise):pricingTier==='retail'?'Price being updated':'Business price awaiting confirmation';
-function priceBlock(v){
- const mrp=confirmedMRP(v),discounted=mrp!==null&&Number.isSafeInteger(v.pricePaise)&&v.pricePaise>0&&mrp>v.pricePaise;
- const label=pricingTier==='gym'?'Gym price':pricingTier==='wholesale'?'Wholesale price':'Selling price';
- return `${mrp===null?'':`<span class="mrp-line">MRP ${discounted?`<del>${money(mrp)}</del>`:money(mrp)}</span>`}<span class="selling-price-label">${label}</span><strong class="selling-price">${price(v)}</strong>`;
+function setCat(c){cat=c;document.querySelectorAll(".cats [data-cat]").forEach(b=>b.classList.toggle("active",b.dataset.cat===c));render();$("shop").scrollIntoView({behavior:"smooth"})}
+function totals(){let n=0,subtotal=0;for(const [k,qty] of Object.entries(cart)){const item=getItem(k);if(!item)continue;const quantity=Math.min(999,Math.max(0,Number(qty)||0));n+=quantity;subtotal+=item.v.price*quantity;}return{n,subtotal}}
+function drawCart(){
+const {n,subtotal}=totals();$("count").textContent=n;
+let html=n?"":'<p class="empty-cart">Your cart is empty. Choose your supplements to get started.</p>';
+for(const [k,qty] of Object.entries(cart)){const item=getItem(k);if(!item)continue;html+='<div class="row"><b>'+item.p.name+'</b><small>'+item.v.label+' · '+money(item.v.price)+'</small><div class="qty"><button data-minus="'+k+'" aria-label="Decrease quantity">−</button><span>'+qty+'</span><button data-plus="'+k+'" aria-label="Increase quantity">+</button><strong>'+money(item.v.price*qty)+'</strong></div></div>'}
+$("items").innerHTML=html;
+$("cart-totals").innerHTML=n?'<div><span>Subtotal</span><b>'+money(subtotal)+'</b></div>':"";
+$("send").disabled=!n;
+document.querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>{const k=b.dataset.minus;cart[k]-=1;if(cart[k]<=0)delete cart[k];persist()});
+document.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>{const k=b.dataset.plus;cart[k]=Math.min(999,cart[k]+1);persist()});
 }
-function image(p,v,hero=false){const src=variantImage(p,v,failedImages);return src?`<img class="${(v?.id==='mass-5kg'||src.includes('nitro-mass-5kg'))?'real-photo':''}" src="${esc(src)}" alt="${esc(p.name+' '+(v?.label||''))}" ${hero?'':'loading="lazy"'} data-product-image="${esc(src)}">`:'';}
-function fallbacks(){document.querySelectorAll('.retail-hero-art>img').forEach(img=>{img.onerror=()=>{img.hidden=true;};if(img.complete&&img.naturalWidth===0)img.hidden=true;});document.querySelectorAll('img[data-product-image]').forEach(img=>{
- img.onerror=()=>{
-  const source=img.dataset.productImage;
-  if(failedImages.has(source))return;
-  failedImages.add(source);products=visibleCatalogue(rawProducts,failedImages);
-  cart=sanitiseCart(cart,products);storageSet('mvn-cart-v2',cart);
-  renderBrands();renderProducts();renderCart();
-  if(location.hash.startsWith('#product/'))renderDetail(location.hash.slice(9));
-  if(location.hash==='#checkout')renderCheckout();
-  if($('productImageDialog').open)renderImageViewer();
- };
- if(img.complete&&img.naturalWidth===0)img.onerror();
-});}
-function renderProducts(){const list=products.filter(p=>(category==='All'||p.category===category)&&(brand==='All'||productBrand(p)===brand)&&(p.name+' '+productBrand(p)+' '+p.category+' '+p.variants.map(v=>v.label).join(' ')).toLowerCase().includes(query.toLowerCase()));if(sort==='az')list.sort((a,b)=>a.name.localeCompare(b.name));if(sort==='low')list.sort((a,b)=>Math.min(...a.variants.map(v=>v.pricePaise??Infinity))-Math.min(...b.variants.map(v=>v.pricePaise??Infinity)));
-$('filters').innerHTML=['All',...new Set(products.map(p=>p.category))].map(c=>`<button type="button" data-category="${esc(c)}" aria-pressed="${c===category}">${esc(c)}</button>`).join('');$('results').textContent=list.length+' products'+(brand==='All'?' · All brands':' · '+brand);
-$('products').innerHTML=list.length?list.map((p,i)=>{const v=p.variants.find(v=>v.id===selected[p.id])||p.variants[0];return `<article class="product"><a class="product-art" href="#product/${p.id}" aria-label="View ${esc(p.name)}"><span class="number">${esc(p.category.toUpperCase())}</span>${image(p,v)}</a><div class="product-info"><div class="product-brand">${esc(productBrand(p))}</div><small>${esc(p.category.toUpperCase())}</small><h3><a href="#product/${p.id}">${esc(p.name)}</a></h3><p>${esc(p.subtitle)}</p><label><span class="sr-only">Select ${esc(p.name)} variant</span><select data-select="${p.id}">${p.variants.map(x=>`<option value="${x.id}" ${v.id===x.id?'selected':''}>${esc(x.label)}</option>`).join('')}</select></label><div class="product-price">${priceBlock(v)}<small>${v.stock===0?'Out of stock':Number.isSafeInteger(v.stock)?'Availability confirmed':'Availability to be confirmed'}</small></div><div class="card-actions"><button class="btn" data-add="${v.id}" ${v.stock===0?'disabled':''}>Add to cart +</button><a class="text-link dark" href="#product/${p.id}">Details ↗</a></div></div></article>`;}).join(''):'<div class="empty">No products match your search. <button class="text-link dark" id="clearSearch">Clear search and filters</button></div>';fallbacks();}
-function totals(){let subtotal=0,known=cart.length>0;for(const line of cart){const {v}=variant(line.variantId);if(!Number.isSafeInteger(v.pricePaise)||v.pricePaise<=0)known=false;else subtotal+=v.pricePaise*line.quantity;}return {subtotal,known,shippingKnown:Number.isSafeInteger(store.shippingPaise)};}
-function totalsHTML(){const t=totals();return `<div class="money-line"><span>Items</span><span>${t.known?money(t.subtotal):'Price pending'}</span></div><div class="money-line"><span>Delivery</span><span>${t.shippingKnown?money(store.shippingPaise):'To be confirmed'}</span></div><div class="money-line total"><span>Total</span><span>${t.known&&t.shippingKnown?money(t.subtotal+store.shippingPaise):'Awaiting confirmation'}</span></div>`;}
-function save(){cart=sanitiseCart(cart,products);storageSet('mvn-cart-v2',cart);renderCart();if(location.hash==='#checkout')renderCheckout();}
-function renderCart(){const n=cart.reduce((s,x)=>s+x.quantity,0);$('count').textContent=n;$('drawerCount').textContent=n;$('cartItems').innerHTML=cart.length?cart.map(x=>{const {p,v}=variant(x.variantId);return `<div class="cart-row"><h3>${esc(p.name)}</h3><p>${esc(v.label)} · ${price(v)}</p><div class="qty"><button data-qty="${v.id}" data-delta="-1" aria-label="Decrease ${esc(p.name)} quantity">−</button><span>${x.quantity}</span><button data-qty="${v.id}" data-delta="1" aria-label="Increase ${esc(p.name)} quantity">+</button><button class="remove" data-remove="${v.id}">Remove</button></div></div>`;}).join(''):'<p class="empty">Your bag is waiting.<br>Explore the collection and find your next essential.</p>';$('cartTotal').innerHTML=totalsHTML();$('bagNote').textContent=paymentReady?'Prices are validated again securely before payment.':'Build your cart freely. Payments and delivery are disabled in this preview.';$('checkoutLink').hidden=!cart.length;}
-function add(id){const found=variant(id);if(!found)return;const existing=cart.find(x=>x.variantId===id),limit=Math.min(99,Number.isSafeInteger(found.v.stock)?found.v.stock:99);if((existing?.quantity||0)>=limit){notify('Maximum available quantity reached.');return;}if(existing)existing.quantity++;else cart.push({variantId:id,quantity:1});save();$('cartDialog').showModal();}
-function renderDetail(id){
- const p=products.find(p=>p.id===id);
- if(!p){$('productView').innerHTML='<div><h1>Product not found.</h1><a href="#shop">Back to collection</a></div>';return;}
- const v=p.variants.find(v=>v.id===selected[p.id])||p.variants[0],photos=variantImages(p,v,failedImages),active=photos.find(photo=>photo.src===gallerySelection[v.id])||photos[0];
- document.title=p.name+' | Max Volume Nutrition';
- $('productView').innerHTML=`<section class="product-gallery" aria-label="${esc(p.name)} photos"><button type="button" class="product-art gallery-main" data-gallery-open="${esc(p.id)}" aria-label="View ${esc(p.name)} ${esc(active.label)} full size"><img src="${esc(active.src)}" alt="${esc(active.alt||p.name+' '+v.label+' — '+active.label)}" data-product-image="${esc(active.src)}"></button><p class="gallery-caption">${esc(active.label)} · Select photo to enlarge</p>${photos.length>1?`<div class="gallery-thumbnails" role="group" aria-label="Choose product photo">${photos.map(photo=>`<button type="button" data-gallery-photo="${esc(photo.src)}" data-gallery-product="${esc(p.id)}" aria-pressed="${photo.src===active.src}"><img src="${esc(photo.src)}" alt="" loading="lazy" data-product-image="${esc(photo.src)}"><span>${esc(photo.label)}</span></button>`).join('')}</div>`:''}</section><div><a class="text-link dark" href="#shop">← Back to collection</a><p class="eyebrow" style="margin-top:30px">${esc(productBrand(p).toUpperCase())} / ${esc(p.category.toUpperCase())}</p><h1>${esc(p.name)}</h1><p>${esc(p.description)}</p><label for="detailVariant">Choose your pack / flavour</label><select id="detailVariant" data-select="${p.id}">${p.variants.map(x=>`<option value="${x.id}" ${x.id===v.id?'selected':''}>${esc(x.label)}</option>`).join('')}</select><div class="product-price">${priceBlock(v)}</div><button class="btn" data-add="${v.id}" ${v.stock===0?'disabled':''}>${v.stock===0?'Out of stock':'Add to cart +'}</button><p class="detail-note">Photos follow your selected pack and flavour. Open the original image to read the label. Read the manufacturer's directions, ingredients and warnings. Need help? <a href="https://wa.me/917708830513" target="_blank" rel="noopener">Ask us on WhatsApp ↗</a></p></div>`;
- fallbacks();
+function openBag(){$("shade").hidden=false;$("drawer").classList.add("open");$("drawer").setAttribute("aria-hidden","false")}
+function closeBag(){$("shade").hidden=true;$("drawer").classList.remove("open");$("drawer").setAttribute("aria-hidden","true")}
+function retailEnquiry(){
+const entries=Object.entries(cart).filter(([k])=>getItem(k));if(!entries.length)return;
+const name=$("customerName").value.trim(),phone=$("customerPhone").value.trim();
+if(!name||!phone){$("checkoutFields").reportValidity();return}
+const lines=entries.map(([k,n])=>{const {p,v}=getItem(k);return p.name+" — "+v.label+" × "+n+" = "+money(n*v.price)});
+const {subtotal}=totals();
+const msg="Hello Max Volume Nutrition, I would like to enquire about availability:\n\n"+lines.join("\n")+"\n\nProduct subtotal: "+money(subtotal)+"\n\nName: "+name+"\nPhone: "+phone+"\n\nPlease confirm product availability. This is an enquiry only; payment and delivery are disabled.";
+window.open("https://wa.me/"+PHONE+"?text="+encodeURIComponent(msg),"_blank","noopener");
 }
-function viewerPhotos(){
- if(!imageViewer)return null;
- const p=products.find(p=>p.id===imageViewer.productId),v=p?.variants.find(v=>v.id===imageViewer.variantId);
- if(!v)return null;
- const photos=variantImages(p,v,failedImages);if(!photos.length)return null;
- let index=photos.findIndex(photo=>photo.src===gallerySelection[v.id]);if(index<0)index=0;
- return {p,v,photos,index};
-}
-function resetImageZoom(){
- $('productImageStage').classList.remove('is-zoomed');$('productImageZoom').setAttribute('aria-pressed','false');$('productImageZoom').textContent='Zoom in';$('productImageStage').scrollTo(0,0);
-}
-function renderImageViewer(){
- const state=viewerPhotos();if(!state){$('productImageDialog').close();return;}
- const {p,v,photos,index}=state,photo=photos[index],image=$('fullProductImage');
- $('productImageTitle').textContent=p.name+' — '+photo.label;
- image.src=photo.src;image.alt=photo.alt||p.name+' '+v.label+' — '+photo.label;image.dataset.productImage=photo.src;
- $('originalProductImage').href=photo.src;$('productImagePosition').textContent=(index+1)+' of '+photos.length+' · '+v.label;
- $('productImagePrevious').disabled=$('productImageNext').disabled=photos.length<2;
- resetImageZoom();fallbacks();
-}
-function openImageViewer(productId){
- const p=products.find(p=>p.id===productId),v=p?.variants.find(v=>v.id===selected[p.id])||p?.variants[0];if(!v)return;
- imageViewer={productId:p.id,variantId:v.id};renderImageViewer();if(viewerPhotos())$('productImageDialog').showModal();
-}
-function moveImageViewer(delta){
- const state=viewerPhotos();if(!state)return;
- const {p,v,photos,index}=state;gallerySelection[v.id]=photos[(index+delta+photos.length)%photos.length].src;
- renderDetail(p.id);renderImageViewer();
-}
-function renderCheckout(){$('summary').innerHTML=cart.length?cart.map(x=>{const {p,v}=variant(x.variantId);return `<div class="summary-row"><b>${esc(p.name)} × ${x.quantity}</b><small>${esc(v.label)}</small><span>${price(v)}</span></div>`;}).join(''):'<p>Your bag is empty. Add a product first.</p>';$('totals').innerHTML=totalsHTML();const valid=cart.every(x=>{const {v}=variant(x.variantId);return Number.isSafeInteger(v.pricePaise)&&v.pricePaise>0&&Number.isSafeInteger(v.stock)&&v.stock>=x.quantity;});$('payButton').disabled=!paymentReady||!cart.length||!valid;$('paymentNote').textContent=paymentReady?'Your total is checked on the server before secure payment opens.':'Checkout is not active yet. Stock, delivery charges and the store payment account are being confirmed. No money can be collected here.';}
-async function confirmation(){let ref=storageGet('mvn-order',null);if(!ref){$('confirmationTitle').textContent='No recent order found.';$('confirmationText').textContent='For order help, contact the store with your payment reference.';return;}try{const b=await api('/api/order-status',ref);$('confirmationTitle').textContent=b.status==='paid'?'Payment confirmed.':'Payment confirmation pending.';$('confirmationText').textContent='Order '+b.id+'. '+(b.status==='paid'?'We have recorded your paid order. Contact the store for dispatch updates.':'Please contact the store before making another payment.');if(b.status==='paid'){cart=[];storageSet('mvn-checkout-attempt',null);save();}}catch(e){$('confirmationTitle').textContent='Please contact the store.';$('confirmationText').textContent=e.message;}}
-function route(){const hash=location.hash||'#home',detail=hash.startsWith('#product/'),checkout=hash==='#checkout',confirm=hash==='#confirmation';$('homeView').hidden=detail||checkout||confirm;$('productView').hidden=!detail;$('checkoutView').hidden=!checkout;$('confirmationView').hidden=!confirm;if($('cartDialog').open)$('cartDialog').close();if($('productImageDialog').open)$('productImageDialog').close();document.title='Max Volume Nutrition | Shop Sports Nutrition';if(detail)renderDetail(hash.slice(9));if(checkout)renderCheckout();if(confirm)confirmation();if(detail||checkout||confirm)window.scrollTo(0,0);else if(hash==='#home')window.scrollTo(0,0);else requestAnimationFrame(()=>document.getElementById(hash.slice(1))?.scrollIntoView());}
-function loadRazorpay(){if(window.Razorpay)return Promise.resolve();return new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://checkout.razorpay.com/v1/checkout.js';s.onload=resolve;s.onerror=()=>reject(Error('Unable to load secure payment. Please try again.'));document.head.append(s);});}
-$('checkoutForm').onsubmit=async e=>{e.preventDefault();if(!paymentReady)return;const btn=$('payButton');btn.disabled=true;$('checkoutError').textContent='';try{const f=new FormData(e.target),customer=Object.fromEntries(f);delete customer.terms;const payload={items:cart,customer,acceptedTerms:f.get('terms')==='on'};const fingerprint=JSON.stringify(payload);let attempt=storageGet('mvn-checkout-attempt',null);if(!attempt||attempt.fingerprint!==fingerprint){attempt={fingerprint,key:crypto.randomUUID()};storageSet('mvn-checkout-attempt',attempt);}const order=await api('/api/checkout',payload,{'Idempotency-Key':attempt.key});storageSet('mvn-order',{id:order.id,token:order.token});await loadRazorpay();const rzp=new window.Razorpay({key:order.key,amount:order.amount,currency:order.currency,order_id:order.providerOrderId,name:'Max Volume Nutrition',description:order.id,prefill:{name:customer.name,email:customer.email,contact:customer.phone},theme:{color:'#c8a55c'},handler:async response=>{try{await api('/api/verify',{id:order.id,token:order.token,...response});location.hash='#confirmation';}catch(err){$('checkoutError').textContent=err.message+' Order reference: '+order.id;btn.disabled=false;}},modal:{ondismiss:()=>{btn.disabled=false;notify('Payment window closed. Your bag is saved.');}}});rzp.on('payment.failed',()=>{$('checkoutError').textContent='Payment was not completed. Check your bank before retrying.';btn.disabled=false;});rzp.open();}catch(err){$('checkoutError').textContent=err.message;btn.disabled=false;}};
-$('cartOpen').onclick=()=>$('cartDialog').showModal();$('cartClose').onclick=$('continueShopping').onclick=()=>$('cartDialog').close();$('cartDialog').onclick=e=>{if(e.target===$('cartDialog')&&e.clientX<$('cartDialog').getBoundingClientRect().left)$('cartDialog').close();};
-document.addEventListener('click',e=>{const photoButton=e.target.closest('[data-gallery-photo]');if(photoButton){const p=products.find(p=>p.id===photoButton.dataset.galleryProduct),v=p?.variants.find(v=>v.id===selected[p.id])||p?.variants[0];if(v&&variantImages(p,v,failedImages).some(photo=>photo.src===photoButton.dataset.galleryPhoto)){gallerySelection[v.id]=photoButton.dataset.galleryPhoto;renderDetail(p.id);const target=[...document.querySelectorAll('[data-gallery-photo]')].find(button=>button.dataset.galleryPhoto===gallerySelection[v.id]);target?.focus({preventScroll:true});}return;}const openPhoto=e.target.closest('[data-gallery-open]');if(openPhoto){openImageViewer(openPhoto.dataset.galleryOpen);return;}const brandButton=e.target.closest('[data-brand]');if(brandButton){brand=brandButton.dataset.brand;category='All';query='';$('search').value='';$('brandFilter').value=brand;renderProducts();location.hash='#shop';}const categoryLink=e.target.closest('[data-go-category]');if(categoryLink){category=categoryLink.dataset.goCategory;renderProducts();location.hash='#shop';}const addButton=e.target.closest('[data-add]');if(addButton)add(addButton.dataset.add);const filter=e.target.closest('[data-category]');if(filter){category=filter.dataset.category;renderProducts();}if(e.target.id==='clearSearch'){query='';category='All';brand='All';$('brandFilter').value='All';$('search').value='';renderProducts();}const qty=e.target.closest('[data-qty]');if(qty){const item=cart.find(x=>x.variantId===qty.dataset.qty);if(item){item.quantity+=Number(qty.dataset.delta);if(item.quantity<1)cart=cart.filter(x=>x!==item);const {v}=variant(qty.dataset.qty);if(Number.isSafeInteger(v.stock))item.quantity=Math.min(item.quantity,v.stock);save();}}const remove=e.target.closest('[data-remove]');if(remove){cart=cart.filter(x=>x.variantId!==remove.dataset.remove);save();}});
-document.addEventListener('change',e=>{if(e.target.dataset.select){selected[e.target.dataset.select]=e.target.value;if(location.hash.startsWith('#product/'))renderDetail(e.target.dataset.select);else renderProducts();}});$('search').oninput=e=>{query=e.target.value;renderProducts();if(['#checkout','#confirmation'].includes(location.hash)||location.hash.startsWith('#product/'))location.hash='#shop';};$('headerSearch').onsubmit=e=>{e.preventDefault();query=$('search').value;renderProducts();location.hash='#shop';};$('brandFilter').onchange=e=>{brand=e.target.value;renderProducts();};$('sort').onchange=e=>{sort=e.target.value;renderProducts();};window.addEventListener('hashchange',route);
-$('productImageClose').onclick=()=>$('productImageDialog').close();
-$('productImagePrevious').onclick=()=>moveImageViewer(-1);$('productImageNext').onclick=()=>moveImageViewer(1);
-$('productImageZoom').onclick=()=>{const zoomed=$('productImageStage').classList.toggle('is-zoomed');$('productImageZoom').setAttribute('aria-pressed',String(zoomed));$('productImageZoom').textContent=zoomed?'Fit image':'Zoom in';};
-$('productImageDialog').addEventListener('keydown',e=>{if(e.key==='ArrowLeft'){e.preventDefault();moveImageViewer(-1);}if(e.key==='ArrowRight'){e.preventDefault();moveImageViewer(1);}});
-$('productImageDialog').addEventListener('close',()=>{imageViewer=null;resetImageZoom();});
+$("bag").onclick=openBag;$("close").onclick=closeBag;$("shade").onclick=closeBag;
+document.querySelectorAll("[data-cat]").forEach(x=>x.onclick=e=>{e.preventDefault();setCat(x.dataset.cat)});
+$("sort").onchange=render;
+$("search").onsubmit=e=>{e.preventDefault();q=$("q").value;cat="all";render();$("shop").scrollIntoView({behavior:"smooth"})};
+$("q").oninput=e=>{q=e.target.value;render()};
+$("checkoutFields").onsubmit=e=>{e.preventDefault();retailEnquiry()};
+render();drawCart();
 
-try{let data;try{data=await api('./api/catalog');}catch{const [p,s]=await Promise.all([fetch('catalog.json').then(r=>r.json()),fetch('store.json').then(r=>r.json())]);data={products:p,store:s,paymentReady:false};}rawProducts=data.products;products=visibleCatalogue(rawProducts);try{brands=await fetch('brands.json').then(r=>r.json());}catch{brands=[];}renderBrands();store=data.store;pricingTier=data.tier||'retail';paymentReady=data.paymentReady;cart=sanitiseCart(storageGet('mvn-cart-v2',[]),products);renderProducts();renderCart();route();}catch(e){$('products').textContent='The catalogue could not load. Please contact the store on +91 77088 30513.';}
+function showDetail(id){
+ const p=P.find(x=>x.id===id);if(!p)return;
+ const dlg=$("productDialog"),root=$("productDetail");
+ const photo=p.img?'<img src="'+p.img+'" alt="'+p.name+'" loading="lazy">':'<div class="placeholder"><b>'+p.name+'</b>Verified product image pending</div>';
+ root.innerHTML='<div class="detail-layout"><div class="detail-photo">'+photo+'</div><div class="detail-copy"><span class="eyebrow dark">UNICORN PRO SERIES</span><h2>'+p.name+'</h2><p>'+p.desc+'</p><p class="detail-note">Product pack and flavour availability are confirmed before fulfilment. Front/back pack-label and ingredient photos will be added after verification; please request the current label when ordering.</p><label for="detail-variant">FLAVOUR / PACK SIZE</label><select id="detail-variant">'+p.variants.map((v,i)=>'<option value="'+i+'">'+v.label+'</option>').join("")+'</select><h3 id="detail-price">'+money(p.variants[0].price)+'</h3><button class="primary" id="detail-add">ADD TO CART +</button></div></div>';
+ root.querySelectorAll("img").forEach(img=>img.addEventListener("error",()=>{img.hidden=true}));
+ const sel=$("detail-variant");sel.onchange=()=>{$("detail-price").textContent=money(p.variants[Number(sel.value)].price)};
+ $("detail-add").onclick=()=>{const k=p.id+"|"+sel.value;cart[k]=Math.min(999,(cart[k]||0)+1);persist();dlg.close();openBag()};
+ if(typeof dlg.showModal==="function")dlg.showModal();else dlg.setAttribute("open","");
+}
+$("detailClose").onclick=()=>$("productDialog").close();
 
-try{const {user}=await api('/api/session');if(user){const form=$('checkoutForm');form.elements.name.value=user.name;form.elements.email.value=user.email;form.elements.email.readOnly=true;}}catch{}
+document.querySelectorAll(".hero-visual img,.detail-photo img").forEach(img=>img.addEventListener("error",()=>{img.hidden=true}));
