@@ -40,6 +40,8 @@ try {
     await page.locator('img.hero-product').scrollIntoViewIfNeeded();
     try{await page.waitForFunction(()=>{const x=document.querySelector('img.hero-product');return x&&x.complete;},{timeout:14000});}catch{}
     const heroImage=await page.locator('img.hero-product').evaluate(el=>({src:el.src,complete:el.complete,loaded:el.naturalWidth>0,naturalWidth:el.naturalWidth,hidden:el.hidden}));
+    await page.evaluate(()=>window.scrollTo(0,0));
+    await delay(250);
     // Capture the actual rendered viewport for external visual inspection.
     const viewportShot=(await page.screenshot({type:'jpeg',quality:42,fullPage:false,animations:'disabled'})).toString('base64');
     for(let i=0;i<viewportShot.length;i+=9000)console.log('MVN_VIEW_'+preset.name+'_'+String(i/9000).padStart(3,'0')+' '+viewportShot.slice(i,i+9000));
@@ -51,6 +53,25 @@ try {
     assert.ok(/4[,\\s]?999/.test(cartText||''),preset.name+' correct cart price: '+JSON.stringify(cartText));
     assert.match(await page.locator('#checkoutFields').innerText(),/payment and delivery are temporarily disabled/i,preset.name+' enquiry mode');
     await page.locator('#close').click();
+    // The supplier-provided 5 kg bucket image must never represent the 3 kg box.
+    await page.locator('#v-mass').selectOption('1');
+    await page.locator('#v-mass').scrollIntoViewIfNeeded();
+    await page.waitForFunction(()=>{
+      const photo=document.querySelector('.add[data-id="mass"]')?.closest('.card')?.querySelector('.photo img');
+      return photo&&photo.complete;
+    },null,{timeout:20000});
+    const bucket=await page.locator('.add[data-id="mass"]').evaluate(btn=>{
+      const img=btn.closest('.card').querySelector('.photo img');
+      return {src:img.src,naturalWidth:img.naturalWidth,hidden:img.hidden};
+    });
+    assert.ok(bucket.naturalWidth>0&&!bucket.hidden,preset.name+' 5kg bucket photo must load');
+    await page.locator('#v-mass').selectOption('0');
+    const missingBox=await page.locator('.add[data-id="mass"]').evaluate(btn=>{
+      const photo=btn.closest('.card').querySelector('.photo');
+      return {imgHidden:photo.querySelector('img')?.hidden,placeholderVisible:!photo.querySelector('.placeholder').hidden};
+    });
+    assert.ok(missingBox.imgHidden&&missingBox.placeholderVisible,preset.name+' 3kg box must not show 5kg bucket');
+    console.log('NITRO_IMAGES',preset.name,JSON.stringify({bucket,missingBox}));
     await page.locator('button[data-detail="mass"]').click();
     assert.ok(await page.locator('#productDialog').isVisible(),preset.name+' product details dialog');
     await page.locator('#detailClose').click();
