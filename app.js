@@ -44,8 +44,8 @@ $("send").disabled=!n;
 document.querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>{const k=b.dataset.minus;cart[k]-=1;if(cart[k]<=0)delete cart[k];persist()});
 document.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>{const k=b.dataset.plus;cart[k]=Math.min(99,cart[k]+1);persist()});
 }
-function openBag(){$("shade").hidden=false;$("drawer").classList.add("open");$("drawer").setAttribute("aria-hidden","false")}
-function closeBag(){$("shade").hidden=true;$("drawer").classList.remove("open");$("drawer").setAttribute("aria-hidden","true")}
+function openBag(){$("shade").hidden=false;$("drawer").inert=false;$("drawer").classList.add("open");$("drawer").setAttribute("aria-hidden","false");$("close").focus()}
+function closeBag(){$("shade").hidden=true;$("drawer").classList.remove("open");$("drawer").setAttribute("aria-hidden","true");$("drawer").inert=true;$("bag").focus()}
 function retailEnquiry(){
 const entries=Object.entries(cart).filter(([k])=>getItem(k));if(!entries.length)return;
 const name=$("customerName").value.trim(),phone=$("customerPhone").value.trim();
@@ -54,8 +54,9 @@ const lines=entries.map(([k,n])=>{const {p,v}=getItem(k);return p.name+" — "+v
 const {subtotal}=totals();
 const msg="Hello Max Volume Nutrition, I would like to enquire about availability:\n\n"+lines.join("\n")+"\n\nProduct subtotal: "+money(subtotal)+"\n\nName: "+name+"\nPhone: "+phone+"\n\nPlease confirm product availability. This is an enquiry only; payment and delivery are disabled.";
 const link="https://wa.me/"+PHONE+"?text="+encodeURIComponent(msg);
-const opened=window.open(link,"_blank","noopener,noreferrer");
-if(!opened){const fallback=$("whatsappFallback");if(fallback){fallback.href=link;fallback.hidden=false;fallback.focus()}}
+const fallback=$("whatsappFallback");if(fallback){fallback.href=link;fallback.hidden=false}
+const opened=window.open(link,"_blank");
+if(opened){try{opened.opener=null}catch(e){}}else if(fallback)fallback.focus()
 }
 $("bag").onclick=openBag;$("close").onclick=closeBag;$("shade").onclick=closeBag;
 document.querySelectorAll("[data-cat]").forEach(x=>x.onclick=e=>{e.preventDefault();setCat(x.dataset.cat)});
@@ -65,13 +66,14 @@ $("q").oninput=e=>{q=e.target.value;render()};
 $("checkoutFields").onsubmit=e=>{e.preventDefault();retailEnquiry()};
 $("customerPhone").addEventListener("input",()=>$("customerPhone").setCustomValidity(""));
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeBag()});
+$("drawer").inert=true;
 render();drawCart();
 
 function showDetail(id){
  const p=P.find(x=>x.id===id);if(!p)return;
  const dlg=$("productDialog"),root=$("productDetail");
  const photo=p.img?'<img src="'+p.img+'" alt="'+p.name+'" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><div class="placeholder" hidden><b>'+p.name+'</b>Pack photo pending</div>':'<div class="placeholder"><b>'+p.name+'</b>Pack photo pending</div>';
- root.innerHTML='<div class="detail-layout"><div class="detail-photo">'+photo+'</div><div class="detail-copy"><span class="eyebrow dark">UNICORN PRO SERIES</span><h2>'+p.name+'</h2><p>'+p.desc+'</p><p class="detail-note">'+p.imageNote+'. Product pack and flavour availability are confirmed before fulfilment. Front/back packaging and ingredient photos will be added after verification; please request the current label when enquiring.</p><label for="detail-variant">FLAVOUR / PACK SIZE</label><select id="detail-variant">'+p.variants.map((v,i)=>'<option value="'+i+'">'+v.label+'</option>').join("")+'</select><h3 id="detail-price">'+money(p.variants[0].price)+'</h3><button class="primary" id="detail-add">ADD TO CART +</button></div></div>';
+ root.innerHTML='<div class="detail-layout"><div class="detail-photo">'+photo+'</div><div class="detail-copy"><span class="eyebrow dark">UNICORN PRO SERIES</span><h2>'+p.name+'</h2><p>'+p.desc+'</p><p class="detail-note">'+p.imageNote+'. Product pack and flavour availability are confirmed before fulfilment. Front/back packaging and ingredient photos will be added after verification; please request the current label when enquiring.</p><label for="detail-variant">FLAVOUR / PACK SIZE</label><select id="detail-variant">'+p.variants.map((v,i)=>'<option value="'+i+'">'+v.label+'</option>').join("")+'</select><h3 id="detail-price">'+money(p.variants[0].price)+'</h3><button class="primary" id="detail-add">ADD TO CART +</button><a class="label-enquiry" target="_blank" rel="noopener noreferrer" href="https://wa.me/" + PHONE + "?text="+encodeURIComponent("Hello Max Volume Nutrition, please share the current front/back packaging and ingredient label photographs for "+p.name+" · "+p.size)+'">REQUEST CURRENT PRODUCT LABEL ↗</a></div></div>';
  const sel=$("detail-variant");sel.onchange=()=>{$("detail-price").textContent=money(p.variants[Number(sel.value)].price)};
  $("detail-add").onclick=()=>{const k=p.id+"|"+sel.value;cart[k]=(cart[k]||0)+1;persist();dlg.close();openBag()};
  if(typeof dlg.showModal==="function")dlg.showModal();else dlg.setAttribute("open","");
