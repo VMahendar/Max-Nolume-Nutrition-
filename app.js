@@ -69,3 +69,6 @@ function showDetail(id){
  if(typeof dlg.showModal==="function")dlg.showModal();else dlg.setAttribute("open","");
 }
 $("detailClose").onclick=()=>$("productDialog").close();
+
+// Featured cards use the same verified catalogue and public retail variants.
+document.querySelectorAll("[data-feature]").forEach(button=>button.addEventListener("click",()=>showDetail(button.dataset.feature)));
