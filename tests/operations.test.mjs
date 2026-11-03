@@ -103,3 +103,31 @@ test('dealer portal rejects anonymous and unapproved users while retail catalogu
  await dealer('/api/logout',{});assert.equal((await dealer('/api/dealer/catalog')).status,401);
  }finally{await f.close();}
 });
+
+test('official hosted pack photos are accepted only from manufacturer image paths and have browser CSP support',async()=>{
+ const f=await fixture();try{
+  const admin=f.client(),guest=f.client();await admin('/api/register',{name:'Admin',email:'admin@example.com',password});f.db.prepare("UPDATE users SET role='admin' WHERE email='admin@example.com'").run();
+  const p=(await admin('/api/admin/overview')).body.products[0],source="https://unicornproseries.com/wp-content/uploads/2026/05/Potency-Whey-600x501-1.png";
+  for(const src of [source,source.replace('https://','https://www.')]){
+   assert.equal((await admin('/api/admin/product',{...p,image:src,images:[{src,label:'Pack photo'}],variants:[{...p.variants[0],image:src,images:[src]}]})).status,200);
+   const response=await guest('/api/catalog'),saved=response.body.products[0],policy=response.headers.get('content-security-policy');
+   assert.equal(saved.image,src);assert.equal(saved.images[0].src,src);assert.equal(saved.variants[0].images[0].src,src);assert.equal(saved.variants[0].pricePaise,10000);assert.equal(saved.variants[0].stock,10);
+   assert.ok(policy.includes("img-src 'self' https://revakanya.com https://unicornproseries.com https://www.unicornproseries.com data:"));
+   assert.ok(!policy.includes("connect-src 'self' https://unicornproseries.com"));
+  }
+  const bad=[
+   'http://unicornproseries.com/wp-content/uploads/2026/05/pack.png',
+   'https://unicornproseries.com.evil.example/wp-content/uploads/2026/05/pack.png',
+   'https://unicornproseries.com@evil.example/wp-content/uploads/2026/05/pack.png',
+   'https://unicornproseries.com/private/pack.png',
+   'https://unicornproseries.com/wp-content/uploads/2026/05/../pack.png',
+   'https://unicornproseries.com/wp-content/uploads/2026/05/%2e%2e/pack.png',
+   'https://unicornproseries.com/wp-content/uploads/2026/05/pack.svg',
+   source+'?redirect=https://evil.example'
+  ];
+  for(const src of bad){
+   assert.equal((await admin('/api/admin/product',{...p,image:src})).status,400,src);
+   assert.equal((await admin('/api/admin/product',{...p,images:[src]})).status,400,src);
+  }
+ }finally{await f.close();}
+});

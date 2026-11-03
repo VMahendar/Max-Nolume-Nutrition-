@@ -2,7 +2,7 @@
    Prices are customer-facing INR amounts. Wholesale prices must NEVER be embedded in public JS. */
 const PHONE="917708830513";
 const P=[
-{id:"whey",name:"Potency Whey",cat:"whey",size:"5 lbs",variants:[{label:"Chocolate · 5 lbs",price:4999},{label:"Coffee · 5 lbs",price:4999}],desc:"Premium whey protein for daily training and recovery.",img:"https://revakanya.com/assets/imgs/Potency%20Whey.png"},
+{id:"whey",name:"Potency Whey",cat:"whey",size:"5 lbs",variants:[{label:"Chocolate · 5 lbs",price:4999},{label:"Coffee · 5 lbs",price:4999}],desc:"Premium whey protein for daily training and recovery.",img:"https://unicornproseries.com/wp-content/uploads/2026/05/Potency-Whey-600x501-1.png"},
 {id:"mass",name:"Nitro Mass",cat:"mass",variants:[{label:"3 kg",price:2599},{label:"5 kg",price:3499}],desc:"Mass gainer available in two pack sizes.",img:""},
 {id:"pre",name:"Sturdy Pre-Workout",cat:"pre",variants:[{label:"250 g",price:1399}],desc:"Pre-workout formula for your training routine.",img:"https://revakanya.com/assets/imgs/Sturdy%20Pre%20Workout.png"},
 {id:"creatine",name:"Pro Creatine",cat:"creatine",variants:[{label:"Blueberry · 100 g",price:899},{label:"Cranberry · 100 g",price:899}],desc:"Creatine supplement in two flavour options.",img:"https://revakanya.com/assets/imgs/Pro%20Creatine.png"},
