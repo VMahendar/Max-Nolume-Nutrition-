@@ -38,3 +38,15 @@ test('variant galleries keep flavour views separate and fall back when one galle
  assert.deepEqual(variantImages(product,{id:'flavour',image:'assets/berry.jpg',images:[{src:'assets/berry-back.jpg',label:'Label'}]}).map(x=>x.src),['assets/berry.jpg','assets/berry-back.jpg']);
  assert.deepEqual(visibleCatalogue([product],new Set(['assets/front.jpg','assets/back.jpg'])),[]);
 });
+
+test('retired Whey packaging stays hidden in saved catalogues while new pack views remain usable',()=>{
+ const retired={id:'potency-whey',image:'assets/potency-whey.png',images:[{src:'assets/potency-whey.png',label:'Old pack'}],variants:[{id:'whey-chocolate',pricePaise:499900,mrpPaise:859900},{id:'whey-coffee',pricePaise:499900,mrpPaise:859900}]};
+ const copy=structuredClone(retired);
+ assert.deepEqual(visibleCatalogue([retired]),[]);
+ assert.deepEqual(retired,copy);
+ const current={...retired,images:[...retired.images,{src:'assets/whey-white-blue-front.jpg',label:'Front'},{src:'assets/whey-white-blue-back.jpg',label:'Back'}]};
+ assert.deepEqual(variantImages(current,current.variants[0]).map(x=>x.label),['Front','Back']);
+ assert.equal(variantImage(current,current.variants[0]),'assets/whey-white-blue-front.jpg');
+ assert.equal(visibleCatalogue([current])[0].variants[0].pricePaise,499900);
+ assert.deepEqual(variantImages(current,{...current.variants[1],image:'assets/potency-whey.png',images:['assets/potency-whey.png']}),[]);
+});

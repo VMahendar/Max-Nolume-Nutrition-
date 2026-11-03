@@ -31,7 +31,7 @@ The official product-page text can be read through the web tool, but direct down
 
 The owner needs to add `unicornproseries.com` to the Cloud Environment network allowlist, or provide the original pack photographs in the existing PR assets folder. Then the original official gallery files can be downloaded, inspected for current white-and-blue packaging and exact pack/flavour matching, and added without image processing. Only views actually supplied by the manufacturer will be labelled front/back; no missing views or new product prices are invented.
 
-The white-and-blue Potency Whey image replacement and official multi-view imports have **not** been applied yet. Existing catalogue/hero photos remain unchanged. This gallery preparation is committed to PR #1 and is not yet deployed to the Free preview while the requested media is pending. The previously approved Nitro Mass 5 kg upload remains intact.
+The white-and-blue Potency Whey image replacement and official multi-view imports have **not** been applied yet. The owner explicitly retired the black-and-gold Whey pack: seed catalogue image references are cleared, the storefront excludes the exact retired local artwork even in saved catalogues, and the hero uses the previously approved Nitro Mass 5 kg bucket instead. Whey remains hidden until usable current-pack photos are supplied. The archived asset and product/variant records are retained; no replacement packaging is invented. This gallery preparation is committed to PR #1 and is not yet deployed to the Free preview while the requested media is pending. The previously approved Nitro Mass 5 kg upload remains intact.
 
 ## Validation
 
@@ -39,3 +39,7 @@ The white-and-blue Potency Whey image replacement and official multi-view import
 - Local Chromium covers real existing pack images and explicitly labelled secondary-view fixtures: thumbnails, full-size original link, zoom/reset, previous/next, arrow keys, Escape, missing secondary views and 320–1440px layout.
 - Existing cart, customer registration/login, wholesale application/approval, administrator MRP saves, the exact Nitro bucket and distributor certificate still pass with no page JavaScript errors.
 - No payment/courier activation, new hosting resource or main-branch merge.
+
+## Retired Whey artwork check
+
+The six focused catalogue tests pass, including old images in saved product and variant galleries, new front/back gallery fallback, record preservation and unchanged selling prices. Current-pack paths in this test are fixtures only; no white-and-blue photos have been imported. This retirement is PR-only until a staging deployment is performed. A true 360° rotation needs a complete ordered sequence of original angles; existing gallery navigation does not invent missing sides.

@@ -5,18 +5,18 @@
     "category": "Protein",
     "subtitle": "Your daily training companion",
     "description": "Unicorn Pro Series whey protein. Check the pack label for ingredients, nutrition and allergen information. Contains milk ingredients.",
-    "image": "assets/potency-whey.png",
+    "image": null,
     "variants": [
       {
         "id": "whey-chocolate",
-        "label": "5 lb \u00b7 Chocolate",
+        "label": "5 lb · Chocolate",
         "pricePaise": 499900,
         "stock": null,
         "mrpPaise": 859900
       },
       {
         "id": "whey-coffee",
-        "label": "5 lb \u00b7 Coffee",
+        "label": "5 lb · Coffee",
         "pricePaise": 499900,
         "stock": null,
         "mrpPaise": 859900
@@ -34,14 +34,14 @@
     "variants": [
       {
         "id": "mass-5kg",
-        "label": "5 kg bucket \u00b7 Double Rich Chocolate",
+        "label": "5 kg bucket · Double Rich Chocolate",
         "pricePaise": 349900,
         "stock": null,
         "image": "assets/Screenshot_2026_1103_003852.jpg"
       },
       {
         "id": "mass-3kg",
-        "label": "3 kg \u00b7 Pack to confirm",
+        "label": "3 kg · Pack to confirm",
         "pricePaise": 259900,
         "stock": null,
         "image": null
@@ -59,14 +59,14 @@
     "variants": [
       {
         "id": "creatine-blueberry",
-        "label": "100 g \u00b7 Blueberry",
+        "label": "100 g · Blueberry",
         "pricePaise": 89900,
         "stock": null,
         "mrpPaise": 149900
       },
       {
         "id": "creatine-cranberry",
-        "label": "100 g \u00b7 Cranberry",
+        "label": "100 g · Cranberry",
         "pricePaise": 89900,
         "stock": null,
         "mrpPaise": 149900
@@ -84,7 +84,7 @@
     "variants": [
       {
         "id": "pre-watermelon",
-        "label": "250 g \u00b7 Watermelon",
+        "label": "250 g · Watermelon",
         "pricePaise": 139900,
         "stock": null
       }

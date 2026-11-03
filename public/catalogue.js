@@ -15,7 +15,8 @@ export function variantImages(product,variant,failedImages=new Set()){
  else gallery=imageEntries(product.images);
  if(typeof primary==='string'&&primary.trim()&&!gallery.some(image=>image.src===primary.trim()))gallery.unshift({src:primary.trim(),label:'Main view',alt:''});
  const seen=new Set();
- return gallery.filter(image=>{if(failedImages.has(image.src)||seen.has(image.src))return false;seen.add(image.src);return true;});
+ // Retired black-and-gold Whey artwork must not return from saved catalogues.
+ return gallery.filter(image=>{if(product.id==='potency-whey'&&image.src==='assets/potency-whey.png')return false;if(failedImages.has(image.src)||seen.has(image.src))return false;seen.add(image.src);return true;});
 }
 export function variantImage(product,variant,failedImages=new Set()){
  return variantImages(product,variant,failedImages)[0]?.src||'';
