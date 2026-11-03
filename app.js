@@ -20,7 +20,7 @@ $("grid").innerHTML=items.length?items.map(card).join(""):'<div class="no-result
 const reset=$("resetFilters");if(reset)reset.onclick=()=>{cat="all";q="";$("q").value="";$("sort").value="default";render()};
 $("resultText").textContent=items.length+" product"+(items.length===1?"":"s")+" available";
 document.querySelectorAll(".variant").forEach(s=>s.addEventListener("change",()=>{const p=P.find(x=>x.id===s.id.slice(2));$("price-"+p.id).textContent=money(p.variants[Number(s.value)].price)}));
-document.querySelectorAll(".details-link").forEach(b=>b.addEventListener("click",()=>showDetail(b.dataset.detail)));
+// Dedicated product pages handle full details and manufacturer documentation.
 document.querySelectorAll(".add").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.id+"|"+$("v-"+b.dataset.id).value;cart[k]=Math.min(99,(cart[k]||0)+1);persist();openBag()}));
 }
 function setCat(c){cat=c;document.querySelectorAll(".cats [data-cat]").forEach(b=>b.classList.toggle("active",b.dataset.cat===c));render();document.querySelector(".productbar").scrollIntoView({behavior:"smooth",block:"start"})}
@@ -59,6 +59,7 @@ $("customerPhone").addEventListener("input",()=>$("customerPhone").setCustomVali
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeBag()});
 $("drawer").inert=true;
 render();drawCart();
+if(new URLSearchParams(window.location.search).get("cart")==="1")openBag();
 
 function showDetail(id){
  const p=P.find(x=>x.id===id);if(!p)return;
