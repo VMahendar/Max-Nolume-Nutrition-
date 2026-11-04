@@ -26,8 +26,8 @@ test('the new white/blue whey photo is not replaced by the old generic pack',()=
   const whey=catalog.find(p=>p.id==='potency-whey');
   assert.ok(whey,'Potency Whey product must remain in the catalogue');
   assert.deepEqual(whey.variants.map(v=>v.pricePaise),[499900,499900]);
-  assert.match(root,/Potency-Whey-600x501-1\\.png/);
-  assert.match(render,/Potency-Whey-600x501-1\\.png/);
+  assert.match(root,/Potency-Whey-600x501-1\.png/);
+  assert.match(render,/Potency-Whey-600x501-1\.png/);
   assert.doesNotMatch(root,/1ff000_e90a0275d7d54a2faef71492a305f3f6/);
   assert.doesNotMatch(render,/1ff000_e90a0275d7d54a2faef71492a305f3f6/);
   assert.doesNotMatch(root,/assets\/potency-whey\.png/);
