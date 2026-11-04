@@ -19,17 +19,17 @@ test('the storefront displays the exact uploaded MVN logo in Codex and Render',(
   }
 });
 
-test('the new white/blue whey photo is not replaced by the old generic pack',()=>{
-  const root=readFileSync('products.js','utf8');
-  const render=readFileSync('public/app.js','utf8');
-  const catalog=JSON.parse(readFileSync('public/catalog.json','utf8'));
-  const whey=catalog.find(p=>p.id==='potency-whey');
+test('the old Whey pack is not displayed or misrepresented as new packaging',()=>{
+  const wheyProducts=JSON.parse(readFileSync('public/catalog.json','utf8'));
+  const whey=wheyProducts.find(p=>p.id==='potency-whey');
   assert.ok(whey,'Potency Whey product must remain in the catalogue');
   assert.deepEqual(whey.variants.map(v=>v.pricePaise),[499900,499900]);
-  assert.match(root,/Potency-Whey-600x501-1\.png/);
-  assert.match(render,/Potency-Whey-600x501-1\.png/);
-  assert.doesNotMatch(root,/1ff000_e90a0275d7d54a2faef71492a305f3f6/);
-  assert.doesNotMatch(render,/1ff000_e90a0275d7d54a2faef71492a305f3f6/);
-  assert.doesNotMatch(root,/assets\/potency-whey\.png/);
-  assert.doesNotMatch(render,/assets\/potency-whey\.png/);
+  assert.equal(whey.image,null,'Unverified product picture must not be published');
+  assert.deepEqual(whey.images,[]);
+  for(const file of ['products.js','public/app.js','index.html','public/index.html','data/products.json','public/catalog.json']){
+    const src=readFileSync(file,'utf8');
+    assert.doesNotMatch(src,/Potency-Whey-600x501-1\\.png|1ff000_e90a0275d7d54a2faef71492a305f3f6/,file+' must not show retired black-gold Whey pack');
+  }
+  assert.match(readFileSync('products.js','utf8'),/id:"whey-chocolate"/);
+  assert.match(readFileSync('public/app.js','utf8'),/id:"whey"/);
 });
