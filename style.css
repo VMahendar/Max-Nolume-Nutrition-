@@ -296,3 +296,13 @@ footer:not(.premium-footer) a{color:#e0ca9b}
 @media(max-width:1120px){#shop .grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:790px){#shop{padding:45px 18px 65px}#shop .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}#shop .category-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}#shop .photo{height:230px}#shop .photo img{max-height:205px}#shop .info{padding:15px}#shop .info h3{font-size:18px}#shop .price b{font-size:25px}}
 @media(max-width:480px){#shop{padding:34px 12px 50px}#shop .grid{gap:10px}#shop .photo{height:178px;padding:19px 9px 9px}#shop .photo img{max-height:145px}#shop .info{padding:13px 10px}#shop .info h3{font-size:16px}#shop .info p{font-size:11px;min-height:50px}#shop .price b{font-size:22px}#shop .details-link{font-size:9px}#shop .add{font-size:10px;min-height:44px}#shop .card .badge{font-size:7px;padding:5px 6px}#shop .placeholder{padding:10px 4px;min-height:130px}#shop .placeholder:before{width:45px;height:45px;font-size:17px}#shop .placeholder b{font-size:13px!important}#shop .category-tiles{gap:9px}#shop .category-tiles button{padding:12px;min-height:100px}#shop .productbar h3{font-size:21px}}
+
+
+/* Owner's original unmodified Max Volume Nutrition PNG lockup.
+   Do not replace with generated initials, simulated lettering or a substitute font. */
+.brand:has(.original-brand-logo),.footbrand:has(.original-brand-logo){display:flex;align-items:center;min-width:0;gap:0}
+.original-brand-logo{display:block;height:76px;width:auto;max-width:100%;object-fit:contain;object-position:center;flex-shrink:0;filter:none!important;transform:none!important}
+.original-footer-logo{height:105px}
+.storehead:has(.original-brand-logo){height:auto;min-height:100px}
+.account-header .original-brand-logo{height:72px}
+@media(max-width:760px){.original-brand-logo{height:60px}.original-footer-logo{height:85px}.storehead:has(.original-brand-logo){min-height:78px}.account-header .original-brand-logo{height:60px}}
