@@ -40,8 +40,8 @@ test('approved 5 kg image replaces legacy references while retaining stock, pric
  }finally{C.db.close();rmSync(dir,{recursive:true,force:true});}
 });
 
-test('current Whey photo replaces retired saved references without changing prices, stock or custom images',()=>{
- const dir=mkdtempSync(resolve(tmpdir(),'mvn-whey-photo-')),C=openCommerce(dir),source="https://unicornproseries.com/wp-content/uploads/2026/05/Potency-Whey-600x501-1.png";
+test('retired Whey imagery is hidden without changing prices, stock or custom images',()=>{
+ const dir=mkdtempSync(resolve(tmpdir(),'mvn-whey-photo-')),C=openCommerce(dir),source=null;
  try{
   const p=C.catalogue(null,true).find(p=>p.id==='potency-whey');
   p.image='assets/potency-whey.png';p.variants[0].image='assets/potency-whey.png';
@@ -49,6 +49,11 @@ test('current Whey photo replaces retired saved references without changing pric
   C.db.prepare('UPDATE inventory SET on_hand=7 WHERE variant_id=?').run('whey-chocolate');
   const updated=C.catalogue(null).find(p=>p.id==='potency-whey');
   assert.equal(updated.image,source);assert.equal(updated.variants[0].image,source);assert.equal(updated.variants[0].pricePaise,499900);assert.equal(updated.variants[0].stock,7);assert.equal(updated.variants[0].mrpPaise,859900);
+  p.image='https://unicornproseries.com/wp-content/uploads/2026/05/Potency-Whey-600x501-1.png';
+  p.variants[0].image=p.image;
+  C.db.prepare('UPDATE products SET data=? WHERE id=?').run(JSON.stringify(p),p.id);
+  const retired=C.catalogue(null).find(p=>p.id==='potency-whey');
+  assert.equal(retired.image,null);assert.equal(retired.variants[0].image,null);
   p.image='assets/custom.jpg';p.variants[0].image='assets/custom-pack.jpg';C.db.prepare('UPDATE products SET data=? WHERE id=?').run(JSON.stringify(p),p.id);
   const custom=C.catalogue(null).find(p=>p.id==='potency-whey');assert.equal(custom.image,'assets/custom.jpg');assert.equal(custom.variants[0].image,'assets/custom-pack.jpg');
   p.image=null;p.variants[0].image=null;C.db.prepare('UPDATE products SET data=? WHERE id=?').run(JSON.stringify(p),p.id);
