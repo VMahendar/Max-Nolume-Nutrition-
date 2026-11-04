@@ -141,3 +141,13 @@ aside{width:min(470px,100%);box-shadow:-20px 0 55px #06102022}
 .account-header nav{display:flex;gap:18px;flex-wrap:wrap}.account-header .brand{min-width:0}
 [hidden]{display:none!important}.dealer-prices{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}.dealer-prices article{padding:20px;border:1px solid #cbd5e1;background:#fff}
 @media(max-width:620px){.head-actions{gap:8px}.account-link{font-size:9px}.account-header{align-items:flex-start;flex-direction:column}}
+
+
+/* Owner's original unmodified Max Volume Nutrition PNG lockup.
+   Do not replace with generated initials, simulated lettering or a substitute font. */
+.brand:has(.original-brand-logo),.footbrand:has(.original-brand-logo){display:flex;align-items:center;min-width:0;gap:0}
+.original-brand-logo{display:block;height:76px;width:auto;max-width:100%;object-fit:contain;object-position:center;flex-shrink:0;filter:none!important;transform:none!important}
+.original-footer-logo{height:105px}
+.storehead:has(.original-brand-logo){height:auto;min-height:100px}
+.account-header .original-brand-logo{height:72px}
+@media(max-width:760px){.original-brand-logo{height:60px}.original-footer-logo{height:85px}.storehead:has(.original-brand-logo){min-height:78px}.account-header .original-brand-logo{height:60px}}
