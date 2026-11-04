@@ -34,7 +34,7 @@ try {
     const logo=await page.locator('header .brand img.original-brand-logo').evaluate(img=>({
       src:img.getAttribute('src'),width:img.naturalWidth,height:img.naturalHeight,display:getComputedStyle(img).display
     }));
-    assert.equal(logo.src,'max-volume-logo-wide.png',preset.name+' must use the owner's existing full-lettering logo image');
+    assert.equal(logo.src,'max-volume-logo-wide.png',preset.name+" must use the owner-approved full-lettering logo image");
     assert.ok(logo.width>0&&logo.height>0,preset.name+' brand logo image must load');
     assert.equal(await page.locator('header .brand .mvmark').count(),0,preset.name+' fake MV text must not render');
 
