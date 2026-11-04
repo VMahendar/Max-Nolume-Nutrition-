@@ -1,3 +1,8 @@
+const retiredWheyImageSources=new Set([
+ 'assets/potency-whey.png',
+ 'https://unicornproseries.com/wp-content/uploads/2026/05/Potency-Whey-600x501-1.png',
+ 'https://static.wixstatic.com/media/1ff000_e90a0275d7d54a2faef71492a305f3f6~mv2.png'
+]);
 // Galleries follow the selected pack. An explicit missing variant image never
 // inherits another pack's photos unless its own gallery is supplied.
 function imageEntries(value){
@@ -16,7 +21,7 @@ export function variantImages(product,variant,failedImages=new Set()){
  if(typeof primary==='string'&&primary.trim()&&!gallery.some(image=>image.src===primary.trim()))gallery.unshift({src:primary.trim(),label:'Main view',alt:''});
  const seen=new Set();
  // Retired black-and-gold Whey artwork must not return from saved catalogues.
- return gallery.filter(image=>{if(product.id==='potency-whey'&&image.src==='assets/potency-whey.png')return false;if(failedImages.has(image.src)||seen.has(image.src))return false;seen.add(image.src);return true;});
+ return gallery.filter(image=>{if(product.id==='potency-whey'&&retiredWheyImageSources.has(image.src))return false;if(failedImages.has(image.src)||seen.has(image.src))return false;seen.add(image.src);return true;});
 }
 export function variantImage(product,variant,failedImages=new Set()){
  return variantImages(product,variant,failedImages)[0]?.src||'';

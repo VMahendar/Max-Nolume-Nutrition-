@@ -31,6 +31,13 @@ try {
     assert.equal(await page.locator('#grid article.card').count(),5,preset.name+' product family count');
     assert.ok(await page.locator('.hero h1').isVisible(),preset.name+' hero visible');
     assert.ok(await page.locator('body').getAttribute('class')==='retail-home',preset.name+' design class');
+    const logo=await page.locator('header .brand img.original-brand-logo').evaluate(img=>({
+      src:img.getAttribute('src'),width:img.naturalWidth,height:img.naturalHeight,display:getComputedStyle(img).display
+    }));
+    assert.equal(logo.src,'max-volume-logo-wide.png',preset.name+" must use the owner-approved full-lettering logo image");
+    assert.ok(logo.width>0&&logo.height>0,preset.name+' brand logo image must load');
+    assert.equal(await page.locator('header .brand .mvmark').count(),0,preset.name+' fake MV text must not render');
+
     const measured=await page.evaluate(()=>{
       const grid=document.querySelector('#grid'),hero=document.querySelector('.hero');
       return {width:innerWidth,scrollWidth:document.documentElement.scrollWidth,columns:getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length,heroBackground:getComputedStyle(hero).backgroundColor,heroText:document.querySelector('.hero h1')?.innerText,cartPresent:!!document.querySelector('#bag'),accountPresent:!!document.querySelector('a[href="account.html"]'),dealerPresent:!!document.querySelector('a[href="dealer.html"]')};

@@ -5,7 +5,7 @@
     "category": "Protein",
     "subtitle": "Your daily training companion",
     "description": "Unicorn Pro Series whey protein. Check the pack label for ingredients, nutrition and allergen information. Contains milk ingredients.",
-    "image": "https://unicornproseries.com/wp-content/uploads/2026/05/Potency-Whey-600x501-1.png",
+    "image": null,
     "variants": [
       {
         "id": "whey-chocolate",
@@ -23,13 +23,7 @@
       }
     ],
     "brand": "Unicorn Pro Series",
-    "images": [
-      {
-        "src": "https://unicornproseries.com/wp-content/uploads/2026/05/Potency-Whey-600x501-1.png",
-        "label": "Pack photo",
-        "alt": "Unicorn Pro Series Potency Whey in the owner-confirmed white-and-blue packaging"
-      }
-    ]
+    "images": []
   },
   {
     "id": "nitro-mass",
