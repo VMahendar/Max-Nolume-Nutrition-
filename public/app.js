@@ -14,7 +14,7 @@ let cat="all",q="",cart={},mode="retail";
 try{const v=JSON.parse(localStorage.getItem("mvn-cart-v2")||"{}");if(v&&typeof v==="object")cart=v}catch(e){}
 function getItem(k){if(!/^(whey|mass|pre|creatine|vitamins)\|[0-9]+$/.test(k))return null;const [id,i]=k.split("|");const p=P.find(x=>x.id===id),v=p&&p.variants[Number(i)];return p&&v?{p,v}:null}
 cart=Object.fromEntries(Object.entries(cart).filter(([k,v])=>getItem(k)&&Number.isSafeInteger(v)&&v>0&&v<=999));
-function persist(){localStorage.setItem("mvn-cart-v2",JSON.stringify(cart));drawCart()}
+function persist(){try{localStorage.setItem("mvn-cart-v2",JSON.stringify(cart))}catch{}drawCart()}
 function coverImage(p,i){const v=p.variants[Number(i)];return v&&Object.prototype.hasOwnProperty.call(v,"img")?(v.img||""):(p.img||"")}
 function swapPhoto(host,src,name){
  if(!host)return;
@@ -45,7 +45,7 @@ document.querySelectorAll(".add").forEach(b=>b.addEventListener("click",()=>{con
 function setCat(c){cat=c;document.querySelectorAll(".cats [data-cat]").forEach(b=>b.classList.toggle("active",b.dataset.cat===c));render();$("shop").scrollIntoView({behavior:"smooth"})}
 function totals(){let n=0,subtotal=0;for(const [k,qty] of Object.entries(cart)){const item=getItem(k);if(!item)continue;const quantity=Math.min(999,Math.max(0,Number(qty)||0));n+=quantity;subtotal+=item.v.price*quantity;}return{n,subtotal}}
 function drawCart(){
-const {n,subtotal}=totals();$("count").textContent=n;
+const {n,subtotal}=totals();$("count").textContent=n;if($("floatingCount"))$("floatingCount").textContent=n;
 let html=n?"":'<p class="empty-cart">Your cart is empty. Choose your supplements to get started.</p>';
 for(const [k,qty] of Object.entries(cart)){const item=getItem(k);if(!item)continue;html+='<div class="row"><b>'+item.p.name+'</b><small>'+item.v.label+' · '+money(item.v.price)+'</small><div class="qty"><button data-minus="'+k+'" aria-label="Decrease quantity">−</button><span>'+qty+'</span><button data-plus="'+k+'" aria-label="Increase quantity">+</button><strong>'+money(item.v.price*qty)+'</strong></div></div>'}
 $("items").innerHTML=html;
@@ -54,8 +54,8 @@ $("send").disabled=!n;
 document.querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>{const k=b.dataset.minus;cart[k]-=1;if(cart[k]<=0)delete cart[k];persist()});
 document.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>{const k=b.dataset.plus;cart[k]=Math.min(999,cart[k]+1);persist()});
 }
-function openBag(){$("shade").hidden=false;$("drawer").classList.add("open");$("drawer").setAttribute("aria-hidden","false")}
-function closeBag(){$("shade").hidden=true;$("drawer").classList.remove("open");$("drawer").setAttribute("aria-hidden","true")}
+function openBag(){$("shade").hidden=false;$("drawer").classList.add("open");$("drawer").setAttribute("aria-hidden","false");document.body.classList.add("cart-open")}
+function closeBag(){$("shade").hidden=true;$("drawer").classList.remove("open");$("drawer").setAttribute("aria-hidden","true");document.body.classList.remove("cart-open")}
 function retailEnquiry(){
 const entries=Object.entries(cart).filter(([k])=>getItem(k));if(!entries.length)return;
 const name=$("customerName").value.trim(),phone=$("customerPhone").value.trim();
@@ -65,7 +65,7 @@ const {subtotal}=totals();
 const msg="Hello Max Volume Nutrition, I would like to enquire about availability:\n\n"+lines.join("\n")+"\n\nProduct subtotal: "+money(subtotal)+"\n\nName: "+name+"\nPhone: "+phone+"\n\nPlease confirm product availability. This is an enquiry only; payment and delivery are disabled.";
 window.open("https://wa.me/"+PHONE+"?text="+encodeURIComponent(msg),"_blank","noopener");
 }
-$("bag").onclick=openBag;$("close").onclick=closeBag;$("shade").onclick=closeBag;
+$("bag").onclick=openBag;if($("floatingCart"))$("floatingCart").onclick=openBag;$("close").onclick=closeBag;$("shade").onclick=closeBag;
 document.querySelectorAll("[data-cat]").forEach(x=>x.onclick=e=>{e.preventDefault();setCat(x.dataset.cat)});
 $("sort").onchange=render;
 $("search").onsubmit=e=>{e.preventDefault();q=$("q").value;cat="all";render();$("shop").scrollIntoView({behavior:"smooth"})};
