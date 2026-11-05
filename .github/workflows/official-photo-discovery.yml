@@ -1,0 +1,23 @@
+name: Official Unicorn product-image discovery
+on:
+  push:
+    branches: [feat/verified-november-stock-unicorn-photos]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  official:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node tests/official-photo-discovery.mjs
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: official-unicorn-source-discovery
+          path: reports/official-photo-research/
+          retention-days: 5
