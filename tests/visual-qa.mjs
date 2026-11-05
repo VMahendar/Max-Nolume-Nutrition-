@@ -73,6 +73,10 @@ try {
     }
     const featuredImage=await page.locator('#grid article.card').first().locator('.photo img').evaluate(img=>({src:img.src,loaded:img.complete&&img.naturalWidth>0,hidden:img.hidden}));
     assert.ok(featuredImage.loaded&&!featuredImage.hidden,preset.name+' first merchandise card shows a real product photo: '+JSON.stringify(featuredImage));
+    if(preset.name==='mobile'){
+      assert.ok(await page.locator('#floatingCart').isVisible(),'mobile persistent shopping cart must be visible');
+      assert.match(await page.locator('#floatingCart').innerText(),/VIEW CART/,'mobile cart has an obvious label');
+    }
     await page.locator('.add[data-id="whey"]').click();
     assert.equal(await page.locator('#count').innerText(),'1',preset.name+' add-to-cart count');
     const cartText=await page.locator('#items').textContent();
@@ -81,6 +85,12 @@ try {
     assert.ok(/4[,\\s]?999/.test(cartText||''),preset.name+' correct cart price: '+JSON.stringify(cartText));
     assert.match(await page.locator('#checkoutFields').innerText(),/payment and delivery are temporarily disabled/i,preset.name+' enquiry mode');
     await page.locator('#close').click();
+    if(preset.name==='mobile'){
+      await page.locator('#floatingCart').click();
+      assert.equal(await page.locator('#drawer').getAttribute('aria-hidden'),'false','mobile floating cart opens the real drawer');
+      assert.match(await page.locator('#items').textContent(),/Potency Whey/,'floating cart contains added product');
+      await page.locator('#close').click();
+    }
     // The supplier-provided 5 kg bucket image must never represent the 3 kg box.
     await page.locator('#v-mass').selectOption('1');
     await page.locator('#v-mass').scrollIntoViewIfNeeded();
@@ -111,6 +121,15 @@ try {
     observations.push({device:preset.name,measured,heroImage,cards,jsErrors:errors});
     await page.close();
   }
+  // If JavaScript fails to load, the homepage still displays a usable
+  // retail catalogue and WhatsApp product enquiries rather than an empty grid.
+  const withoutJs=await browser.newPage({javaScriptEnabled:false,viewport:{width:390,height:844}});
+  const noJsResponse=await withoutJs.goto(origin+'/',{waitUntil:'domcontentloaded'});
+  assert.equal(noJsResponse.status(),200,'JavaScript-disabled homepage responds');
+  assert.equal(await withoutJs.locator('#grid article.card').count(),5,'five product cards render before JavaScript');
+  assert.equal(await withoutJs.locator('#grid a.add[href^="https://wa.me/"]').count(),5,'every fallback card offers a real enquiry action');
+  assert.match(await withoutJs.locator('#grid').textContent(),/4,999/,'retail prices remain visible without JavaScript');
+  await withoutJs.close();
   const page=await browser.newPage();
   assert.equal((await page.goto(origin+'/account.html')).status(),200,'account route');
   assert.ok(await page.locator('form#login').isVisible(),'account login visible');
