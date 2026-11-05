@@ -37,6 +37,7 @@ try {
       const r=img.getBoundingClientRect(),h=img.closest('header').getBoundingClientRect();
       return {loaded:img.complete&&img.naturalWidth>0,width:r.width,height:r.height,left:r.left,right:r.right,headerLeft:h.left,headerRight:h.right};
     });
+    console.log('ORIGINAL_LOGO',preset.name,JSON.stringify(originalLogo));
     assert.ok(originalLogo.loaded&&originalLogo.width>100&&originalLogo.height>40,preset.name+' original logo loads at usable size: '+JSON.stringify(originalLogo));
     assert.ok(originalLogo.left>=originalLogo.headerLeft-2&&originalLogo.right<=originalLogo.headerRight+2,preset.name+' logo must fit header: '+JSON.stringify(originalLogo));
     assert.ok(await page.locator('body').getAttribute('class')==='retail-home',preset.name+' design class');
@@ -56,11 +57,13 @@ try {
     await page.locator('img.hero-product').scrollIntoViewIfNeeded();
     try{await page.waitForFunction(()=>{const x=document.querySelector('img.hero-product');return x&&x.complete;},{timeout:14000});}catch{}
     const heroImage=await page.locator('img.hero-product').evaluate(el=>({src:el.src,complete:el.complete,loaded:el.naturalWidth>0,naturalWidth:el.naturalWidth,hidden:el.hidden}));
-    await page.evaluate(()=>window.scrollTo(0,0));
-    await delay(250);
+    await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';window.scrollTo({top:0,behavior:'instant'});});
+    await delay(180);
     // Capture the actual rendered viewport for external visual inspection.
     const viewportShot=(await page.screenshot({type:'jpeg',quality:42,fullPage:false,animations:'disabled'})).toString('base64');
     for(let i=0;i<viewportShot.length;i+=9000)console.log('MVN_VIEW_'+preset.name+'_'+String(i/9000).padStart(3,'0')+' '+viewportShot.slice(i,i+9000));
+    const featuredImage=await page.locator('#grid article.card').first().locator('.photo img').evaluate(img=>({src:img.src,loaded:img.complete&&img.naturalWidth>0,hidden:img.hidden}));
+    assert.ok(featuredImage.loaded&&!featuredImage.hidden,preset.name+' first merchandise card shows a real product photo: '+JSON.stringify(featuredImage));
     await page.locator('.add[data-id="whey"]').click();
     assert.equal(await page.locator('#count').innerText(),'1',preset.name+' add-to-cart count');
     const cartText=await page.locator('#items').textContent();
