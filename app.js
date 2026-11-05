@@ -14,6 +14,7 @@ return '<article class="card"><span class="badge">UNICORN PRO SERIES</span><div 
 }
 function render(){
 const items=P.filter(p=>(cat==="all"||p.cat===cat)&&((p.name+" "+p.variants.map(v=>v.label).join(" ")).toLowerCase().includes(q.toLowerCase())));
+if($("sort").value==="default")items.sort((a,b)=>Number(Boolean(b.img))-Number(Boolean(a.img)));
 if($("sort").value==="name")items.sort((a,b)=>a.name.localeCompare(b.name));
 if($("sort").value==="low")items.sort((a,b)=>a.variants[0].price-b.variants[0].price);
 $("grid").innerHTML=items.length?items.map(card).join(""):'<div class="no-results">No products matched your search. <button type="button" id="resetFilters">Show all products</button></div>';

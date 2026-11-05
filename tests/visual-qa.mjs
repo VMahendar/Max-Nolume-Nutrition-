@@ -30,6 +30,16 @@ try {
     await page.locator('#grid article.card').first().waitFor({timeout:10000});
     assert.equal(await page.locator('#grid article.card').count(),5,preset.name+' product family count');
     assert.ok(await page.locator('.hero h1').isVisible(),preset.name+' hero visible');
+    assert.match(await page.locator('.hero h1').innerText(),/MAX VOLUME\s+NUTRITION/i,preset.name+' business name is hero headline');
+    assert.match(await page.locator('.hero-declaration').innerText(),/OFFICIAL TAMIL NADU DISTRIBUTOR/i,preset.name+' distribution identity');
+    assert.ok(await page.locator('#brands .brands-intro').isVisible(),preset.name+' upcoming brands section');
+    const originalLogo=await page.locator('header .original-brand-logo').evaluate(img=>{
+      const r=img.getBoundingClientRect(),h=img.closest('header').getBoundingClientRect();
+      return {loaded:img.complete&&img.naturalWidth>0,width:r.width,height:r.height,left:r.left,right:r.right,headerLeft:h.left,headerRight:h.right};
+    });
+    console.log('ORIGINAL_LOGO',preset.name,JSON.stringify(originalLogo));
+    assert.ok(originalLogo.loaded&&originalLogo.width>100&&originalLogo.height>40,preset.name+' original logo loads at usable size: '+JSON.stringify(originalLogo));
+    assert.ok(originalLogo.left>=originalLogo.headerLeft-2&&originalLogo.right<=originalLogo.headerRight+2,preset.name+' logo must fit header: '+JSON.stringify(originalLogo));
     assert.ok(await page.locator('body').getAttribute('class')==='retail-home',preset.name+' design class');
     const logo=await page.locator('header .brand img.original-brand-logo').evaluate(img=>({
       src:img.getAttribute('src'),width:img.naturalWidth,height:img.naturalHeight,display:getComputedStyle(img).display
@@ -47,11 +57,20 @@ try {
     await page.locator('img.hero-product').scrollIntoViewIfNeeded();
     try{await page.waitForFunction(()=>{const x=document.querySelector('img.hero-product');return x&&x.complete;},{timeout:14000});}catch{}
     const heroImage=await page.locator('img.hero-product').evaluate(el=>({src:el.src,complete:el.complete,loaded:el.naturalWidth>0,naturalWidth:el.naturalWidth,hidden:el.hidden}));
-    await page.evaluate(()=>window.scrollTo(0,0));
-    await delay(250);
+    await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';window.scrollTo({top:0,behavior:'instant'});});
+    await delay(180);
     // Capture the actual rendered viewport for external visual inspection.
     const viewportShot=(await page.screenshot({type:'jpeg',quality:42,fullPage:false,animations:'disabled'})).toString('base64');
     for(let i=0;i<viewportShot.length;i+=9000)console.log('MVN_VIEW_'+preset.name+'_'+String(i/9000).padStart(3,'0')+' '+viewportShot.slice(i,i+9000));
+    // Capture lower merchandising sections as evidence, not just the hero.
+    for(const sectionName of ['shop','brands']){
+      await page.locator('#'+sectionName).scrollIntoViewIfNeeded();
+      await delay(280);
+      const shot=(await page.screenshot({type:'jpeg',quality:38,fullPage:false,animations:'disabled'})).toString('base64');
+      for(let i=0;i<shot.length;i+=9000)console.log('MVN_SECTION_'+preset.name+'_'+sectionName+'_'+String(i/9000).padStart(3,'0')+' '+shot.slice(i,i+9000));
+    }
+    const featuredImage=await page.locator('#grid article.card').first().locator('.photo img').evaluate(img=>({src:img.src,loaded:img.complete&&img.naturalWidth>0,hidden:img.hidden}));
+    assert.ok(featuredImage.loaded&&!featuredImage.hidden,preset.name+' first merchandise card shows a real product photo: '+JSON.stringify(featuredImage));
     await page.locator('.add[data-id="whey"]').click();
     assert.equal(await page.locator('#count').innerText(),'1',preset.name+' add-to-cart count');
     const cartText=await page.locator('#items').textContent();
@@ -81,6 +100,8 @@ try {
     console.log('NITRO_IMAGES',preset.name,JSON.stringify({bucket,missingBox}));
     await page.locator('button[data-detail="mass"]').click();
     assert.ok(await page.locator('#productDialog').isVisible(),preset.name+' product details dialog');
+    assert.equal(await page.locator('#detail-variant').inputValue(),'0',preset.name+' product details preserve selected 3kg pack');
+    assert.match(await page.locator('#detail-price').innerText(),/2,599/,preset.name+' selected 3kg price preserved');
     await page.locator('#detailClose').click();
     const cards=await page.locator('#grid article.card').evaluateAll(nodes=>nodes.map(n=>({name:n.querySelector('h3')?.textContent,photo:(()=>{const x=n.querySelector('.photo img');return x?{loaded:x.naturalWidth>0,complete:x.complete,hidden:x.hidden,src:x.src}:null})(),placeholder:!!n.querySelector('.photo .placeholder')})));
     await page.screenshot({path:reportDir+'/'+preset.name+'.png',fullPage:true,animations:'disabled'});
