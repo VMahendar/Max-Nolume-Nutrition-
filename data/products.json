@@ -12,14 +12,22 @@
         "label": "5 lb · Chocolate",
         "pricePaise": 499900,
         "stock": null,
-        "mrpPaise": 859900
+        "mrpPaise": 859900,
+        "prices": {
+          "wholesale": 385000,
+          "gym": 420000
+        }
       },
       {
         "id": "whey-coffee",
         "label": "5 lb · Coffee",
         "pricePaise": 499900,
         "stock": null,
-        "mrpPaise": 859900
+        "mrpPaise": 859900,
+        "prices": {
+          "wholesale": 385000,
+          "gym": 420000
+        }
       }
     ],
     "brand": "Unicorn Pro Series",
@@ -38,14 +46,22 @@
         "label": "5 kg bucket · Double Rich Chocolate",
         "pricePaise": 349900,
         "stock": null,
-        "image": "assets/Screenshot_2026_1103_003852.jpg"
+        "image": "assets/Screenshot_2026_1103_003852.jpg",
+        "prices": {
+          "wholesale": 265000,
+          "gym": 285000
+        }
       },
       {
         "id": "mass-3kg",
         "label": "3 kg · Pack to confirm",
         "pricePaise": 259900,
         "stock": null,
-        "image": null
+        "image": null,
+        "prices": {
+          "wholesale": 195000,
+          "gym": 215000
+        }
       }
     ],
     "brand": "Unicorn Pro Series"
@@ -56,21 +72,31 @@
     "category": "Creatine",
     "subtitle": "Make every session count",
     "description": "Unicorn Pro Series creatine supplement in 100 g packs. Choose Blueberry or Cranberry. Read the pack label for ingredients and directions.",
-    "image": "assets/pro-creatine.png",
+    "image": null,
     "variants": [
       {
         "id": "creatine-blueberry",
         "label": "100 g · Blueberry",
         "pricePaise": 89900,
         "stock": null,
-        "mrpPaise": 149900
+        "mrpPaise": 149900,
+        "image": null,
+        "prices": {
+          "wholesale": 65000,
+          "gym": 75000
+        }
       },
       {
         "id": "creatine-cranberry",
         "label": "100 g · Cranberry",
         "pricePaise": 89900,
         "stock": null,
-        "mrpPaise": 149900
+        "mrpPaise": 149900,
+        "image": "assets/pro-creatine.png",
+        "prices": {
+          "wholesale": 65000,
+          "gym": 75000
+        }
       }
     ],
     "brand": "Unicorn Pro Series"
@@ -87,7 +113,11 @@
         "id": "pre-watermelon",
         "label": "250 g · Watermelon",
         "pricePaise": 139900,
-        "stock": null
+        "stock": null,
+        "prices": {
+          "wholesale": 105000,
+          "gym": 115000
+        }
       }
     ],
     "brand": "Unicorn Pro Series"
@@ -104,7 +134,11 @@
         "id": "musclevite-pack",
         "label": "Pack details to confirm",
         "pricePaise": 69900,
-        "stock": null
+        "stock": null,
+        "prices": {
+          "wholesale": 45000,
+          "gym": 50000
+        }
       }
     ],
     "brand": "Unicorn Pro Series"

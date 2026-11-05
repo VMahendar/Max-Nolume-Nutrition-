@@ -1,71 +1,59 @@
-# MAX VOLUME NUTRITION — SINGLE MASTER WEBSITE
+# MAX VOLUME NUTRITION
 
-Official source-of-truth repository for the Max Volume Nutrition sports-nutrition storefront.
+Sports nutrition retail, wholesale and distribution — Chennai, Tamil Nadu.
 
-## One master, one deployment
+**Current official source:** [GitHub main](https://github.com/VMahendar/Max-Volume-Nutrition-/tree/main)  
+**Current working preview:** https://max-volume-nutrition-preview.onrender.com/  
+**Launch readiness & required external setup:** [docs/LAUNCH_STATUS.md](docs/LAUNCH_STATUS.md)
 
-- **Authoritative source:** `main` branch of this repository.
-- **Current free public test deployment:** https://headless-nlozvpbsxpr-mahendar0605-140c.wix-site-host.com
-- **Wix site ID (edit this same site; do not create a new one):** `9944f2c5-d6f2-4a2a-909e-1d14f6b9eb8b`
-- **Wix dashboard:** https://manage.wix.com/dashboard/9944f2c5-d6f2-4a2a-909e-1d14f6b9eb8b
-- **Legacy separate ChatGPT-hosted URL:** https://max-volume-nutrition.wrydegu128.chatgpt.site — not authoritative; it cannot be synchronized automatically with the Wix-hosted site via this repository. Retire or redirect it from its owning editor when available. Do not advertise it.
-- **Future custom domain:** Not purchased or connected. Hold until staging is signed off.
+## One website, one source of truth
 
-**Never treat Codex preview, the legacy ChatGPT-hosted site, and the Wix test site as three independent masters.** Codex changes should be committed to `main` and then deployed to the **existing** Wix site ID above. Changes made in GitHub alone do not auto-publish to Wix.
+Render serves the advanced Node.js/SQLite storefront from `public/`, using `server.mjs`. The source branch is `main`. The separately retained root `index.html`, `premium.css`, `retail.css` and `app.js` are static/Codex compatibility files; updating them alone **does not** update Render.
 
-## Design direction — original MVN, GNC-inspired merchandising
+Historic Wix and ChatGPT-hosted versions are not the current production destination. Please do not advertise their old links. The custom domain has not yet been bought or connected.
 
-- Professional, high-contrast **GNC-inspired retail layout and shopping usability** — do not copy GNC branding, images, or layouts.
-- Unique Max Volume Nutrition **black/gold** brand identity.
-- Clean white header with strong search and category navigation; black-and-gold hero; bright off-white shopping grid.
-- Real and clearly differentiated product pack photography, bold prices, detailed product pages, responsive mobile browsing.
-- Consistent look across homepage, wholesale, about, contact and policies.
+## Identity
 
-## Catalogue — retail only
+Use the **owner's original** Max Volume Nutrition logo from `public/max-volume-logo-wide.png` and `public/max-volume-logo.png` without recreating the lettering, proportions, colours or monogram. The current storefront uses original navy/royal-blue merchandising design; it is not a GNC visual clone. The black/gold **Whey product packaging** is retired and must not be reintroduced. The logo must not be redrawn.
 
-| Product | Retail price |
+Unicorn Pro Series is the current Tamil Nadu distributor collection; more brands are coming soon. Do not claim exclusive distribution without the supplier's written confirmation.
+
+## Public catalogue — customer prices only
+
+| Variant | Retail price |
 |---|---:|
-| Potency Whey 5 lbs Chocolate | ₹4,999 |
-| Potency Whey 5 lbs Coffee | ₹4,999 |
-| Sturdy Pre-Workout 250 g Watermelon | ₹1,399 |
+| Potency Whey 5 lb Chocolate | ₹4,999 |
+| Potency Whey 5 lb Coffee | ₹4,999 |
 | Nitro Mass 5 kg **bucket** | ₹3,499 |
 | Nitro Mass 3 kg **box** | ₹2,599 |
+| Sturdy Pre-Workout 250 g | ₹1,399 |
 | Pro Creatine 100 g Blueberry | ₹899 |
 | Pro Creatine 100 g Cranberry | ₹899 |
 | Musclevite Multivitamin | ₹699 |
 
-The 8 products match the launch supplier invoice; variant labels and photos should be checked against the packaging before publicizing them as exact. There must be no public wholesale pricing in HTML or JS. Missing or unverified pack images must not be replaced with a different pack size or fabricated packaging. Product label / lab test reports require verification and should be linked to the correct size and batch.
+Wholesale and gym tiers are stored in the **non-public** `data/products.json` seed and the private database. The public `public/catalog.json` contains no trade prices. Approved trade tiers are delivered only to authenticated, administrator-approved dealer accounts.
 
-## Current staging functionality
+Product photographs must match the **exact** pack and flavour. No incorrect picture should be substituted for missing current packs; verify front, back, ingredient and nutrition label before publishing.
 
-- Catalogue, filtering, search, variant display, product information, enquiry bag and WhatsApp prefilled enquiries.
-- Supplier/reference images and the owner's Nitro Mass 5 kg bucket photograph; product photo requests available.
-- Separate business wholesale enquiry page.
-- No online payment, no automatic order creation, no customer account, no logistics booking or checkout backend.
-- No domain purchase required for preview testing.
-- Staging should not be indexed; see `robots.txt`.
+## Commerce functionality
 
-## Source files
+- Customer registration, login/logout, private order history and account password changes.
+- Dealer application, private approved trade pricing, administrator approvals.
+- Admin product/stock configuration, GST/invoices, order/reconciliation, refund/shipping-management architecture.
+- Frontend search, filters, cart and WhatsApp enquiry.
+- Razorpay and Shiprocket integrations exist in the codebase but remain **disabled** until verified merchant credentials, business checks and production infrastructure are ready.
+- The live Render preview uses `npm run start:staging`, preventing any real payment or shipment. The Render Free filesystem is not suitable for durable production orders without further work.
 
-- `index.html`: storefront structure
-- `retail.css`: single authoritative retail design override; avoid additional conflicting styles
-- `style.css`: inherited layout rules for all pages
-- `app.js`: public retail catalogue and enquiry logic
-- `dealer.html`: dealer enquiries only
-- `about.html`, `contact.html`, `policies.html`: supporting content
+## Tests and local operation
 
-## Publish discipline
+Requires Node.js 24+.
 
-1. Make changes to this repository's `main` branch.
-2. Test JavaScript syntax, exact prices/SKUs, filters, cart totals and enquiry link generation.
-3. Upload changed files to the **same Wix site ID** listed above (use the connected Wix Headless file uploader).
-4. Fetch the Wix live paths and hosted product assets to verify HTTP 200 and correct revision.
-5. Validate end-to-end on real mobile and desktop browsers before claiming full launch-readiness.
-6. Do **not** register a custom domain, enable online payments or shipping, or claim orders are confirmed without separate user approval and implementation.
+```sh
+npm run check
+npm test
+npm run launch:audit -- --report
+```
 
-## Launch blockers
+CI also runs Playwright Chromium desktop/mobile shopping and account/wholesale flows. A strict `npm run start:production` command is included but must refuse to start until all launch prerequisites pass. Do not change the live Render service to it prematurely.
 
-- Verified Nitro Mass **3 kg box** and Musclevite photographs, plus all requested front/back ingredient panels.
-- Verify any published lab-test evidence is genuine and relevant to the specific product and batch.
-- Manual cross-browser and end-to-end WhatsApp flow confirmation.
-- For full e-commerce: transactional backend, order records, payment provider, shipping configuration, tax/legal reviews, and user acceptance testing.
+Consult [docs/PRODUCTION.md](docs/PRODUCTION.md), [docs/STAGING.md](docs/STAGING.md) and [docs/LAUNCH_STATUS.md](docs/LAUNCH_STATUS.md) before a production cutover.

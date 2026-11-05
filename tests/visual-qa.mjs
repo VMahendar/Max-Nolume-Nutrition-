@@ -3,12 +3,14 @@ import {spawn} from 'node:child_process';
 import {mkdirSync,writeFileSync} from 'node:fs';
 import {setTimeout as delay} from 'node:timers/promises';
 import {chromium} from 'playwright';
+import {DatabaseSync} from 'node:sqlite';
 
 const origin='http://127.0.0.1:3187';
+const dataDir='/tmp/mvn-visual-qa-'+process.pid;
 const reportDir='reports/visual-qa';
 mkdirSync(reportDir,{recursive:true});
 const app=spawn(process.execPath,['server.mjs'],{
-  env:{...process.env,HOST:'127.0.0.1',PORT:'3187',PUBLIC_ORIGIN:origin,NODE_ENV:'test',STAGING_MODE:'false',PAYMENTS_ENABLED:'false',SHIPROCKET_ENABLED:'false',DATA_DIR:'/tmp/mvn-visual-qa-'+process.pid},
+  env:{...process.env,HOST:'127.0.0.1',PORT:'3187',PUBLIC_ORIGIN:origin,NODE_ENV:'test',STAGING_MODE:'false',PAYMENTS_ENABLED:'false',SHIPROCKET_ENABLED:'false',DATA_DIR:dataDir},
   stdio:['ignore','pipe','pipe']
 });
 let appError='';app.stderr.on('data',d=>appError+=d.toString());
@@ -114,6 +116,53 @@ try {
   assert.ok(await page.locator('form#login').isVisible(),'account login visible');
   assert.equal((await page.goto(origin+'/dealer.html')).status(),200,'dealer route');
   assert.equal((await page.goto(origin+'/admin.html')).status(),200,'admin route served; authorization protected by API');
+  // Full customer and business-account workflow in an isolated test database.
+  const buyer=await browser.newPage();
+  await buyer.goto(origin+'/account.html');
+  await buyer.locator('#register input[name="name"]').fill('Launch Test Customer');
+  await buyer.locator('#register input[name="email"]').fill('launch-buyer@example.test');
+  await buyer.locator('#register input[name="password"]').fill('LaunchQA-Passphrase-2026');
+  await buyer.locator('#register button').click();
+  await buyer.locator('#signedIn').waitFor({state:'visible',timeout:12000});
+  assert.match(await buyer.locator('#tier').innerText(),/retail/i,'new account must start at retail tier');
+  await buyer.locator('#dealer select[name="kind"]').selectOption('wholesale');
+  await buyer.locator('#dealer input[name="business"]').fill('Launch QA Supplement Outlet');
+  await buyer.locator('#dealer button').click();
+  await buyer.waitForFunction(()=>document.querySelector('#dealerStatus')?.textContent.includes('pending'),null,{timeout:12000});
+  const denied=await buyer.evaluate(async()=>(await fetch('/api/dealer/catalog')).status);
+  assert.equal(denied,403,'pending dealers cannot see private wholesale prices');
+  const adminPage=await browser.newPage();
+  await adminPage.goto(origin+'/account.html');
+  await adminPage.locator('#register input[name="name"]').fill('Launch QA Admin');
+  await adminPage.locator('#register input[name="email"]').fill('launch-admin@example.test');
+  await adminPage.locator('#register input[name="password"]').fill('LaunchAdmin-Passphrase-2026');
+  await adminPage.locator('#register button').click();
+  await adminPage.locator('#signedIn').waitFor({state:'visible',timeout:12000});
+  const qaDb=new DatabaseSync(dataDir+'/orders.sqlite');
+  try{assert.equal(qaDb.prepare("UPDATE users SET role='admin' WHERE email=?").run('launch-admin@example.test').changes,1);}
+  finally{qaDb.close();}
+  await adminPage.goto(origin+'/admin.html');
+  await adminPage.locator('#dashboard').waitFor({state:'visible',timeout:12000});
+  await adminPage.locator('#dealerTable button[data-status="approved"]').first().click();
+  await adminPage.waitForFunction(()=>document.querySelector('#dealerTable')?.textContent.includes('approved'),null,{timeout:12000});
+  await buyer.reload();
+  await buyer.waitForFunction(()=>document.querySelector('#tier')?.textContent.includes('wholesale'),null,{timeout:12000});
+  const dealer=await buyer.evaluate(async()=>{const r=await fetch('/api/dealer/catalog');return {status:r.status,body:await r.json()}});
+  assert.equal(dealer.status,200,'approved dealer catalogue available');
+  const whey=dealer.body.products.find(p=>p.id==='potency-whey');
+  assert.equal(whey.variants.find(v=>v.id==='whey-chocolate').pricePaise,385000,'private dealer Whey price');
+  const retailer=await buyer.evaluate(async()=>(await (await fetch('/api/retail/catalog')).json()).products);
+  const publicWhey=retailer.find(p=>p.id==='potency-whey').variants[0];
+  assert.equal(publicWhey.pricePaise,499900,'public Whey price remains retail');
+  assert.equal(Object.hasOwn(publicWhey,'prices'),false,'private tiers not leaked into public API');
+  await buyer.locator('#logout').click();
+  await buyer.locator('#anonymous').waitFor({state:'visible',timeout:12000});
+  await buyer.locator('#login input[name="email"]').fill('launch-buyer@example.test');
+  await buyer.locator('#login input[name="password"]').fill('LaunchQA-Passphrase-2026');
+  await buyer.locator('#login button').click();
+  await buyer.waitForFunction(()=>document.querySelector('#tier')?.textContent.includes('wholesale'),null,{timeout:12000});
+  console.log('ACCOUNT_WHOLESALE_QA_PASS',JSON.stringify({register:true,login:true,dealerApplication:true,adminApproval:true,privatePricing:true,publicRetailOnly:true}));
+  await buyer.close();await adminPage.close();
   const catalog=await fetch(origin+'/api/retail/catalog');
   assert.equal(catalog.status,200,'retail catalog API');
   assert.equal((await catalog.json()).paymentReady,false,'payment must remain disabled');
