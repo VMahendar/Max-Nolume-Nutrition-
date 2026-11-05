@@ -30,6 +30,15 @@ try {
     await page.locator('#grid article.card').first().waitFor({timeout:10000});
     assert.equal(await page.locator('#grid article.card').count(),5,preset.name+' product family count');
     assert.ok(await page.locator('.hero h1').isVisible(),preset.name+' hero visible');
+    assert.match(await page.locator('.hero h1').innerText(),/MAX VOLUME\\s+NUTRITION/i,preset.name+' business name is hero headline');
+    assert.match(await page.locator('.hero-declaration').innerText(),/OFFICIAL TAMIL NADU DISTRIBUTOR/i,preset.name+' distribution identity');
+    assert.ok(await page.locator('#brands .brands-intro').isVisible(),preset.name+' upcoming brands section');
+    const originalLogo=await page.locator('header .original-brand-logo').evaluate(img=>{
+      const r=img.getBoundingClientRect(),h=img.closest('header').getBoundingClientRect();
+      return {loaded:img.complete&&img.naturalWidth>0,width:r.width,height:r.height,left:r.left,right:r.right,headerLeft:h.left,headerRight:h.right};
+    });
+    assert.ok(originalLogo.loaded&&originalLogo.width>100&&originalLogo.height>40,preset.name+' original logo loads at usable size: '+JSON.stringify(originalLogo));
+    assert.ok(originalLogo.left>=originalLogo.headerLeft-2&&originalLogo.right<=originalLogo.headerRight+2,preset.name+' logo must fit header: '+JSON.stringify(originalLogo));
     assert.ok(await page.locator('body').getAttribute('class')==='retail-home',preset.name+' design class');
     const logo=await page.locator('header .brand img.original-brand-logo').evaluate(img=>({
       src:img.getAttribute('src'),width:img.naturalWidth,height:img.naturalHeight,display:getComputedStyle(img).display
