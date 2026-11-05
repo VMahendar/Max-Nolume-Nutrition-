@@ -62,6 +62,13 @@ try {
     // Capture the actual rendered viewport for external visual inspection.
     const viewportShot=(await page.screenshot({type:'jpeg',quality:42,fullPage:false,animations:'disabled'})).toString('base64');
     for(let i=0;i<viewportShot.length;i+=9000)console.log('MVN_VIEW_'+preset.name+'_'+String(i/9000).padStart(3,'0')+' '+viewportShot.slice(i,i+9000));
+    // Capture lower merchandising sections as evidence, not just the hero.
+    for(const sectionName of ['shop','brands']){
+      await page.locator('#'+sectionName).scrollIntoViewIfNeeded();
+      await delay(280);
+      const shot=(await page.screenshot({type:'jpeg',quality:38,fullPage:false,animations:'disabled'})).toString('base64');
+      for(let i=0;i<shot.length;i+=9000)console.log('MVN_SECTION_'+preset.name+'_'+sectionName+'_'+String(i/9000).padStart(3,'0')+' '+shot.slice(i,i+9000));
+    }
     const featuredImage=await page.locator('#grid article.card').first().locator('.photo img').evaluate(img=>({src:img.src,loaded:img.complete&&img.naturalWidth>0,hidden:img.hidden}));
     assert.ok(featuredImage.loaded&&!featuredImage.hidden,preset.name+' first merchandise card shows a real product photo: '+JSON.stringify(featuredImage));
     await page.locator('.add[data-id="whey"]').click();
