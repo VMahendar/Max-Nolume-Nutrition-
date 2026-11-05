@@ -23,8 +23,23 @@ try{
  if(await products.count()){
   try{await page.locator('#grid .add').first().click({timeout:6000});await page.waitForTimeout(550);cartResult=await page.evaluate(()=>{const d=document.querySelector('#drawer'),i=document.querySelector('#items'),r=d.getBoundingClientRect(),st=getComputedStyle(d);return {drawer:d.getAttribute('aria-hidden'),drawerClasses:d.className,count:document.querySelector('#count').textContent,itemsText:i.textContent.slice(0,220),itemsInnerText:i.innerText.slice(0,220),computed:{visibility:st.visibility,display:st.display,transform:st.transform,zIndex:st.zIndex,opacity:st.opacity},rect:{x:r.x,width:r.width,right:r.right},viewportWidth:innerWidth,shadeHidden:document.querySelector('#shade').hidden};});}catch(e){cartResult=String(e)}
  }
+ const floating=page.locator('#floatingCart');
+ const visibleCart=await floating.isVisible();
+ let floatingWorks=false;
+ if(visibleCart&&await products.count()){
+  await page.locator('#close').click();
+  await floating.click();
+  floatingWorks=(await page.locator('#drawer').getAttribute('aria-hidden'))==='false'&&(await page.locator('#items').textContent()).includes('Nitro Mass');
+ }
+ const noJs=await browser.newPage({javaScriptEnabled:false,viewport:{width:390,height:844}});
+ await noJs.goto(base+'/?qa=nojstest',{waitUntil:'domcontentloaded',timeout:80000});
+ const fallbackCards=await noJs.locator('#grid article.card').count();
+ const fallbackContact=await noJs.locator('#grid a.add[href^="https://wa.me/"]').count();
+ await noJs.close();
+ report.publicShopCheck={cards:await products.count(),visibleCart,floatingWorks,fallbackCards,fallbackContact,ok:await products.count()===5&&visibleCart&&floatingWorks&&fallbackCards===5&&fallbackContact===5};
  await page.screenshot({path:out+'/live-mobile.png',fullPage:true,animations:'disabled'});
  report.browser={status:response?.status(),...data,cartResult,errors,failed:failed.slice(0,12)};
 }catch(e){report.browser={error:String(e)}}finally{await browser?.close()}
 writeFileSync(out+'/report.json',JSON.stringify(report,null,2));
 console.log('LIVE_DIAGNOSTIC',JSON.stringify(report));
+if(!report.publicShopCheck?.ok)process.exitCode=1;
