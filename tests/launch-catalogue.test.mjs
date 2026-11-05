@@ -59,7 +59,7 @@ test('public catalogue never uses Cranberry artwork for Blueberry or 5kg bucket 
   const all=c.catalogue(null),creatine=all.find(p=>p.id==='pro-creatine'),mass=all.find(p=>p.id==='nitro-mass');
   assert.equal(creatine.image,null);
   assert.equal(creatine.variants.find(v=>v.id==='creatine-blueberry').image,null,'250g Blueberry image must not misrepresent the listed 100g SKU');
-  assert.equal(creatine.variants.find(v=>v.id==='creatine-cranberry').image,'assets/pro-creatine.png');
+  assert.equal(creatine.variants.find(v=>v.id==='creatine-cranberry').image,null,'existing Cranberry image is 250g, not verified for 100g');
   assert.equal(mass.variants.find(v=>v.id==='mass-3kg').image,null);
   assert.ok(mass.variants.find(v=>v.id==='mass-5kg').image.includes('Screenshot_2026_1103'));
   const whey=all.find(p=>p.id==='potency-whey'),pre=all.find(p=>p.id==='sturdy-pre');
@@ -73,6 +73,6 @@ test('public catalogue never uses Cranberry artwork for Blueberry or 5kg bucket 
   const corrected=c.catalogue(null).find(p=>p.id==='pro-creatine');
   assert.equal(corrected.image,null);
   assert.equal(corrected.variants[0].image,null,'legacy image may not override the confirmed 100g placeholder');
-  assert.equal(corrected.variants[1].image,'assets/pro-creatine.png');
+  assert.equal(corrected.variants[1].image,null,'legacy Cranberry image must be held back until 100g photo verified');
  }finally{try{c?.db.close()}finally{rmSync(dir,{recursive:true,force:true})}}
 });
