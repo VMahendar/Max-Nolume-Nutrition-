@@ -90,18 +90,12 @@
         "pricePaise": 89900,
         "stock": null,
         "mrpPaise": 149900,
-        "image": "https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png",
+        "image": null,
         "prices": {
           "wholesale": 65000,
           "gym": 75000
         },
-        "images": [
-          {
-            "src": "https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png",
-            "label": "Front — Blueberry 100 g",
-            "alt": "Unicorn Pro Series Pro Creatine Blueberry 100 g"
-          }
-        ]
+        "images": []
       },
       {
         "id": "creatine-cranberry",
@@ -109,14 +103,16 @@
         "pricePaise": 89900,
         "stock": null,
         "mrpPaise": 149900,
-        "image": "assets/pro-creatine.png",
+        "image": null,
         "prices": {
           "wholesale": 65000,
           "gym": 75000
-        }
+        },
+        "images": []
       }
     ],
-    "brand": "Unicorn Pro Series"
+    "brand": "Unicorn Pro Series",
+    "images": []
   },
   {
     "id": "sturdy-pre",
