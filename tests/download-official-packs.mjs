@@ -11,7 +11,7 @@ mkdirSync('reports/official-photo-research',{recursive:true});
 for(let i=0;i<urls.length;i++){
  const r=await fetch(urls[i],{headers:{'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/131 Safari/537.36','Accept':'image/png,image/jpeg,image/webp,image/*,*/*;q=0.8'},signal:AbortSignal.timeout(35000)});
  const b=Buffer.from(await r.arrayBuffer());
- const png=b.subarray(0,8).toString('hex')==='89504e470d0a1a',jpg=b.subarray(0,3).toString('hex')==='ffd8ff';
+ const png=b.subarray(0,8).toString('hex')==='89504e470d0a1a0a',jpg=b.subarray(0,3).toString('hex')==='ffd8ff';
  if(!r.ok||(!png&&!jpg))throw Error('Invalid image '+i+' status '+r.status+' '+b.subarray(0,150));
  const path='reports/official-photo-research/raw-'+i+(jpg?'.jpg':'.png');
  writeFileSync(path,b);
