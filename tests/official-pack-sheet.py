@@ -18,8 +18,9 @@ for i,(name,url) in enumerate(urls.items()):
  draw.rectangle([x+6,y+6,x+394,y+454],fill='white',outline='#dbe4ef',width=2)
  draw.text((x+16,y+16),name,fill='#111827')
  try:
-  req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
-  data=urllib.request.urlopen(req,timeout=30).read()
+  source=list(urls).index(name)
+  ext='.jpg' if source==2 else '.png'
+  data=(out/('raw-'+str(source)+ext)).read_bytes()
   img=Image.open(io.BytesIO(data));original=(img.width,img.height)
   img.thumbnail((350,360))
   if img.mode in ['RGBA','LA']:
