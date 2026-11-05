@@ -3,9 +3,9 @@ const urls=[
 'https://unicornproseries.com/wp-content/uploads/2026/09/Potency-Whey.png',
 'https://unicornproseries.com/wp-content/uploads/2026/07/Nitro-Mass-1.png',
 'https://unicornproseries.com/wp-content/uploads/2026/07/47305.jpeg',
-'https://unicornproseries.com/wp-content/uploads/2026/07/Stuedy-Pinapple.png',
+'https://unicornproseries.com/wp-content/uploads/2026/07/Stuedy-Watermelon.png',
 'https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png',
-'https://unicornproseries.com/wp-content/uploads/2026/05/Potency-Whey-600x501-1.png'
+'https://unicornproseries.com/wp-content/uploads/2026/07/Nitro-Mass.png'
 ];
 mkdirSync('reports/official-photo-research',{recursive:true});
 for(let i=0;i<urls.length;i++){
