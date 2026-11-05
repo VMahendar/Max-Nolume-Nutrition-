@@ -5,7 +5,7 @@ const P=[
 {id:"whey",name:"Potency Whey",cat:"whey",size:"5 lbs",variants:[{label:"Chocolate · 5 lbs",price:4999},{label:"Coffee · 5 lbs",price:4999}],desc:"Premium whey protein for daily training and recovery.",img:""},
 {id:"mass",name:"Nitro Mass",cat:"mass",featuredIndex:1,variants:[{label:"3 kg · Box photo pending",price:2599,img:null},{label:"5 kg · Bucket",price:3499,img:"https://static.wixstatic.com/media/1ff000_f0a98421d4c647d18591722f454076cf~mv2.png"}],desc:"Mass gainer available in two pack sizes.",img:""},
 {id:"pre",name:"Sturdy Pre-Workout",cat:"pre",variants:[{label:"250 g",price:1399}],desc:"Pre-workout formula for your training routine.",img:"https://static.wixstatic.com/media/1ff000_c2a176e091a14c6a9c0bf121a2007f5c~mv2.png"},
-{id:"creatine",name:"Pro Creatine",cat:"creatine",variants:[{label:"Blueberry · 100 g",price:899},{label:"Cranberry · 100 g",price:899}],desc:"Creatine supplement in two flavour options.",img:"https://static.wixstatic.com/media/1ff000_8db16ef46b194a72b5a5657b83130626~mv2.png"},
+{id:"creatine",name:"Pro Creatine",cat:"creatine",featuredIndex:1,variants:[{label:"Blueberry · 100 g",price:899,img:null},{label:"Cranberry · 100 g",price:899}],desc:"Creatine supplement in two flavour options.",img:"https://static.wixstatic.com/media/1ff000_8db16ef46b194a72b5a5657b83130626~mv2.png"},
 {id:"vitamins",name:"Multivitamin",cat:"vitamins",variants:[{label:"1 pack",price:699}],desc:"Daily multivitamin supplement.",img:""}
 ];
 const $=id=>document.getElementById(id);
