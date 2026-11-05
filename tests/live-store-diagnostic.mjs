@@ -28,7 +28,6 @@ try{
  const visibleCart=await floating.isVisible();
  let floatingWorks=false;
  if(visibleCart&&await products.count()){
-  await page.locator('#close').click();
   await floating.click();
   floatingWorks=(await page.locator('#drawer').getAttribute('aria-hidden'))==='false'&&(await page.locator('#items').textContent()).includes('Nitro Mass');
  }
