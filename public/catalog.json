@@ -12,14 +12,24 @@
         "label": "5 lb · Chocolate",
         "pricePaise": 499900,
         "stock": null,
-        "mrpPaise": 859900
+        "mrpPaise": 859900,
+        "image": null,
+        "images": []
       },
       {
         "id": "whey-coffee",
         "label": "5 lb · Coffee",
         "pricePaise": 499900,
         "stock": null,
-        "mrpPaise": 859900
+        "mrpPaise": 859900,
+        "image": "https://unicornproseries.com/wp-content/uploads/2026/09/Potency-Whey.png",
+        "images": [
+          {
+            "src": "https://unicornproseries.com/wp-content/uploads/2026/09/Potency-Whey.png",
+            "label": "Front — Coffee 5 lb",
+            "alt": "Current white-and-blue Unicorn Pro Series Potency Whey Coffee 5 lb bottle"
+          }
+        ]
       }
     ],
     "brand": "Unicorn Pro Series",
@@ -64,7 +74,14 @@
         "pricePaise": 89900,
         "stock": null,
         "mrpPaise": 149900,
-        "image": null
+        "image": "https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png",
+        "images": [
+          {
+            "src": "https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png",
+            "label": "Front — Blueberry 100 g",
+            "alt": "Unicorn Pro Series Pro Creatine Blueberry 100 g"
+          }
+        ]
       },
       {
         "id": "creatine-cranberry",
@@ -83,16 +100,31 @@
     "category": "Pre-Workout",
     "subtitle": "For your pre-training routine",
     "description": "Unicorn Pro Series pre-workout. Read the product label for caffeine content, directions and warnings. Confirm suitability before use.",
-    "image": "assets/sturdy-pre-workout.png",
+    "image": "https://unicornproseries.com/wp-content/uploads/2026/07/Stuedy-Watermelon.png",
     "variants": [
       {
         "id": "pre-watermelon",
         "label": "250 g · Watermelon",
         "pricePaise": 139900,
-        "stock": null
+        "stock": null,
+        "image": "https://unicornproseries.com/wp-content/uploads/2026/07/Stuedy-Watermelon.png",
+        "images": [
+          {
+            "src": "https://unicornproseries.com/wp-content/uploads/2026/07/Stuedy-Watermelon.png",
+            "label": "Front — Watermelon 250 g",
+            "alt": "Unicorn Pro Series Sturdy Pre-Workout Watermelon 250 g"
+          }
+        ]
       }
     ],
-    "brand": "Unicorn Pro Series"
+    "brand": "Unicorn Pro Series",
+    "images": [
+      {
+        "src": "https://unicornproseries.com/wp-content/uploads/2026/07/Stuedy-Watermelon.png",
+        "label": "Front — Watermelon 250 g",
+        "alt": "Unicorn Pro Series Sturdy Pre-Workout Watermelon 250 g"
+      }
+    ]
   },
   {
     "id": "musclevite",
