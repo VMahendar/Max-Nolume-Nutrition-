@@ -2,10 +2,10 @@
    Prices are customer-facing INR amounts. Wholesale prices must NEVER be embedded in public JS. */
 const PHONE="917708830513";
 const P=[
-{id:"whey",name:"Potency Whey",cat:"whey",size:"5 lbs",variants:[{label:"Chocolate · 5 lbs",price:4999},{label:"Coffee · 5 lbs",price:4999}],desc:"Premium whey protein for daily training and recovery.",img:""},
-{id:"mass",name:"Nitro Mass",cat:"mass",featuredIndex:1,variants:[{label:"3 kg · Box photo pending",price:2599,img:null},{label:"5 kg · Bucket",price:3499,img:"https://static.wixstatic.com/media/1ff000_f0a98421d4c647d18591722f454076cf~mv2.png"}],desc:"Mass gainer available in two pack sizes.",img:""},
-{id:"pre",name:"Sturdy Pre-Workout",cat:"pre",variants:[{label:"250 g",price:1399}],desc:"Pre-workout formula for your training routine.",img:"https://static.wixstatic.com/media/1ff000_c2a176e091a14c6a9c0bf121a2007f5c~mv2.png"},
-{id:"creatine",name:"Pro Creatine",cat:"creatine",featuredIndex:1,variants:[{label:"Blueberry · 100 g",price:899,img:null},{label:"Cranberry · 100 g",price:899}],desc:"Creatine supplement in two flavour options.",img:"https://static.wixstatic.com/media/1ff000_8db16ef46b194a72b5a5657b83130626~mv2.png"},
+{id:"whey",name:"Potency Whey",cat:"whey",size:"5 lbs",featuredIndex:1,variants:[{label:"Chocolate · 5 lbs",price:4999,img:null},{label:"Coffee · 5 lbs",price:4999,img:"https://unicornproseries.com/wp-content/uploads/2026/09/Potency-Whey.png"}],desc:"Current white-and-blue 5 lb range. Choose Chocolate or Coffee. Pack photo shown for Coffee.",img:""},
+{id:"mass",name:"Nitro Mass",cat:"mass",featuredIndex:1,variants:[{label:"3 kg · Box photo pending",price:2599,img:null},{label:"5 kg · Bucket",price:3499,img:"assets/Screenshot_2026_1103_003852.jpg"}],desc:"Mass gainer available in two pack sizes.",img:""},
+{id:"pre",name:"Sturdy Pre-Workout",cat:"pre",variants:[{label:"Watermelon · 250 g",price:1399,img:"https://unicornproseries.com/wp-content/uploads/2026/07/Stuedy-Watermelon.png"}],desc:"Watermelon flavour, 250 g. Refer to the actual product label for ingredients and caffeine content.",img:"https://unicornproseries.com/wp-content/uploads/2026/07/Stuedy-Watermelon.png"},
+{id:"creatine",name:"Pro Creatine",cat:"creatine",featuredIndex:0,variants:[{label:"Blueberry · 100 g",price:899,img:"https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png"},{label:"Cranberry · 100 g",price:899,img:"assets/pro-creatine.png"}],desc:"Blueberry and Cranberry flavours. Availability to be confirmed.",img:""},
 {id:"vitamins",name:"Multivitamin",cat:"vitamins",variants:[{label:"1 pack",price:699}],desc:"Daily multivitamin supplement.",img:""}
 ];
 const $=id=>document.getElementById(id);
@@ -27,7 +27,7 @@ function swapPhoto(host,src,name){
  img.hidden=false;placeholder.hidden=true;img.src=src;
 }
 function card(p){
-const featured=p.featuredIndex||0;const cover=coverImage(p,featured);const pic=cover?'<img loading="lazy" src="'+cover+'" alt="'+p.name+'"><div class="placeholder" hidden><b>'+p.name+'</b>Photo coming soon</div>':'<div class="placeholder"><b>'+p.name+'</b>Verified pack photo coming soon</div>';
+const featured=p.featuredIndex||0;const cover=coverImage(p,featured);const packAlt=p.name+' — '+p.variants[featured].label;const pic=cover?'<img loading="lazy" src="'+cover+'" alt="'+packAlt+'"><div class="placeholder" hidden><b>'+p.name+'</b>Photo coming soon</div>':'<div class="placeholder"><b>'+p.name+'</b>Verified pack photo coming soon</div>';
 return '<article class="card"><span class="badge">UNICORN PRO SERIES</span><div class="photo">'+pic+'</div><div class="info"><small>UNICORN PRO SERIES</small><h3>'+p.name+'</h3><p>'+p.desc+'</p><label class="variant-label" for="v-'+p.id+'">FLAVOUR / PACK SIZE</label><select id="v-'+p.id+'" class="variant">'+p.variants.map((v,i)=>'<option value="'+i+'"'+(i===featured?' selected':'')+'>'+v.label+'</option>').join("")+'</select><div class="price"><b id="price-'+p.id+'">'+money(p.variants[featured].price)+'</b><small>Retail selling price</small></div><button class="details-link" type="button" data-detail="'+p.id+'">VIEW PRODUCT DETAILS →</button><button class="add" data-id="'+p.id+'">ADD TO CART +</button></div></article>';
 }
 function render(){
