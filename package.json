@@ -11,6 +11,7 @@
     "test": "node --test tests/*.test.mjs",
     "check": "node --check server.mjs && node --check commerce.mjs && node --check integrations.mjs && node --check lib.mjs && node --check manage.mjs && node --check public/app.js && node --check public/account.js && node --check public/admin.js && node --check public/invoice.js && node --check staging.mjs && node --check staging-server.mjs && node --check deploy/staging-init.mjs && node --check public/catalogue.js && node --check public/dealer.js && node --check public/dealer-enquiry.js",
     "dev": "node --env-file-if-exists=.env server.mjs",
-    "start:staging": "node deploy/staging-init.mjs && node staging-server.mjs"
+    "start:staging": "node deploy/staging-init.mjs && node staging-server.mjs",
+    "launch:audit": "node deploy/launch-readiness.mjs"
   }
 }
