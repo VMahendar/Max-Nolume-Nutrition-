@@ -58,17 +58,21 @@ test('public catalogue never uses Cranberry artwork for Blueberry or 5kg bucket 
   c=openCommerce(dir);
   const all=c.catalogue(null),creatine=all.find(p=>p.id==='pro-creatine'),mass=all.find(p=>p.id==='nitro-mass');
   assert.equal(creatine.image,null);
-  assert.equal(creatine.variants.find(v=>v.id==='creatine-blueberry').image,null);
+  assert.equal(creatine.variants.find(v=>v.id==='creatine-blueberry').image,'https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png');
   assert.equal(creatine.variants.find(v=>v.id==='creatine-cranberry').image,'assets/pro-creatine.png');
   assert.equal(mass.variants.find(v=>v.id==='mass-3kg').image,null);
   assert.ok(mass.variants.find(v=>v.id==='mass-5kg').image.includes('Screenshot_2026_1103'));
+  const whey=all.find(p=>p.id==='potency-whey'),pre=all.find(p=>p.id==='sturdy-pre');
+  assert.equal(whey.variants.find(v=>v.id==='whey-chocolate').image,null,'Chocolate must not borrow the Coffee pack picture');
+  assert.equal(whey.variants.find(v=>v.id==='whey-coffee').image,'https://unicornproseries.com/wp-content/uploads/2026/09/Potency-Whey.png');
+  assert.equal(pre.variants.find(v=>v.id==='pre-watermelon').image,'https://unicornproseries.com/wp-content/uploads/2026/07/Stuedy-Watermelon.png');
   // Simulate legacy database retaining old generic Cranberry image.
   const old=JSON.parse(c.db.prepare("SELECT data FROM products WHERE id='pro-creatine'").get().data);
   old.image='assets/pro-creatine.png';delete old.variants[0].image;delete old.variants[1].image;
   c.db.prepare("UPDATE products SET data=? WHERE id='pro-creatine'").run(JSON.stringify(old));
   const corrected=c.catalogue(null).find(p=>p.id==='pro-creatine');
   assert.equal(corrected.image,null);
-  assert.equal(corrected.variants[0].image,null);
+  assert.equal(corrected.variants[0].image,'https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png');
   assert.equal(corrected.variants[1].image,'assets/pro-creatine.png');
  }finally{try{c?.db.close()}finally{rmSync(dir,{recursive:true,force:true})}}
 });
