@@ -21,7 +21,7 @@ try{
  const products=page.locator('#grid article.card');
  let cartResult='not tested';
  if(await products.count()){
-  try{await page.locator('#grid .add').first().click({timeout:6000});cartResult={drawer:await page.locator('#drawer').getAttribute('aria-hidden'),count:await page.locator('#count').innerText(),items:(await page.locator('#items').innerText()).slice(0,200)}}catch(e){cartResult=String(e)}
+  try{await page.locator('#grid .add').first().click({timeout:6000});await page.waitForTimeout(550);cartResult=await page.evaluate(()=>{const d=document.querySelector('#drawer'),i=document.querySelector('#items'),r=d.getBoundingClientRect(),st=getComputedStyle(d);return {drawer:d.getAttribute('aria-hidden'),drawerClasses:d.className,count:document.querySelector('#count').textContent,itemsText:i.textContent.slice(0,220),itemsInnerText:i.innerText.slice(0,220),computed:{visibility:st.visibility,display:st.display,transform:st.transform,zIndex:st.zIndex,opacity:st.opacity},rect:{x:r.x,width:r.width,right:r.right},viewportWidth:innerWidth,shadeHidden:document.querySelector('#shade').hidden};});}catch(e){cartResult=String(e)}
  }
  await page.screenshot({path:out+'/live-mobile.png',fullPage:true,animations:'disabled'});
  report.browser={status:response?.status(),...data,cartResult,errors,failed:failed.slice(0,12)};
