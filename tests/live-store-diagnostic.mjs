@@ -24,6 +24,7 @@ try{
   try{await page.locator('#grid .add').first().click({timeout:6000});await page.waitForTimeout(550);cartResult=await page.evaluate(()=>{const d=document.querySelector('#drawer'),i=document.querySelector('#items'),r=d.getBoundingClientRect(),st=getComputedStyle(d);return {drawer:d.getAttribute('aria-hidden'),drawerClasses:d.className,count:document.querySelector('#count').textContent,itemsText:i.textContent.slice(0,220),itemsInnerText:i.innerText.slice(0,220),computed:{visibility:st.visibility,display:st.display,transform:st.transform,zIndex:st.zIndex,opacity:st.opacity},rect:{x:r.x,width:r.width,right:r.right},viewportWidth:innerWidth,shadeHidden:document.querySelector('#shade').hidden};});}catch(e){cartResult=String(e)}
  }
  const floating=page.locator('#floatingCart');
+ if(await page.locator('#drawer').getAttribute('aria-hidden')==='false')await page.locator('#close').click();
  const visibleCart=await floating.isVisible();
  let floatingWorks=false;
  if(visibleCart&&await products.count()){
