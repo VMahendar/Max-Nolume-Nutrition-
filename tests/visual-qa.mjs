@@ -30,7 +30,7 @@ try {
     await page.locator('#grid article.card').first().waitFor({timeout:10000});
     assert.equal(await page.locator('#grid article.card').count(),5,preset.name+' product family count');
     assert.ok(await page.locator('.hero h1').isVisible(),preset.name+' hero visible');
-    assert.match(await page.locator('.hero h1').innerText(),/MAX VOLUME\\s+NUTRITION/i,preset.name+' business name is hero headline');
+    assert.match(await page.locator('.hero h1').innerText(),/MAX VOLUME\s+NUTRITION/i,preset.name+' business name is hero headline');
     assert.match(await page.locator('.hero-declaration').innerText(),/OFFICIAL TAMIL NADU DISTRIBUTOR/i,preset.name+' distribution identity');
     assert.ok(await page.locator('#brands .brands-intro').isVisible(),preset.name+' upcoming brands section');
     const originalLogo=await page.locator('header .original-brand-logo').evaluate(img=>{
