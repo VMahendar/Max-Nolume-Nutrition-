@@ -6,9 +6,9 @@ urls={
  'Potency Whey Sep (official)': 'https://unicornproseries.com/wp-content/uploads/2026/09/Potency-Whey.png',
  'Nitro Mass 1 (official)': 'https://unicornproseries.com/wp-content/uploads/2026/07/Nitro-Mass-1.png',
  'Nitro Mass gallery 2 (official)': 'https://unicornproseries.com/wp-content/uploads/2026/07/47305.jpeg',
- 'Sturdy Pineapple (official)': 'https://unicornproseries.com/wp-content/uploads/2026/07/Stuedy-Pinapple.png',
+ 'Sturdy Watermelon (official)': 'https://unicornproseries.com/wp-content/uploads/2026/07/Stuedy-Watermelon.png',
  'Pro Creatine Blueberry (official)': 'https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png',
- 'Potency Whey May old (official)': 'https://unicornproseries.com/wp-content/uploads/2026/05/Potency-Whey-600x501-1.png'
+ 'Nitro Mass variant (official)': 'https://unicornproseries.com/wp-content/uploads/2026/07/Nitro-Mass.png'
 }
 sheet=Image.new('RGB',(1200,920),'#eff3fb')
 draw=ImageDraw.Draw(sheet)
