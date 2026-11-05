@@ -10,9 +10,9 @@
 .retail-home .announce>span{display:flex;align-items:center;gap:9px}
 .retail-home .announce a{color:#fff;margin-left:15px;border-bottom:1px solid #8daef4}
 .retail-home .live-dot{display:inline-block;width:7px;height:7px;background:#6ce7b4;border-radius:50%;box-shadow:0 0 0 3px #6ce7b425}
-.retail-home .storehead{height:118px;min-height:118px!important;padding:0 max(22px,calc((100% - 1380px)/2));display:grid;grid-template-columns:288px minmax(280px,1fr) auto;align-items:center;gap:32px;background:#fff;border-bottom:1px solid #e1e8f3;position:relative;z-index:7;box-shadow:0 7px 25px #0c2b5f0b}
-.retail-home .brand-identity{display:flex;align-items:center;justify-content:center;width:288px;height:106px;min-width:0;flex:none;overflow:visible;background:#0e1f3c;border:1px solid #273959;border-radius:0 0 8px 8px;padding:8px 14px}
-.retail-home .brand-identity .original-brand-logo{display:block!important;width:100%!important;height:88px!important;max-height:88px!important;max-width:100%!important;object-fit:contain!important;object-position:center!important;filter:none!important;transform:none!important;flex-shrink:1!important}
+.retail-home .storehead{height:144px;min-height:144px!important;padding:0 max(22px,calc((100% - 1380px)/2));display:grid;grid-template-columns:288px minmax(280px,1fr) auto;align-items:center;gap:32px;background:#fff;border-bottom:1px solid #e1e8f3;position:relative;z-index:7;box-shadow:0 7px 25px #0c2b5f0b}
+.retail-home .brand-identity{display:flex;align-items:center;justify-content:center;width:288px;height:132px;min-width:0;flex:none;overflow:visible;background:#0e1f3c;border:1px solid #273959;border-radius:0 0 8px 8px;padding:8px 14px}
+.retail-home .brand-identity .original-brand-logo{display:block!important;width:100%!important;height:115px!important;max-height:115px!important;max-width:100%!important;object-fit:contain!important;object-position:center!important;filter:none!important;transform:none!important;flex-shrink:1!important}
 .retail-home .header-search{min-width:0;display:flex;flex-direction:column;gap:8px}
 .retail-home .header-descriptor{color:#61718c;font-size:9px;font-weight:900;letter-spacing:.16em}
 .retail-home .header-descriptor span{color:#1559e6}
@@ -171,7 +171,7 @@
 .retail-home :focus-visible{outline:3px solid #86b5ff;outline-offset:3px}
 @media(max-width:1180px){
  .retail-home .storehead{grid-template-columns:240px minmax(220px,1fr) auto;gap:18px;padding:0 20px}
- .retail-home .brand-identity{width:240px;height:102px}
+ .retail-home .brand-identity{width:240px;height:108px}
  .retail-home .head-actions{gap:9px}
  .retail-home .head-actions .account-link{display:none}
  .retail-home .hero-copy{padding-left:32px}
@@ -181,7 +181,7 @@
  .retail-home .distribution-link{grid-column:2;justify-self:start}
 }
 @media(max-width:900px){
- .retail-home .storehead{grid-template-columns:210px minmax(0,1fr);height:auto;min-height:105px;gap:10px 20px;padding:7px 16px 13px}
+ .retail-home .storehead{grid-template-columns:210px minmax(0,1fr);height:auto;min-height:0!important;gap:10px 20px;padding:7px 16px 13px}
  .retail-home .brand-identity{width:210px;height:88px}
  .retail-home .brand-identity img{height:78px!important;max-height:78px!important}
  .retail-home .header-search{grid-column:1/-1;grid-row:2;order:3}
