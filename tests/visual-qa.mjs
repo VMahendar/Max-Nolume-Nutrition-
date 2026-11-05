@@ -100,6 +100,8 @@ try {
     console.log('NITRO_IMAGES',preset.name,JSON.stringify({bucket,missingBox}));
     await page.locator('button[data-detail="mass"]').click();
     assert.ok(await page.locator('#productDialog').isVisible(),preset.name+' product details dialog');
+    assert.equal(await page.locator('#detail-variant').inputValue(),'0',preset.name+' product details preserve selected 3kg pack');
+    assert.match(await page.locator('#detail-price').innerText(),/2,599/,preset.name+' selected 3kg price preserved');
     await page.locator('#detailClose').click();
     const cards=await page.locator('#grid article.card').evaluateAll(nodes=>nodes.map(n=>({name:n.querySelector('h3')?.textContent,photo:(()=>{const x=n.querySelector('.photo img');return x?{loaded:x.naturalWidth>0,complete:x.complete,hidden:x.hidden,src:x.src}:null})(),placeholder:!!n.querySelector('.photo .placeholder')})));
     await page.screenshot({path:reportDir+'/'+preset.name+'.png',fullPage:true,animations:'disabled'});
