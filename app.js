@@ -2,12 +2,9 @@
    Prices are customer-facing INR amounts. Wholesale prices must NEVER be embedded in public JS. */
 const PHONE="917708830513";
 const P=[
-{id:"whey",name:"Potency Whey",cat:"whey",size:"5 lbs",variants:[{label:"Chocolate · 5 lbs",price:4999},{label:"Coffee · 5 lbs",price:4999}],desc:"Premium whey protein for daily training and recovery.",img:"https://raw.githubusercontent.com/VMahendar/Max-Volume-Nutrition-/main/public/assets/potency-whey.png"},
-{id:"mass",name:"Nitro Mass",cat:"mass",featuredIndex:1,variants:[{label:"3 kg · Box photo pending",price:2599,img:null},{label:"5 kg · Bucket",price:3499,img:"https://raw.githubusercontent.com/VMahendar/Max-Volume-Nutrition-/main/public/assets/nitro-mass-5kg.jpg"}],desc:"Mass gainer available in two pack sizes.",img:""},
-{id:"pre",name:"Sturdy Pre-Workout",cat:"pre",variants:[{label:"250 g",price:1399}],desc:"Pre-workout formula for your training routine.",img:"https://raw.githubusercontent.com/VMahendar/Max-Volume-Nutrition-/main/public/assets/sturdy-pre-workout.png"},
-{id:"creatine",name:"Pro Creatine",cat:"creatine",featuredIndex:1,variants:[{label:"Blueberry · 100 g",price:899,img:null},{label:"Cranberry · 100 g",price:899}],desc:"Creatine supplement in two flavour options.",img:"https://raw.githubusercontent.com/VMahendar/Max-Volume-Nutrition-/main/public/assets/pro-creatine.png"},
-{id:"vitamins",name:"Multivitamin",cat:"vitamins",variants:[{label:"1 pack",price:699}],desc:"Daily multivitamin supplement.",img:""}
-];
+{id:"whey",name:"Potency Whey",cat:"whey",size:"5 lbs",variants:[{label:"Chocolate · 5 lbs",price:4999},{label:"Coffee · 5 lbs",price:4999}],desc:"Current white-and-blue pack range. Confirm flavour before enquiry.",img:""},
+{id:"mass",name:"Nitro Mass",cat:"mass",featuredIndex:1,variants:[{label:"3 kg · image pending",price:2599,img:null},{label:"5 kg · current white-and-blue bucket, image pending",price:3499,img:null}],desc:"Mass gainer. Only current white-and-blue packaging requested.",img:""}
+]
 const $=id=>document.getElementById(id);
 const money=n=>"₹"+Number(n).toLocaleString("en-IN");
 let cat="all",q="",cart={},mode="retail";
@@ -19,7 +16,7 @@ function coverImage(p,i){const v=p.variants[Number(i)];return v&&Object.prototyp
 function swapPhoto(host,src,name){
  if(!host)return;
  let img=host.querySelector("img"),placeholder=host.querySelector(".placeholder");
- if(!placeholder){placeholder=document.createElement("div");placeholder.className="placeholder";placeholder.textContent="Verified pack photo coming soon";host.appendChild(placeholder)}
+ if(!placeholder){placeholder=document.createElement("div");placeholder.className="placeholder";placeholder.textContent="Current white-and-blue product photograph pending verification";host.appendChild(placeholder)}
  if(!src){if(img)img.hidden=true;placeholder.hidden=false;return}
  if(!img){img=document.createElement("img");img.loading="lazy";img.alt=name;host.insertBefore(img,placeholder)}
  img.onerror=()=>{img.hidden=true;placeholder.hidden=false};
@@ -27,7 +24,7 @@ function swapPhoto(host,src,name){
  img.hidden=false;placeholder.hidden=true;img.src=src;
 }
 function card(p){
-const featured=p.featuredIndex||0;const cover=coverImage(p,featured);const pic=cover?'<img loading="lazy" src="'+cover+'" alt="'+p.name+'"><div class="placeholder" hidden><b>'+p.name+'</b>Photo coming soon</div>':'<div class="placeholder"><b>'+p.name+'</b>Verified pack photo coming soon</div>';
+const featured=p.featuredIndex||0;const cover=coverImage(p,featured);const pic=cover?'<img loading="lazy" src="'+cover+'" alt="'+p.name+'"><div class="placeholder" hidden><b>'+p.name+'</b>Current white-and-blue image pending</div>':'<div class="placeholder"><b>'+p.name+'</b>Current white-and-blue product photograph pending verification</div>';
 return '<article class="card"><span class="badge">UNICORN PRO SERIES</span><div class="photo">'+pic+'</div><div class="info"><small>UNICORN PRO SERIES</small><h3>'+p.name+'</h3><p>'+p.desc+'</p><label class="variant-label" for="v-'+p.id+'">FLAVOUR / PACK SIZE</label><select id="v-'+p.id+'" class="variant">'+p.variants.map((v,i)=>'<option value="'+i+'"'+(i===featured?' selected':'')+'>'+v.label+'</option>').join("")+'</select><div class="price"><b id="price-'+p.id+'">'+money(p.variants[featured].price)+'</b><small>Retail selling price</small></div><button class="details-link" type="button" data-detail="'+p.id+'">VIEW PRODUCT DETAILS →</button><button class="add" data-id="'+p.id+'">ADD TO CART +</button></div></article>';
 }
 function render(){
