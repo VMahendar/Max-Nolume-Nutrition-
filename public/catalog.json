@@ -90,7 +90,7 @@
         "pricePaise": 89900,
         "stock": null,
         "mrpPaise": 149900,
-        "image": "assets/pro-creatine.png"
+        "image": null
       }
     ],
     "brand": "Unicorn Pro Series"
@@ -101,7 +101,7 @@
     "category": "Pre-Workout",
     "subtitle": "For your pre-training routine",
     "description": "Unicorn Pro Series pre-workout. Read the product label for caffeine content, directions and warnings. Confirm suitability before use.",
-    "image": "assets/sturdy-pre-workout.png",
+    "image": null,
     "variants": [
       {
         "id": "pre-watermelon",

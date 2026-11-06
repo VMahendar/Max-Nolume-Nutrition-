@@ -51,7 +51,7 @@ test('eight verified retail variants retain published customer prices and privat
  }finally{try{c?.db.close()}finally{rmSync(dir,{recursive:true,force:true})}}
 });
 
-test('public catalogue never uses Cranberry artwork for Blueberry or 5kg bucket for 3kg box',()=>{
+test('public catalogue never displays mismatched Cranberry 250g artwork as 100g, or 5kg bucket as 3kg box',()=>{
  const dir=mkdtempSync(resolve(tmpdir(),'mvn-launch-media-'));
  let c;
  try{
@@ -59,7 +59,7 @@ test('public catalogue never uses Cranberry artwork for Blueberry or 5kg bucket 
   const all=c.catalogue(null),creatine=all.find(p=>p.id==='pro-creatine'),mass=all.find(p=>p.id==='nitro-mass');
   assert.equal(creatine.image,null);
   assert.equal(creatine.variants.find(v=>v.id==='creatine-blueberry').image,null);
-  assert.equal(creatine.variants.find(v=>v.id==='creatine-cranberry').image,'assets/pro-creatine.png');
+  assert.equal(creatine.variants.find(v=>v.id==='creatine-cranberry').image,null,'250g artwork must not be presented as a 100g pack');
   assert.equal(mass.variants.find(v=>v.id==='mass-3kg').image,null);
   assert.equal(mass.variants.find(v=>v.id==='mass-5kg').image,'assets/Screenshot_2026_1103_003852.jpg');
   assert.equal(mass.variants.find(v=>v.id==='mass-5kg').images[0].src,'assets/Screenshot_2026_1103_003852.jpg');
@@ -73,6 +73,6 @@ test('public catalogue never uses Cranberry artwork for Blueberry or 5kg bucket 
   const corrected=c.catalogue(null).find(p=>p.id==='pro-creatine');
   assert.equal(corrected.image,null);
   assert.equal(corrected.variants[0].image,null);
-  assert.equal(corrected.variants[1].image,'assets/pro-creatine.png');
+  assert.equal(corrected.variants[1].image,null,'legacy generic image must not override pack-specific safety');
  }finally{try{c?.db.close()}finally{rmSync(dir,{recursive:true,force:true})}}
 });
