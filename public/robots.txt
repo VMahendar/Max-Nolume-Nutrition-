@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin.html
+Disallow: /account.html
+Disallow: /dealer.html
+Sitemap: https://max-volume-nutrition-preview.onrender.com/sitemap.xml
