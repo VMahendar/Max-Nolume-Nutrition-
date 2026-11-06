@@ -3,38 +3,51 @@ import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 
-test('public storefront is white-first, retains original MVN logo and removes duplicate brand feature',()=>{
- const html=read('public/index.html'),css=read('public/white-store.css');
- assert.ok(html.includes('<link rel="stylesheet" href="white-store.css">'));
- assert.match(css,/background:#fff!important/);
- assert.ok(html.includes('src="max-volume-logo-wide.png"'));
- assert.ok(!html.includes('distribution-feature'),'duplicated Unicorn brand section removed');
- assert.ok(html.includes('href="dealer.html"'),'wholesale destination remains usable');
- assert.ok(html.includes('UNICORN PRO SERIES'),'main distribution identity is retained');
+test('retail flagship keeps original logo, integrates masthead and leads with products',()=>{
+ const html=read('public/index.html'),css=read('public/flagship.css');
+ assert.ok(html.includes('<link rel="stylesheet" href="flagship.css">'));
+ assert.match(css,/background:#fff!important/,'white retail shopping canvas');
+ assert.match(css,/\.retail-home \.storehead\{\s*background:var\(--mvn-night\)!important/);
+ assert.match(css,/\.retail-home \.brand-identity\{\s*background:transparent!important/,'logo has no separate pasted-on backdrop');
+ assert.match(css,/mix-blend-mode:screen/,'original black-background logo integrates with masthead');
+ assert.ok(html.includes('src="max-volume-logo-wide.png"'),'original full logo retained');
+ assert.ok(html.includes('FUEL EVERY<br><strong>REP.</strong>'),'product-first hero rather than duplicating company name');
+ assert.ok(!html.includes('distribution-feature'),'repeated Unicorn promotion removed');
+ assert.ok(!html.includes('category-tiles'),'no duplicated category lists');
+ assert.match(html,/section class="benefits" aria-label="Shop by category"/);
+ assert.ok(html.includes('href="dealer.html"'),'dealer destination retained');
+ assert.ok(html.includes('UNICORN PRO SERIES'),'genuine brand retained in product and distributor context');
 });
 
-test('the actual current local product photographs are referenced without substituting wrong variants',()=>{
+test('homepage excludes demonstrably incorrect product photos and retains verified stock imagery',()=>{
  const html=read('public/index.html'),app=read('public/app.js'),both=html+'\n'+app;
- assert.ok(!both.includes('static.wixstatic.com'),'no outdated externally hosted hero or product photos');
- for(const name of ['potency-whey-coffee-5lb.webp','Screenshot_2026_1103_003852.jpg','sturdy-pre-workout.png','pro-creatine.png']){
-  assert.ok(existsSync(new URL('../public/assets/'+name,import.meta.url)),'missing current local product image '+name);
-  assert.ok(both.includes('assets/'+name),'product image not used '+name);
+ const seed=JSON.parse(read('data/products.json'));
+ const pub=JSON.parse(read('public/catalog.json'));
+ assert.ok(!both.includes('static.wixstatic.com'),'no stale Wix-hosted hero or product photos');
+ for(const name of ['potency-whey-coffee-5lb.webp','Screenshot_2026_1103_003852.jpg']){
+  assert.ok(existsSync(new URL('../public/assets/'+name,import.meta.url)),name+' exists');
+  assert.ok(both.includes('assets/'+name),name+' used');
  }
- assert.match(app,/3 kg · Box photo pending.*?img:null/,'3kg pack must not use 5kg bucket photo');
- assert.match(app,/Chocolate · 5 lbs.*?img:null/,'Chocolate must not reuse Coffee image');
+ for(const wrong of ['assets/sturdy-pre-workout.png','assets/pro-creatine.png']){
+  assert.ok(!both.includes(wrong),'incorrect-size/flavour photograph must never show on storefront: '+wrong);
+ }
+ for(const source of [seed,pub]){
+  assert.equal(source.find(p=>p.id==='sturdy-pre').image,null);
+  assert.equal(source.find(p=>p.id==='pro-creatine').variants.find(v=>v.id==='creatine-cranberry').image,null);
+ }
+ assert.match(app,/3 kg · Box photo pending.*?img:null/,'3kg pack must not use 5kg photo');
+ assert.match(app,/Chocolate · 5 lbs.*?img:null/,'Chocolate must not use Coffee photo');
  assert.match(app,/Blueberry · 100 g.*?img:null/,'Blueberry must not use Cranberry photo');
 });
 
-test('public retail price offers use only verified MRP and show accurate discount',()=>{
+test('public retail offers use verified MRP and keep confidential wholesale pricing private',()=>{
  const app=read('public/app.js'),seed=JSON.parse(read('public/catalog.json'));
- assert.match(app,/mrp:8599/);
- assert.match(app,/mrp:1499/);
+ assert.match(app,/mrp:8599/);assert.match(app,/mrp:1499/);
  assert.ok(app.includes('function priceMarkup(v)'));
  assert.ok(app.includes('class="discount-value"'));
  const whey=seed.find(p=>p.id==='potency-whey').variants;
  assert.deepEqual(whey.map(v=>v.mrpPaise),[859900,859900]);
  assert.deepEqual(whey.map(v=>v.pricePaise),[499900,499900]);
- const mass=seed.find(p=>p.id==='nitro-mass').variants;
- assert.ok(mass.every(v=>v.mrpPaise===undefined),'never invent Nitro Mass MRP');
- assert.ok(!app.includes('wholesale":'),'never embed private wholesale pricing in public script');
+ assert.ok(seed.find(p=>p.id==='nitro-mass').variants.every(v=>v.mrpPaise===undefined),'never invent Nitro MRP');
+ assert.ok(!app.includes('wholesale":'),'wholesale prices cannot ship in public JS');
 });
