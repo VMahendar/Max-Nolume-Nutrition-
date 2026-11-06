@@ -291,3 +291,82 @@
  .retail-home #drawer .drawerfoot{max-height:65dvh;overflow-y:auto}
  .retail-home #drawer .dhead button{min-width:44px;min-height:44px}
 }
+
+
+/* MVN flagship retail layout refinement — preserves the owner's ORIGINAL logo PNG. */
+.retail-home{--mvn-ink:#10213c;--mvn-royal:#1759cf;--mvn-pale:#f4f7fb}
+.retail-home .storehead{
+ height:auto;min-height:108px!important;padding:14px max(22px,calc((100% - 1380px)/2));
+ grid-template-columns:minmax(220px,280px) minmax(240px,1fr) auto;
+ gap:clamp(14px,2vw,30px);align-items:center;position:relative;
+}
+.retail-home .brand-identity{
+ width:100%;height:auto;min-height:68px;max-width:280px;
+ padding:4px 6px;overflow:visible;border:0;border-radius:0;background:transparent;
+ justify-content:flex-start;min-width:0;
+}
+.retail-home .brand-identity .original-brand-logo{
+ display:block!important;width:100%!important;height:auto!important;
+ max-height:90px!important;max-width:100%!important;object-fit:contain!important;
+ object-position:left center!important;filter:none!important;transform:none!important;
+}
+.retail-home .header-descriptor{font-size:10px;letter-spacing:.09em}
+.retail-home .head-actions{flex-wrap:wrap;gap:10px}
+.retail-home .head-actions a,.retail-home .head-actions button{border-radius:5px}
+.retail-home .nav{gap:0;justify-content:space-between;padding:0 max(16px,calc((100% - 1380px)/2))}
+.retail-home .nav a{font-weight:800}
+.retail-home .hero{min-height:520px}
+.retail-home .hero-copy{padding-top:56px;padding-bottom:56px}
+.retail-home .card{border:1px solid #dbe3ef;border-radius:12px;box-shadow:0 5px 19px #102b5511}
+.retail-home .card .photo{background:#fff}
+.retail-home .card .photo img{filter:drop-shadow(0 9px 9px #1b32511a)}
+.retail-home .card .info{padding:19px}
+.retail-home .info h3{font-size:20px}
+.retail-home .info select,.retail-home .add,.retail-home .details-link{border-radius:7px}
+.retail-home .add{font-size:12px;letter-spacing:.02em}
+.retail-home .price b{font-variant-numeric:tabular-nums}
+@media(max-width:1180px){
+ .retail-home .storehead{grid-template-columns:minmax(185px,235px) minmax(210px,1fr) auto;padding:12px 20px}
+ .retail-home .brand-identity{width:100%;height:auto;min-height:65px}
+ .retail-home .brand-identity .original-brand-logo{height:auto!important;max-height:76px!important}
+}
+@media(max-width:900px){
+ .retail-home .storehead{grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;padding:11px 16px 13px;min-height:0!important}
+ .retail-home .brand-identity{grid-column:1;grid-row:1;width:min(245px,100%);min-height:0;height:auto;padding:0}
+ .retail-home .brand-identity .original-brand-logo{width:100%!important;height:auto!important;max-height:72px!important}
+ .retail-home .head-actions{grid-column:2;grid-row:1;justify-content:flex-end}
+ .retail-home .header-search{grid-column:1/-1;grid-row:2;width:100%;order:initial}
+}
+@media(max-width:620px){
+ .retail-home .storehead{padding:9px 13px 12px;gap:8px}
+ .retail-home .brand-identity{width:min(200px,100%);height:auto;min-height:0;padding:0}
+ .retail-home .brand-identity .original-brand-logo{width:100%!important;height:auto!important;max-height:64px!important;object-position:left center!important}
+ .retail-home #bag{height:39px;padding:0 10px}
+ .retail-home .head-actions{gap:5px}
+ .retail-home .nav{justify-content:flex-start}
+ .retail-home .hero-copy{padding:38px 20px 31px}
+ .retail-home .hero h1{font-size:clamp(40px,10vw,56px);line-height:.97;overflow-wrap:anywhere}
+ .retail-home .hero-visual{padding:21px 14px 31px}
+ .retail-home #shop{padding:42px 13px 56px}
+ .retail-home .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .retail-home .card .photo{height:190px;padding:10px 5px}
+ .retail-home .card .photo img{max-height:166px}
+ .retail-home .card .info{padding:12px 10px 14px}
+ .retail-home .info h3{font-size:16px}
+ .retail-home .info p{min-height:42px;font-size:11px}
+ .retail-home .info select{height:40px;font-size:11px}
+ .retail-home .price{flex-direction:column;align-items:flex-start;gap:0}
+ .retail-home .price b{font-size:21px}
+ .retail-home .details-link{font-size:9px;min-height:38px}
+ .retail-home .add{font-size:10px;height:43px}
+ .retail-home .card .badge{font-size:7px;left:6px;top:7px}
+ .retail-home .placeholder:before{width:60px;height:60px;font-size:8px}
+ .retail-home .placeholder b{font-size:13px}
+}
+@media(max-width:390px){
+ .retail-home .brand-identity{width:min(160px,100%)}
+ .retail-home .brand-identity .original-brand-logo{max-height:55px!important}
+ .retail-home .grid{grid-template-columns:1fr}
+ .retail-home .card .photo{height:240px}
+ .retail-home .card .photo img{max-height:210px}
+}
