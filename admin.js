@@ -35,6 +35,8 @@ document.addEventListener('click',e=>{
  const customer=marketingMembers.find(m=>m.id===btn.dataset.contact);
  if(!customer)return;
  const eventTitle=$('marketingEventText').value.trim();
+ if(eventTitle&&!customer.festivalUpdates){$('marketingMessage').textContent='This customer has not opted in to festival or promotion announcements.';return;}
+ if(!eventTitle&&!customer.cadenceDays){$('marketingMessage').textContent='This customer has not opted in to supplement replenishment reminders.';return;}
  const eventMessage=eventTitle
  ?'Hello '+customer.name+', Max Volume Nutrition update: '+eventTitle+'. Reply STOP if you no longer want these offers.'
  :'Hello '+customer.name+', this is Max Volume Nutrition. Would you like help checking your supplement stock and reordering? Reply STOP to opt out.';
