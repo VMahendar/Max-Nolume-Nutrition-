@@ -40,16 +40,22 @@
     "name": "Nitro Mass",
     "category": "Mass Gainer",
     "subtitle": "Build your nutrition routine",
-    "description": "Unicorn Pro Series Nitro Mass. The 5 kg bucket and 3 kg pack require separate verified product photographs. Check the selected variant's pack label for ingredients, net weight and nutrition.",
-    "image": null,
+    "description": "Unicorn Pro Series Nitro Mass. The 5 kg bucket is pictured using the owner's uploaded pack photograph. The 3 kg pack is a separate variant; its exact photo is pending verification. Always check the received label for ingredients and nutrition.",
+    "image": "assets/Screenshot_2026_1103_003852.jpg",
     "variants": [
       {
         "id": "mass-5kg",
         "label": "5 kg bucket · Double Rich Chocolate",
         "pricePaise": 349900,
         "stock": null,
-        "image": null,
-        "images": []
+        "image": "assets/Screenshot_2026_1103_003852.jpg",
+        "images": [
+          {
+            "src": "assets/Screenshot_2026_1103_003852.jpg",
+            "label": "5 kg bucket — owner uploaded front photograph",
+            "alt": "Nitro Mass 5 kg bucket supplier pack photograph uploaded by Max Volume Nutrition"
+          }
+        ]
       },
       {
         "id": "mass-3kg",
