@@ -26,7 +26,15 @@ async function refresh(){
   $('dealerStatus').textContent=user.dealer
     ?'Your '+user.dealer.kind+' application: '+user.dealer.status+'.'
     :'Apply for review to request business pricing. Retail rates apply until approval.';
-  $('dealer').querySelector('button[type="submit"]').disabled=Boolean(user.dealer)&&user.dealer.status!=='rejected';
+  const response=await api('/api/me/marketing');
+  const preferences=response.preferences;
+  const form=$('marketing');
+  form.elements.cadenceDays.value=String(preferences.cadenceDays);
+  form.elements.emailOptIn.checked=preferences.emailOptIn;
+  form.elements.whatsappOptIn.checked=preferences.whatsappOptIn;
+  form.elements.phone.value=preferences.phone?.replace(/^91(?=[6-9]\d{9}$)/,'')||'';
+  form.elements.festivalUpdates.checked=preferences.festivalUpdates;
+  form.elements.explicitConsent.checked=false;
 
   let saved;
   try{saved=JSON.parse(localStorage.getItem('mvn-order')||'null');}catch{}
@@ -60,10 +68,9 @@ async function perform(button,request,successText){
 const copy={
   login:'Signed in successfully.',
   register:'Your account has been created.',
-  dealer:'Dealer application received for review.',
   password:'Password changed. Please sign in again.'
 };
-for(const name of ['register','login','dealer','password']){
+for(const name of ['register','login','password']){
   $(name).addEventListener('submit',event=>{
     event.preventDefault();
     const form=event.currentTarget;
@@ -75,6 +82,25 @@ for(const name of ['register','login','dealer','password']){
     },copy[name]);
   });
 }
+$('marketing').addEventListener('submit',event=>{
+ event.preventDefault();
+ const form=event.currentTarget;
+ const button=event.submitter||form.querySelector('button[type="submit"]');
+ void perform(button,async()=>{
+   const data=formObject(form);
+   await api('/api/me/marketing',{
+     cadenceDays:Number(data.cadenceDays),festivalUpdates:form.elements.festivalUpdates.checked,
+     emailOptIn:form.elements.emailOptIn.checked,whatsappOptIn:form.elements.whatsappOptIn.checked,
+     phone:data.phone||'',explicitConsent:form.elements.explicitConsent.checked
+   });
+ },'Your communication preferences have been saved. No marketing messages have been sent.');
+});
+$('marketingStop').addEventListener('click',event=>void perform(event.currentTarget,async()=>{
+  await api('/api/me/marketing',{
+    cadenceDays:0,festivalUpdates:false,emailOptIn:false,whatsappOptIn:false,
+    phone:'',explicitConsent:false
+  });
+},'All promotional reminders and festival updates have been turned off.'));
 $('logout').addEventListener('click',event=>void perform(event.currentTarget,async()=>{
   await api('/api/logout',{});
 },'Signed out successfully.'));
