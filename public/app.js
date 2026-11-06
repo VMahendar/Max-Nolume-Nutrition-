@@ -2,10 +2,10 @@
    Prices are customer-facing INR amounts. Wholesale prices must NEVER be embedded in public JS. */
 const PHONE="917708830513";
 const P=[
-{id:"whey",name:"Potency Whey",cat:"whey",size:"5 lbs",featuredIndex:1,variants:[{label:"Chocolate · 5 lbs",price:4999,img:null},{label:"Coffee · 5 lbs",price:4999,img:"assets/potency-whey-coffee-5lb.webp"}],desc:"Premium whey protein for daily training and recovery.",img:""},
+{id:"whey",name:"Potency Whey",cat:"whey",size:"5 lbs",featuredIndex:1,variants:[{label:"Chocolate · 5 lbs",price:4999,mrp:8599,img:null},{label:"Coffee · 5 lbs",price:4999,mrp:8599,img:"assets/potency-whey-coffee-5lb.webp"}],desc:"Premium whey protein for daily training and recovery.",img:""},
 {id:"mass",name:"Nitro Mass",cat:"mass",featuredIndex:1,variants:[{label:"3 kg · Box photo pending",price:2599,img:null},{label:"5 kg · Bucket",price:3499,img:"assets/Screenshot_2026_1103_003852.jpg"}],desc:"Mass gainer available in two pack sizes.",img:""},
-{id:"pre",name:"Sturdy Pre-Workout",cat:"pre",variants:[{label:"250 g",price:1399}],desc:"Pre-workout formula for your training routine.",img:"https://static.wixstatic.com/media/1ff000_c2a176e091a14c6a9c0bf121a2007f5c~mv2.png"},
-{id:"creatine",name:"Pro Creatine",cat:"creatine",featuredIndex:1,variants:[{label:"Blueberry · 100 g",price:899,img:null},{label:"Cranberry · 100 g",price:899}],desc:"Creatine supplement in two flavour options.",img:"https://static.wixstatic.com/media/1ff000_8db16ef46b194a72b5a5657b83130626~mv2.png"},
+{id:"pre",name:"Sturdy Pre-Workout",cat:"pre",variants:[{label:"250 g",price:1399}],desc:"Pre-workout formula for your training routine.",img:"assets/sturdy-pre-workout.png"},
+{id:"creatine",name:"Pro Creatine",cat:"creatine",featuredIndex:1,variants:[{label:"Blueberry · 100 g",price:899,mrp:1499,img:null},{label:"Cranberry · 100 g",price:899,mrp:1499,img:"assets/pro-creatine.png"}],desc:"Creatine supplement in two flavour options.",img:""},
 {id:"vitamins",name:"Multivitamin",cat:"vitamins",variants:[{label:"1 pack",price:699}],desc:"Daily multivitamin supplement.",img:""}
 ];
 const $=id=>document.getElementById(id);
@@ -26,9 +26,17 @@ function swapPhoto(host,src,name){
  img.onload=()=>{img.hidden=false;placeholder.hidden=true};
  img.hidden=false;placeholder.hidden=true;img.src=src;
 }
+function priceMarkup(v){
+ const hasMrp=Number.isSafeInteger(v.mrp)&&v.mrp>v.price;
+ const percent=hasMrp?Math.round((v.mrp-v.price)*100/v.mrp):0;
+ return '<div class="price-main"><b class="selling-price">'+money(v.price)+'</b>'+
+ (hasMrp?'<del class="mrp-value" aria-label="MRP '+money(v.mrp)+'">MRP '+money(v.mrp)+'</del>':'')+
+ '</div>'+(hasMrp?'<span class="discount-value">'+percent+'% OFF · SAVE '+money(v.mrp-v.price)+'</span>':'')+
+ '<small class="selling-caption">Selling price</small>';
+}
 function card(p){
 const featured=p.featuredIndex||0;const cover=coverImage(p,featured);const pic=cover?'<img loading="lazy" src="'+cover+'" alt="'+p.name+'"><div class="placeholder" hidden><b>'+p.name+'</b>Photo coming soon</div>':'<div class="placeholder"><b>'+p.name+'</b>Verified pack photo coming soon</div>';
-return '<article class="card"><span class="badge">UNICORN PRO SERIES</span><div class="photo">'+pic+'</div><div class="info"><small>UNICORN PRO SERIES</small><h3>'+p.name+'</h3><p>'+p.desc+'</p><label class="variant-label" for="v-'+p.id+'">FLAVOUR / PACK SIZE</label><select id="v-'+p.id+'" class="variant">'+p.variants.map((v,i)=>'<option value="'+i+'"'+(i===featured?' selected':'')+'>'+v.label+'</option>').join("")+'</select><div class="price"><b id="price-'+p.id+'">'+money(p.variants[featured].price)+'</b><small>Retail selling price</small></div><button class="details-link" type="button" data-detail="'+p.id+'">VIEW PRODUCT DETAILS →</button><button class="add" data-id="'+p.id+'">ADD TO CART +</button></div></article>';
+return '<article class="card"><div class="photo">'+pic+'</div><div class="info"><small>UNICORN PRO SERIES</small><h3>'+p.name+'</h3><p>'+p.desc+'</p><label class="variant-label" for="v-'+p.id+'">FLAVOUR / PACK SIZE</label><select id="v-'+p.id+'" class="variant">'+p.variants.map((v,i)=>'<option value="'+i+'"'+(i===featured?' selected':'')+'>'+v.label+'</option>').join("")+'</select><div class="price" id="price-'+p.id+'">'+priceMarkup(p.variants[featured])+'</div><button class="details-link" type="button" data-detail="'+p.id+'">VIEW PRODUCT DETAILS →</button><button class="add" data-id="'+p.id+'">ADD TO CART +</button></div></article>';
 }
 function render(){
 const items=P.filter(p=>(cat==="all"||p.cat===cat)&&((p.name+" "+p.variants.map(v=>v.label).join(" ")).toLowerCase().includes(q.toLowerCase())));
@@ -38,7 +46,7 @@ if($("sort").value==="low")items.sort((a,b)=>a.variants[0].price-b.variants[0].p
 $("grid").innerHTML=items.map(card).join("");
  document.querySelectorAll(".photo img").forEach(img=>img.addEventListener("error",()=>{img.hidden=true;if(img.nextElementSibling)img.nextElementSibling.hidden=false}));
 $("resultText").textContent=items.length+" product"+(items.length===1?"":"s")+" available";
-document.querySelectorAll(".variant").forEach(s=>s.addEventListener("change",()=>{const p=P.find(x=>x.id===s.id.slice(2));$("price-"+p.id).textContent=money(p.variants[Number(s.value)].price);swapPhoto(s.closest(".card").querySelector(".photo"),coverImage(p,s.value),p.name)}));
+document.querySelectorAll(".variant").forEach(s=>s.addEventListener("change",()=>{const p=P.find(x=>x.id===s.id.slice(2));$("price-"+p.id).innerHTML=priceMarkup(p.variants[Number(s.value)]);swapPhoto(s.closest(".card").querySelector(".photo"),coverImage(p,s.value),p.name)}));
 document.querySelectorAll(".details-link").forEach(b=>b.addEventListener("click",()=>showDetail(b.dataset.detail)));
 document.querySelectorAll(".add").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.id+"|"+$("v-"+b.dataset.id).value;cart[k]=Math.min(999,(cart[k]||0)+1);persist();openBag()}));
 }
@@ -78,9 +86,9 @@ function showDetail(id){
  const dlg=$("productDialog"),root=$("productDetail");
  const initialIndex=Number($("v-"+id)?.value ?? p.featuredIndex ?? 0);
  const cover=coverImage(p,initialIndex);const photo=cover?'<img src="'+cover+'" alt="'+p.name+'" loading="lazy"><div class="placeholder" hidden>Verified product image pending</div>':'<div class="placeholder"><b>'+p.name+'</b>Verified product image pending</div>';
- root.innerHTML='<div class="detail-layout"><div class="detail-photo">'+photo+'</div><div class="detail-copy"><span class="eyebrow dark">UNICORN PRO SERIES</span><h2>'+p.name+'</h2><p>'+p.desc+'</p><p class="detail-note">Product pack and flavour availability are confirmed before fulfilment. Front/back pack-label and ingredient photos will be added after verification; please request the current label when ordering.</p><label for="detail-variant">FLAVOUR / PACK SIZE</label><select id="detail-variant">'+p.variants.map((v,i)=>'<option value="'+i+'"'+(i===initialIndex?' selected':'')+'>'+v.label+'</option>').join("")+'</select><h3 id="detail-price">'+money(p.variants[initialIndex].price)+'</h3><button class="primary" id="detail-add">ADD TO CART +</button></div></div>';
+ root.innerHTML='<div class="detail-layout"><div class="detail-photo">'+photo+'</div><div class="detail-copy"><span class="eyebrow dark">UNICORN PRO SERIES</span><h2>'+p.name+'</h2><p>'+p.desc+'</p><p class="detail-note">Product pack and flavour availability are confirmed before fulfilment. Front/back pack-label and ingredient photos will be added after verification; please request the current label when ordering.</p><label for="detail-variant">FLAVOUR / PACK SIZE</label><select id="detail-variant">'+p.variants.map((v,i)=>'<option value="'+i+'"'+(i===initialIndex?' selected':'')+'>'+v.label+'</option>').join("")+'</select><div class="price detail-price" id="detail-price">'+priceMarkup(p.variants[initialIndex])+'</div><button class="primary" id="detail-add">ADD TO CART +</button></div></div>';
  swapPhoto(root.querySelector(".detail-photo"),coverImage(p,initialIndex),p.name);
- const sel=$("detail-variant");sel.onchange=()=>{$("detail-price").textContent=money(p.variants[Number(sel.value)].price);swapPhoto(root.querySelector(".detail-photo"),coverImage(p,sel.value),p.name)};
+ const sel=$("detail-variant");sel.onchange=()=>{$("detail-price").innerHTML=priceMarkup(p.variants[Number(sel.value)]);swapPhoto(root.querySelector(".detail-photo"),coverImage(p,sel.value),p.name)};
  $("detail-add").onclick=()=>{const k=p.id+"|"+sel.value;cart[k]=Math.min(999,(cart[k]||0)+1);persist();dlg.close();openBag()};
  if(typeof dlg.showModal==="function")dlg.showModal();else dlg.setAttribute("open","");
 }
