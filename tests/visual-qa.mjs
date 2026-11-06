@@ -43,10 +43,10 @@ try {
     assert.ok(originalLogo.loaded&&originalLogo.width>100&&originalLogo.height>40,preset.name+' original logo loads at usable size: '+JSON.stringify(originalLogo));
     assert.ok(originalLogo.left>=originalLogo.headerLeft-2&&originalLogo.right<=originalLogo.headerRight+2,preset.name+' logo must fit header: '+JSON.stringify(originalLogo));
     const masthead=await page.locator('.storehead').evaluate(el=>getComputedStyle(el).backgroundColor);
-    const logoStyles=await page.locator('.brand-identity').evaluate(el=>({bg:getComputedStyle(el).backgroundColor,bgImage:getComputedStyle(el).backgroundImage,blend:getComputedStyle(el.querySelector('img')).mixBlendMode}));
+    const logoStyles=await page.locator('.brand-identity').evaluate(el=>({bg:getComputedStyle(el).backgroundColor,bgImage:getComputedStyle(el).backgroundImage,blend:getComputedStyle(el).mixBlendMode}));
     assert.equal(masthead,'rgb(20, 24, 30)',preset.name+' seamless dark masthead');
     assert.equal(logoStyles.bg,'rgba(0, 0, 0, 0)',preset.name+' logo has no cut-and-paste rectangular panel');
-    assert.equal(logoStyles.bgImage,'none',preset.name+' no separate background-image badge');
+    assert.ok(logoStyles.bgImage.includes('max-volume-logo-wide.png'),preset.name+' original gold image is the integrated masthead artwork');
     assert.equal(logoStyles.blend,'screen',preset.name+' original gold artwork blends into masthead');
 
     assert.ok(await page.locator('body').getAttribute('class')==='retail-home',preset.name+' design class');
