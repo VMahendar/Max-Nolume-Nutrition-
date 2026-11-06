@@ -1,4 +1,5 @@
 import {startLocalBackupScheduler} from './deploy/local-backups.mjs';
+import {startDriveBackupScheduler} from './deploy/drive-backup.mjs';
 import http from 'node:http';
 import {stagingGate} from './staging.mjs';
 const allowStaging=stagingGate();
@@ -134,5 +135,6 @@ function validImage(value){
  return value;
 }
 startLocalBackupScheduler();
+const stopDriveBackup=startDriveBackupScheduler(resolve(process.env.DATA_DIR||'runtime'));
 server.requestTimeout=30000;server.headersTimeout=15000;const portArg=process.argv.indexOf('--port');server.listen(Number(portArg>=0?process.argv[portArg+1]:process.env.PORT)||3000,process.env.HOST||'0.0.0.0',()=>console.log('Store running at '+origin));
-for(const signal of ['SIGTERM','SIGINT'])process.on(signal,()=>server.close(()=>{db.close();process.exit(0);}));
+for(const signal of ['SIGTERM','SIGINT'])process.on(signal,()=>{stopDriveBackup?.();server.close(()=>{db.close();process.exit(0);});});
