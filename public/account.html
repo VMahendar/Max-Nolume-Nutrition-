@@ -107,16 +107,8 @@
         </section>
         <div class="account-sidebar">
           <section class="account-panel" aria-labelledby="dealerTitle">
-            <div class="panel-heading"><span class="panel-step">FOR GYMS & RETAILERS</span><h2 id="dealerTitle">Business pricing</h2><p id="dealerStatus">An administrator reviews applications. Retail prices apply until approval.</p></div>
-            <form id="dealer">
-              <label for="dealerKind">Business type</label>
-              <select id="dealerKind" name="kind"><option value="gym">Gym / fitness studio</option><option value="wholesale">Supplement retailer / wholesale</option></select>
-              <label for="dealerBusiness">Business name</label>
-              <input id="dealerBusiness" name="business" placeholder="Your business name" required maxlength="200">
-              <label for="dealerGstin">GSTIN <small>Optional, if applicable</small></label>
-              <input id="dealerGstin" name="gstin" maxlength="15" placeholder="GST registration number">
-              <button class="account-submit" type="submit">Request dealer review <span aria-hidden="true">→</span></button>
-            </form>
+            <div class="panel-heading"><span class="panel-step">GYMS, SHOPS & WHOLESALE</span><h2 id="dealerTitle">Business accounts</h2><p id="dealerStatus">Apply on our dedicated wholesale portal with your shop name, address, GSTIN and business details. Trade rates require approval.</p></div>
+            <a class="account-submit account-link-button" href="wholesale-account.html">Open wholesale account <span aria-hidden="true">→</span></a>
           </section>
           <section class="account-panel" aria-labelledby="securityTitle">
             <div class="panel-heading"><span class="panel-step">ACCOUNT SECURITY</span><h2 id="securityTitle">Change password</h2><p>Update your password securely. You'll be signed out afterward.</p></div>
@@ -130,6 +122,20 @@
           </section>
         </div>
       </div>
+      <section class="account-panel marketing-panel" aria-labelledby="marketingTitle">
+        <div class="marketing-intro"><div class="panel-heading"><span class="panel-step">YOUR COMMUNICATION PREFERENCES</span><h2 id="marketingTitle">Updates worth opening.</h2><p>Choose occasional supplement replenishment reminders and festival announcements from Max Volume Nutrition. You control the timing and can unsubscribe at any time.</p></div><div class="marketing-mark" aria-hidden="true">MV<span>N</span></div></div>
+        <form id="marketing" class="marketing-form">
+          <div class="marketing-grid">
+            <div><label for="cadenceDays">Supplement reminder frequency</label><select id="cadenceDays" name="cadenceDays"><option value="0">No replenishment reminders</option><option value="15">Every 15 days</option><option value="30">Every 30 days</option></select></div>
+            <div class="marketing-channel-group"><span class="marketing-label">Where may we contact you?</span><label class="marketing-check"><input type="checkbox" name="emailOptIn"> Email updates to your registered email</label><label class="marketing-check"><input type="checkbox" name="whatsappOptIn"> WhatsApp updates</label></div>
+            <div><label for="marketingPhone">WhatsApp mobile (only if selected)</label><input id="marketingPhone" name="phone" type="tel" inputmode="tel" maxlength="25" placeholder="10-digit mobile number"></div>
+            <div class="marketing-channel-group"><span class="marketing-label">Additional announcements</span><label class="marketing-check"><input type="checkbox" name="festivalUpdates"> Festival offers and new launches</label></div>
+          </div>
+          <label class="marketing-check marketing-consent"><input type="checkbox" name="explicitConsent"> I agree to receive the selected messages from Max Volume Nutrition. I understand I can turn them off whenever I wish.</label>
+          <div class="marketing-actions"><button type="submit" class="account-submit">Save my preferences <span aria-hidden="true">→</span></button><button type="button" id="marketingStop" class="marketing-stop">Stop all marketing updates</button></div>
+          <p class="marketing-disclosure">Preferences are saved securely. Marketing messages are not automatically sent until a compliant email or WhatsApp sending service is connected and approved.</p>
+        </form>
+      </section>
     </section>
   </main>
 
