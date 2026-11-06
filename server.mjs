@@ -179,6 +179,35 @@ if(path==='/api/verify'&&req.method==='POST'){const b=JSON.parse(await body(req)
 if(path==='/api/webhook'&&req.method==='POST'){const raw=await body(req);if(!signatureMatches(raw,req.headers['x-razorpay-signature'],process.env.RAZORPAY_WEBHOOK_SECRET))fail(400,'Invalid signature.');const b=JSON.parse(raw),p=b.payload?.payment?.entity;if(['payment.captured','order.paid'].includes(b.event)&&p){const row=db.prepare('SELECT * FROM orders WHERE provider_id=?').get(p.order_id);if(!row)fail(503,'Payment order is awaiting reconciliation.');fulfil(row,p);}return json(res,200,{received:true});}
 if(path==='/api/order-status'&&req.method==='POST'){const b=JSON.parse(await body(req)),row=db.prepare('SELECT * FROM orders WHERE id=?').get(String(b.id));if(!accessible(row,user,b.token))fail(404,'Order not found.');return json(res,200,C.publicOrder(row));}
 if(path.startsWith('/api/admin/')){admin(user);
+if(path==='/api/admin/marketing/audience'&&req.method==='GET'){
+ const members=db.prepare('SELECT u.id,u.name,u.email,m.phone,m.email_opt_in,m.whatsapp_opt_in,'+
+ 'm.cadence_days,m.festival_opt_in,m.consented_at,m.last_reorder_contact_at,m.last_festival_contact_at '+
+ 'FROM marketing_preferences m JOIN users u ON u.id=m.user_id '+
+ 'WHERE m.consented_at IS NOT NULL AND (m.email_opt_in=1 OR m.whatsapp_opt_in=1) '+
+ 'ORDER BY u.created DESC LIMIT 500').all();
+ const now=Date.now();
+ return json(res,200,{automaticSending:false,subscribers:members.map(m=>{
+ const last=m.last_reorder_contact_at||m.consented_at;
+ const nextDue=m.cadence_days>0?new Date(Date.parse(last)+m.cadence_days*86400000).toISOString():null;
+ return {id:m.id,name:m.name,email:m.email,phone:m.phone,emailOptIn:!!m.email_opt_in,
+ whatsappOptIn:!!m.whatsapp_opt_in,cadenceDays:m.cadence_days,festivalUpdates:!!m.festival_opt_in,
+ nextDue,reorderDue:nextDue?Date.parse(nextDue)<=now:false};
+ })});
+}
+if(path==='/api/admin/marketing/mark'&&req.method==='POST'){
+ const b=JSON.parse(await body(req));
+ if(!['reorder','festival'].includes(b.kind))fail(400,'Unknown contact category.');
+ const person=db.prepare('SELECT * FROM marketing_preferences WHERE user_id=?').get(String(b.userId||''));
+ if(!person?.consented_at||(!person.email_opt_in&&!person.whatsapp_opt_in))fail(409,'No active permission to contact this customer.');
+ if((b.kind==='reorder'&&!person.cadence_days)||(b.kind==='festival'&&!person.festival_opt_in))
+   fail(409,'Customer has not consented to this message type.');
+ const col=b.kind==='reorder'?'last_reorder_contact_at':'last_festival_contact_at';
+ C.tx(()=>{
+  db.prepare('UPDATE marketing_preferences SET '+col+'=? WHERE user_id=?').run(new Date().toISOString(),b.userId);
+  C.audit(user.id,'marketing.manual_contact_recorded',b.userId,{kind:b.kind});
+ });
+ return json(res,200,{ok:true});
+}
 if(path==='/api/admin/overview'&&req.method==='GET')return json(res,200,{products:C.catalogue(user,true),dealers:db.prepare('SELECT d.*,u.email,u.name FROM dealers d JOIN users u ON u.id=d.user_id ORDER BY d.created DESC LIMIT 100').all(),orders:db.prepare('SELECT * FROM orders ORDER BY created DESC LIMIT 100').all().map(C.publicOrder),store:C.setting('store'),tax:C.setting('tax'),shippingReady:!!shippingReady(),paymentReady:!!enabled(),reviews:db.prepare('SELECT r.*,u.name FROM product_reviews r JOIN users u ON u.id=r.user_id ORDER BY r.updated DESC LIMIT 100').all(),audit:db.prepare('SELECT * FROM audit ORDER BY id DESC LIMIT 100').all()});
 if(req.method!=='POST')fail(405,'Method not allowed.');const b=JSON.parse(await body(req));
 if(path==='/api/admin/review'){
