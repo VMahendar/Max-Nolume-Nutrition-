@@ -199,3 +199,20 @@ html{scroll-behavior:smooth}
  .retail-home .card .photo img{max-height:190px!important}
 }
 @media(prefers-reduced-motion:reduce){.retail-home .card{transition:none!important}.retail-home .hero a{transition:none!important}}
+
+/* The original wide logo PNG contains generous internal black margins.
+   Show the same unmodified artwork as a correctly zoomed background while
+   retaining its accessible <img> in the markup. No logo redrawing. */
+.retail-home .brand-identity{
+  background-color:#161a20!important;
+  background-image:url("max-volume-logo-wide.png")!important;
+  background-repeat:no-repeat!important;
+  background-position:center center!important;
+  background-size:164% auto!important;
+}
+.retail-home .brand-identity .original-brand-logo{
+  opacity:0!important;
+}
+@media(max-width:620px){
+  .retail-home .brand-identity{background-size:174% auto!important;}
+}
