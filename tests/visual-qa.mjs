@@ -220,6 +220,7 @@ try {
   const freshTradeSession=await newDealer.evaluate(async()=>await (await fetch('/api/session')).json());
   assert.equal(freshTradeSession.user.dealer.status,'pending','new wholesaler starts pending approval');
   await newDealer.close();
+  await buyer.goto(origin+'/account.html');
   const denied=await buyer.evaluate(async()=>(await fetch('/api/dealer/catalog')).status);
   assert.equal(denied,403,'pending dealers cannot see private wholesale prices');
   const adminPage=await browser.newPage();
