@@ -157,3 +157,24 @@ body.account-page{margin:0;min-height:100vh;background:#f6f7f7;color:#1e242b;fon
  .account-page .account-mainnav a{font-size:9px}
 }
 @media(prefers-reduced-motion:reduce){.account-page .account-submit{transition:none}}
+
+/* Consent-led customer updates section. Marketing is opt-in and off by default. */
+.account-page .marketing-panel{margin-top:24px;border-top:3px solid #b78b47;padding:32px 35px}
+.account-page .marketing-intro{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.account-page .marketing-intro .panel-heading{max-width:660px;margin-bottom:27px}
+.account-page .marketing-mark{font-size:44px;font-weight:900;letter-spacing:-.1em;color:#d8dde2}
+.account-page .marketing-mark span{color:#b88c49}
+.account-page .marketing-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 35px}
+.account-page .marketing-grid>div{min-width:0}
+.account-page form .marketing-label{display:block;color:#2a3138;font-size:12px;font-weight:750;margin-bottom:10px}
+.account-page form .marketing-check{display:flex!important;justify-content:flex-start!important;align-items:flex-start!important;gap:10px!important;margin:12px 0!important;font-size:12px!important;font-weight:600!important;color:#4d5964!important;letter-spacing:0!important}
+.account-page form .marketing-check input{width:17px;height:17px;min-height:17px;margin:1px 0 0;accent-color:#a77b3f;flex:0 0 17px}
+.account-page form .marketing-consent{padding:16px;background:#f8f8f7;border:1px solid #e5e8ea;margin:17px 0 0!important}
+.account-page .marketing-actions{display:flex;gap:13px;align-items:center;margin-top:15px;flex-wrap:wrap}
+.account-page .marketing-actions .account-submit{width:auto;min-width:255px}
+.account-page .marketing-stop{min-height:48px;padding:11px 15px;color:#5d6268;border:1px solid #c9cdd0;background:#fff;font-size:12px;font-weight:730;cursor:pointer;border-radius:3px}
+.account-page .marketing-stop:hover{background:#f1f2f3}
+.account-page .marketing-disclosure{color:#737d86;font-size:11px;line-height:1.65;margin:15px 0 0}
+.account-page .account-link-button{max-width:310px;text-decoration:none!important}
+@media(max-width:800px){.account-page .marketing-panel{padding:26px}.account-page .marketing-grid{grid-template-columns:1fr;gap:0}}
+@media(max-width:600px){.account-page .marketing-panel{padding:23px 19px}.account-page .marketing-intro{gap:8px}.account-page .marketing-mark{font-size:28px}.account-page .marketing-actions{align-items:stretch;flex-direction:column}.account-page .marketing-actions .account-submit,.account-page .marketing-actions .marketing-stop{width:100%;min-width:0}}
