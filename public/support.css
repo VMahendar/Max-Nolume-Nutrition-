@@ -1,0 +1,64 @@
+/* Support Center — original MVN brand identity, not another company's logo. */
+.support-page{background:#fff!important}
+.support-page .support-hero{background:#fff;border-bottom:1px solid #e3e7ea}
+.support-page .support-hero-inner{max-width:1280px;margin:0 auto;padding:66px 24px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(270px,.7fr);gap:55px;align-items:center}
+.support-page .support-hero h1{font-size:clamp(45px,5.8vw,76px);line-height:1.04;letter-spacing:-.06em;font-weight:870;margin:12px 0 23px;color:#1c232b}
+.support-page .support-hero h1 em{font-style:normal;color:#b08b4c}
+.support-page .support-hero-inner>div>p:last-child{font-size:15px;max-width:650px;color:#66717a;line-height:1.75}
+.support-page .support-hero-contact{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:25px 29px;border:1px solid #e3e6e9;border-top:3px solid #b88e50;background:#fbfbfb}
+.support-page .support-hero-contact>span{color:#977340;font-size:10px;font-weight:840;letter-spacing:.1em}
+.support-page .support-hero-contact a{font-size:15px;font-weight:750;color:#252e38;overflow-wrap:anywhere}
+.support-page .support-hero-contact small{font-size:11px;color:#7e858c;line-height:1.6}
+.support-page .support-main{max-width:1280px;padding:68px 24px 85px;margin:0 auto}
+.support-page .support-section-heading{margin-bottom:30px}
+.support-page .support-section-heading>span{font-size:10px;letter-spacing:.1em;color:#a17f4b;font-weight:840}
+.support-page .support-section-heading h2{font-size:clamp(30px,3.2vw,43px);color:#222830;letter-spacing:-.04em;margin:8px 0}
+.support-page .support-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:78px}
+.support-page .support-topic{display:flex;flex-direction:column;min-height:224px;padding:26px 21px;border:1px solid #e4e7ea;border-radius:2px;background:#fff;color:#222a32!important;transition:box-shadow .2s,border-color .2s}
+.support-page .support-topic:hover{border-color:#caa66b;box-shadow:0 8px 23px #26303d12}
+.support-page .support-number{color:#a88346;font-size:10px;font-weight:800;letter-spacing:.07em}
+.support-page .support-topic h3{font-size:21px;letter-spacing:-.025em;margin:26px 0 9px;line-height:1.2}
+.support-page .support-topic p{font-size:12px;color:#6c7780;margin:0 0 18px;line-height:1.6;flex:1}
+.support-page .support-topic>span:last-child{font-size:11px;font-weight:800;color:#a57a38}
+.support-page .support-certificate{display:grid;grid-template-columns:1fr minmax(300px,500px);gap:36px;align-items:center;background:#161c23;padding:40px 44px;margin-bottom:77px;color:#fff}
+.support-page .support-certificate>div>span{color:#dbb976;font-size:10px;letter-spacing:.1em;font-weight:780}
+.support-page .support-certificate h2{font-size:clamp(30px,3vw,44px);line-height:1.14;letter-spacing:-.04em;margin:16px 0}
+.support-page .support-certificate p{max-width:510px;font-size:13px;color:#d0d6db;line-height:1.8}
+.support-page .support-certificate a{display:inline-flex;padding:14px 0;border-bottom:1px solid #d2ae70;margin-top:12px;font-size:11px;font-weight:800;color:#e7cb92}
+.support-page .support-certificate img{display:block;width:100%;height:auto;max-height:330px;object-fit:contain;background:#fff}
+.support-page .support-faq{display:grid;grid-template-columns:minmax(200px,.6fr) minmax(0,1.4fr);gap:50px;align-items:start;border-top:1px solid #e1e5e9;padding:31px 0 36px;scroll-margin-top:30px}
+.support-page .support-faq>div:first-child>span{font-size:10px;color:#a58042;letter-spacing:.07em;font-weight:800}
+.support-page .support-faq h2{font-size:25px;letter-spacing:-.04em;margin:10px 0;color:#212932}
+.support-page .support-faq details{border-bottom:1px solid #e4e7ea;padding:12px 0}
+.support-page .support-faq details:first-child{padding-top:0}
+.support-page .support-faq summary{display:list-item;cursor:pointer;color:#252d35;font-size:14px;font-weight:800;padding:8px 6px 9px 0}
+.support-page .support-faq details p{font-size:13px;line-height:1.8;color:#69747e;margin:2px 0 15px}
+.support-page .support-faq details a{color:#946e36;text-decoration:underline}
+.support-page .support-end{margin-top:58px;background:#f4f5f6;border:1px solid #e5e7ea;padding:41px;display:flex;align-items:center;justify-content:space-between;gap:30px}
+.support-page .support-end span{font-size:10px;letter-spacing:.1em;color:#9b7741;font-weight:800}
+.support-page .support-end h2{font-size:34px;letter-spacing:-.04em;margin:10px 0}
+.support-page .support-end p{font-size:13px;color:#66727d;margin:0}
+.support-page .support-end-actions{display:grid;gap:10px;min-width:225px;text-align:center}
+.support-page .support-end-actions a{display:block;border:1px solid #bac1ca;padding:13px 19px;color:#2c333b;font-size:11px;font-weight:800}
+.support-page .support-end-actions .support-cta{background:#171d24;border-color:#171d24;color:#fff}
+@media(max-width:1000px){
+ .support-page .support-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .support-page .support-hero-inner{gap:26px}
+ .support-page .support-certificate{grid-template-columns:1fr}
+}
+@media(max-width:720px){
+ .support-page .support-hero-inner{grid-template-columns:1fr;padding:43px 19px;gap:27px}
+ .support-page .support-main{padding:43px 16px 56px}
+ .support-page .support-faq{grid-template-columns:1fr;gap:12px}
+ .support-page .support-certificate{padding:27px 20px}
+ .support-page .support-end{flex-direction:column;align-items:stretch;padding:28px 20px}
+ .support-page .support-end-actions{min-width:0}
+}
+@media(max-width:480px){
+ .support-page .support-grid{grid-template-columns:1fr;gap:10px;margin-bottom:48px}
+ .support-page .support-topic{min-height:167px}
+ .support-page .support-topic h3{margin-top:16px}
+ .support-page .support-hero h1{font-size:49px}
+ .support-page .support-hero-contact a{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){.support-page .support-topic{transition:none}}
