@@ -379,3 +379,13 @@
 .retail-home .drawerfoot .send{font-size:12px;letter-spacing:.02em;min-height:47px;border-radius:6px}
 .retail-home .drawerfoot input:focus{outline:2px solid #1559e6;outline-offset:1px}
 .retail-home .store-notice{line-height:1.6}
+
+/* Helpful indexable shopping information - original MVN visual system */
+.retail-home .store-faq{padding:54px max(20px,calc((100% - 1280px)/2));background:#fff;border-top:1px solid #dfe6f1;color:#172c50}
+.retail-home .store-faq h2{font-size:clamp(24px,3vw,34px);font-weight:900;line-height:1.15;letter-spacing:-.02em;margin:9px 0}
+.retail-home .store-faq-intro p{font-size:14px;color:#5e6d83}
+.retail-home .store-faq-items{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:22px}
+.retail-home .store-faq-items article{background:#f5f8fd;border:1px solid #e1e8f3;border-radius:9px;padding:21px}
+.retail-home .store-faq-items h3{font-size:15px;font-weight:900;color:#11326c;margin:0 0 9px}
+.retail-home .store-faq-items p{font-size:13px;line-height:1.7;color:#5c6c82;margin:0}
+@media(max-width:780px){.retail-home .store-faq-items{grid-template-columns:1fr}.retail-home .store-faq{padding:36px 20px}}
