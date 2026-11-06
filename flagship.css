@@ -359,3 +359,23 @@ html{scroll-behavior:smooth;scroll-padding-top:130px}
 /* Keep original square-source logo artwork visible at intended wide-banner
    proportions; suppress duplicate missing-image overlays when the photo loads. */
 .retail-home .placeholder[hidden],.retail-home .photo img[hidden],.retail-home .detail-photo img[hidden]{display:none!important}
+
+/* Original source image still contains a dim black/grey matte.
+   Display-time luminance-to-alpha filter removes only that matte, leaving
+   the gold logo shapes and letterforms intact. No new logo artwork. */
+.retail-home .logo-filter-defs{position:absolute!important;width:0!important;height:0!important;pointer-events:none!important;overflow:hidden!important}
+.retail-home .brand-identity{filter:url("#mvnGoldKey")!important;mix-blend-mode:normal!important}
+.retail-home .footer-logo-frame{
+  display:block!important;width:248px!important;max-width:100%!important;height:75px!important;
+  background-image:url("max-volume-logo-wide.png")!important;background-repeat:no-repeat!important;
+  background-position:center center!important;background-size:100% auto!important;
+  filter:url("#mvnGoldKey")!important;
+}
+.retail-home .footer-logo-frame .original-footer-logo{
+  opacity:0!important;display:block!important;width:100%!important;height:75px!important;
+  max-height:75px!important;object-fit:contain!important;
+}
+@media(max-width:620px){
+ .retail-home .footer-logo-frame{width:220px!important;height:68px!important}
+ .retail-home .footer-logo-frame .original-footer-logo{height:68px!important}
+}
