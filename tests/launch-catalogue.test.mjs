@@ -61,7 +61,8 @@ test('public catalogue never uses Cranberry artwork for Blueberry or 5kg bucket 
   assert.equal(creatine.variants.find(v=>v.id==='creatine-blueberry').image,null);
   assert.equal(creatine.variants.find(v=>v.id==='creatine-cranberry').image,'assets/pro-creatine.png');
   assert.equal(mass.variants.find(v=>v.id==='mass-3kg').image,null);
-  assert.ok(mass.variants.find(v=>v.id==='mass-5kg').image.includes('Nitro-Mass-1-300x300'));
+  assert.equal(mass.variants.find(v=>v.id==='mass-5kg').image,'assets/Screenshot_2026_1103_003852.jpg');
+  assert.equal(mass.variants.find(v=>v.id==='mass-5kg').images[0].src,'assets/Screenshot_2026_1103_003852.jpg');
   const whey=all.find(p=>p.id==='potency-whey');
   assert.equal(whey.variants.find(v=>v.id==='whey-chocolate').image,null);
   assert.equal(whey.variants.find(v=>v.id==='whey-coffee').image,'assets/potency-whey-coffee-5lb.webp');
