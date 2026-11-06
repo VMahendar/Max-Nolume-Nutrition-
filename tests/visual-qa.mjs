@@ -33,8 +33,8 @@ try {
     assert.equal(await page.locator('#grid article.card').count(),5,preset.name+' product family count');
     assert.ok(await page.locator('.hero h1').isVisible(),preset.name+' hero visible');
     assert.match(await page.locator('.hero h1').innerText(),/FUEL EVERY\s+REP/i,preset.name+' product-first hero headline');
-    assert.match(await page.locator('.hero-declaration').innerText(),/OFFICIAL TAMIL NADU DISTRIBUTOR/i,preset.name+' distribution identity');
-    assert.ok(await page.locator('#brands .brands-intro').isVisible(),preset.name+' upcoming brands section');
+    assert.match(await page.locator('.hero-declaration').innerText(),/AUTHORIZED UNICORN PRO SERIES DISTRIBUTOR/i,preset.name+' distribution identity');
+    assert.ok(await page.locator('#brands .motion-stage').isVisible(),preset.name+' upcoming GLOTECH feature');
     const originalLogo=await page.locator('header .original-brand-logo').evaluate(img=>{
       const r=img.getBoundingClientRect(),h=img.closest('header').getBoundingClientRect();
       return {loaded:img.complete&&img.naturalWidth>0,width:r.width,height:r.height,left:r.left,right:r.right,headerLeft:h.left,headerRight:h.right};
@@ -169,6 +169,20 @@ try {
     await accountPage.locator('[data-password-for="loginPassword"]').click();
     assert.equal(await accountPage.locator('#loginPassword').getAttribute('type'),'password',preset.name+' password hidden again');
     await accountPage.screenshot({path:reportDir+'/'+preset.name+'-account.png',fullPage:true,animations:'disabled'});
+    await accountPage.goto(origin+'/wholesale-account.html',{waitUntil:'domcontentloaded'});
+    await accountPage.locator('#b2bRegister input[name="business"]').waitFor({state:'visible'});
+    assert.equal(await accountPage.locator('#b2bRegister input[name="gstin"]').count(),1,preset.name+' dedicated GSTIN on wholesale registration');
+    assert.equal(await accountPage.locator('#b2bRegister input[name="pincode"]').count(),1,preset.name+' dedicated shop PIN code on wholesale registration');
+    const wholesaleOverflow=await accountPage.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+    assert.ok(wholesaleOverflow<=2,preset.name+' wholesale registration has no horizontal overflow');
+    await accountPage.screenshot({path:reportDir+'/'+preset.name+'-wholesale.png',fullPage:true,animations:'disabled'});
+    await accountPage.goto(origin+'/support.html',{waitUntil:'domcontentloaded'});
+    await accountPage.locator('.support-faq').first().waitFor({state:'visible'});
+    assert.ok(await accountPage.locator('.support-certificate img').isVisible(),preset.name+' original certificate shown in Help Center');
+    const helpOverflow=await accountPage.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+    assert.ok(helpOverflow<=2,preset.name+' Help Center has no horizontal overflow');
+    await accountPage.screenshot({path:reportDir+'/'+preset.name+'-support.png',fullPage:true,animations:'disabled'});
+
     assert.deepEqual(failures,[],preset.name+' account JavaScript must not throw');
     await accountPage.close();
   }
@@ -181,10 +195,46 @@ try {
   await buyer.locator('#register button[type="submit"]').click();
   await buyer.locator('#signedIn').waitFor({state:'visible',timeout:12000});
   assert.match(await buyer.locator('#tier').innerText(),/retail/i,'new account must start at retail tier');
-  await buyer.locator('#dealer select[name="kind"]').selectOption('wholesale');
-  await buyer.locator('#dealer input[name="business"]').fill('Launch QA Supplement Outlet');
-  await buyer.locator('#dealer button[type="submit"]').click();
-  await buyer.waitForFunction(()=>document.querySelector('#dealerStatus')?.textContent.includes('pending'),null,{timeout:12000});
+  // Opt-in reminders and festival updates must never start enabled by default.
+  await buyer.locator('#marketing select[name="cadenceDays"]').selectOption('15');
+  await buyer.locator('#marketing input[name="emailOptIn"]').check();
+  await buyer.locator('#marketing input[name="festivalUpdates"]').check();
+  await buyer.locator('#marketing input[name="explicitConsent"]').check();
+  await buyer.locator('#marketing button[type="submit"]').click();
+  await buyer.waitForFunction(async()=>{
+    const r=await fetch('/api/me/marketing'),x=await r.json();
+    return x.preferences?.cadenceDays===15&&x.preferences?.festivalUpdates===true;
+  },null,{timeout:10000});
+  await buyer.goto(origin+'/wholesale-account.html');
+  await buyer.locator('#wholesaleApplySection').waitFor({state:'visible',timeout:12000});
+  await buyer.locator('#b2bApply input[name="business"]').fill('Launch QA Supplement Outlet');
+  await buyer.locator('#b2bApply select[name="kind"]').selectOption('wholesale');
+  await buyer.locator('#b2bApply input[name="phone"]').fill('9876543210');
+  await buyer.locator('#b2bApply input[name="city"]').fill('Chennai');
+  await buyer.locator('#b2bApply input[name="pincode"]').fill('603103');
+  await buyer.locator('#b2bApply textarea[name="address"]').fill('1 Test Street, Kelambakkam');
+  await buyer.locator('#b2bApply button[type="submit"]').click();
+  await buyer.waitForFunction(()=>document.querySelector('#wholesaleStatus')?.textContent.toLowerCase().includes('pending'),null,{timeout:12000});
+
+  // Verify brand-new wholesaler registration is independent of customer signup.
+  const newDealer=await browser.newPage();
+  await newDealer.goto(origin+'/wholesale-account.html');
+  await newDealer.locator('#b2bRegister input[name="business"]').fill('Trade QA Fitness Shop');
+  await newDealer.locator('#b2bRegister select[name="kind"]').selectOption('wholesale');
+  await newDealer.locator('#b2bRegister input[name="gstin"]').fill('33AAAAA0000A1Z5');
+  await newDealer.locator('#b2bRegister input[name="name"]').fill('Trade QA Owner');
+  await newDealer.locator('#b2bRegister input[name="phone"]').fill('9876543211');
+  await newDealer.locator('#b2bRegister input[name="city"]').fill('Puducherry');
+  await newDealer.locator('#b2bRegister input[name="pincode"]').fill('605001');
+  await newDealer.locator('#b2bRegister textarea[name="address"]').fill('3 Trade Avenue, Puducherry');
+  await newDealer.locator('#b2bRegister input[name="email"]').fill('trade-new@example.test');
+  await newDealer.locator('#b2bRegister input[name="password"]').fill('TradeNewSecure-Passphrase-2026');
+  await newDealer.locator('#b2bRegister button[type="submit"]').click();
+  await newDealer.waitForFunction(()=>document.querySelector('#wholesaleStatus')?.textContent.toLowerCase().includes('pending'),null,{timeout:12000});
+  const freshTradeSession=await newDealer.evaluate(async()=>await (await fetch('/api/session')).json());
+  assert.equal(freshTradeSession.user.dealer.status,'pending','new wholesaler starts pending approval');
+  await newDealer.close();
+  await buyer.goto(origin+'/account.html');
   const denied=await buyer.evaluate(async()=>(await fetch('/api/dealer/catalog')).status);
   assert.equal(denied,403,'pending dealers cannot see private wholesale prices');
   const adminPage=await browser.newPage();
@@ -199,7 +249,11 @@ try {
   finally{qaDb.close();}
   await adminPage.goto(origin+'/admin.html');
   await adminPage.locator('#dashboard').waitFor({state:'visible',timeout:12000});
-  await adminPage.locator('#dealerTable button[data-status="approved"]').first().click();
+  const audience=await adminPage.evaluate(async()=>await (await fetch('/api/admin/marketing/audience')).json());
+  assert.ok(audience.subscribers.some(p=>p.email==='launch-buyer@example.test'&&p.cadenceDays===15&&p.festivalUpdates),'only opted-in buyers join marketing audience');
+  assert.equal(audience.automaticSending,false,'no unconfigured auto-sending');
+
+  await adminPage.locator('#dealerTable tr').filter({hasText:'launch-buyer@example.test'}).locator('button[data-status="approved"]').click();
   await adminPage.waitForFunction(()=>document.querySelector('#dealerTable')?.textContent.includes('approved'),null,{timeout:12000});
   await buyer.reload();
   await buyer.waitForFunction(()=>document.querySelector('#tier')?.textContent.includes('wholesale'),null,{timeout:12000});
@@ -218,6 +272,10 @@ try {
   await buyer.locator('#login button[type="submit"]').click();
   await buyer.waitForFunction(()=>document.querySelector('#tier')?.textContent.includes('wholesale'),null,{timeout:12000});
   console.log('ACCOUNT_WHOLESALE_QA_PASS',JSON.stringify({register:true,login:true,dealerApplication:true,adminApproval:true,privatePricing:true,publicRetailOnly:true}));
+  await buyer.locator('#marketingStop').click();
+  await buyer.waitForFunction(async()=>{const x=await (await fetch('/api/me/marketing')).json();return x.preferences?.cadenceDays===0&&!x.preferences?.festivalUpdates;},null,{timeout:10000});
+  const afterOptOut=await adminPage.evaluate(async()=>await (await fetch('/api/admin/marketing/audience')).json());
+  assert.ok(!afterOptOut.subscribers.some(p=>p.email==='launch-buyer@example.test'),'marketing opt-out excludes buyer');
   await buyer.close();await adminPage.close();
   const catalog=await fetch(origin+'/api/retail/catalog');
   assert.equal(catalog.status,200,'retail catalog API');

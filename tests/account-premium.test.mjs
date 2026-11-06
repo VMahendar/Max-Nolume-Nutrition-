@@ -9,16 +9,17 @@ test('account UI uses a coherent premium customer interface and preserves auth A
  assert.ok(html.includes('max-volume-logo-wide.png'));
  assert.ok(html.includes('mvnGoldKey'));
  assert.ok(!html.includes('href="admin.html"'),'do not show an admin link to ordinary shoppers');
- for(const id of ['anonymous','signedIn','message','login','register','dealer','password','logout','orders','welcome','tier','dealerStatus']){
+ for(const id of ['anonymous','signedIn','message','login','register','marketing','marketingStop','password','logout','orders','welcome','tier','dealerStatus']){
    assert.match(html,new RegExp('id="'+id+'"'));
  }
- for(const name of ['name="email"','name="password"','name="business"','name="kind"','name="gstin"','name="currentPassword"']){
+ for(const name of ['name="email"','name="password"','name="currentPassword"']){
    assert.ok(html.includes(name));
  }
  assert.match(css,/\.account-page \[hidden\]\{display:none!important\}/);
  assert.match(css,/\.account-page \.account-auth-grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
  assert.match(css,/@media\(max-width:600px\)/);
  assert.ok(js.includes("api('/api/'+name,data)"),'use existing server authentication endpoints');
+ assert.ok(html.includes('href="wholesale-account.html"'),'separate wholesaler portal linked');
  assert.ok(!js.includes('innerHTML=error'), 'do not inject untrusted error text as HTML');
 });
 

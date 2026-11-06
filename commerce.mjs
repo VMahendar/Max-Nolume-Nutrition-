@@ -25,6 +25,20 @@ CREATE TABLE IF NOT EXISTS invoices(order_id TEXT PRIMARY KEY REFERENCES orders(
 CREATE TABLE IF NOT EXISTS shipments(order_id TEXT PRIMARY KEY REFERENCES orders(id),status TEXT NOT NULL,data TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS counters(key TEXT PRIMARY KEY,value INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS user_wishlist(user_id TEXT NOT NULL REFERENCES users(id),variant_id TEXT NOT NULL,created TEXT NOT NULL,PRIMARY KEY(user_id,variant_id));
+CREATE TABLE IF NOT EXISTS dealer_profiles(
+ user_id TEXT PRIMARY KEY REFERENCES users(id),phone TEXT NOT NULL,city TEXT NOT NULL,
+ address TEXT NOT NULL,pincode TEXT NOT NULL,notes TEXT NOT NULL DEFAULT '',updated TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS marketing_preferences(
+ user_id TEXT PRIMARY KEY REFERENCES users(id),phone TEXT NOT NULL DEFAULT '',
+ email_opt_in INTEGER NOT NULL DEFAULT 0 CHECK(email_opt_in IN (0,1)),
+ whatsapp_opt_in INTEGER NOT NULL DEFAULT 0 CHECK(whatsapp_opt_in IN (0,1)),
+ cadence_days INTEGER NOT NULL DEFAULT 0 CHECK(cadence_days IN (0,15,30)),
+ festival_opt_in INTEGER NOT NULL DEFAULT 0 CHECK(festival_opt_in IN (0,1)),
+ consented_at TEXT,updated_at TEXT NOT NULL,last_reorder_contact_at TEXT,last_festival_contact_at TEXT
+);
+CREATE INDEX IF NOT EXISTS marketing_due ON marketing_preferences(cadence_days,consented_at);
+
 CREATE TABLE IF NOT EXISTS product_reviews(id TEXT PRIMARY KEY,product_id TEXT NOT NULL REFERENCES products(id),user_id TEXT NOT NULL REFERENCES users(id),rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),title TEXT NOT NULL,body TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),created TEXT NOT NULL,updated TEXT NOT NULL,UNIQUE(product_id,user_id));
 CREATE INDEX IF NOT EXISTS product_review_status ON product_reviews(product_id,status);
 

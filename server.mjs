@@ -31,6 +31,24 @@ const limits=new Map();function rate(key,max){const now=Date.now();if(limits.siz
 async function body(req){const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>65536)fail(413,'Request too large.');chunks.push(chunk);}return Buffer.concat(chunks).toString('utf8');}
 const cookie=(res,token)=>res.setHeader('Set-Cookie',`mvn_session=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${token?604800:0}${production||origin.startsWith('https:')?'; Secure':''}`);
 const requireUser=user=>user||fail(401,'Please sign in.');
+
+function businessPhone(value){
+ const valueText=clean(value,25).replace(/[\s()+.-]/g,'');
+ const digits=valueText.startsWith('91')&&valueText.length===12?valueText.slice(2):valueText;
+ if(!/^[6-9]\d{9}$/.test(digits))fail(400,'Enter a valid 10-digit Indian mobile number.');
+ return '91'+digits;
+}
+function businessDetails(b){
+ const kind=String(b.kind||'');
+ if(!['gym','wholesale'].includes(kind))fail(400,'Choose a gym/studio or a wholesale/supplement retailer.');
+ const business=clean(b.business,200),phone=businessPhone(b.phone),city=clean(b.city,100),address=clean(b.address,350);
+ const pincode=clean(b.pincode,6);
+ if(!/^[1-9]\d{5}$/.test(pincode))fail(400,'Enter a valid six-digit PIN code.');
+ const gstin=typeof b.gstin==='string'?b.gstin.trim().toUpperCase():'';
+ if(gstin&&!/^\d{2}[A-Z0-9]{13}$/.test(gstin))fail(400,'Invalid GSTIN format.');
+ return {kind,business,phone,city,address,pincode,gstin};
+}
+
 const admin=user=>{if(requireUser(user).role!=='admin')fail(403,'Administrator access required.');return user;};
 const accessible=(row,user,token)=>row&&(user?.role==='admin'||row.user_id&&row.user_id===user?.id||typeof token==='string'&&row.token===token);
 function invoice(row,p){if(!p.tax?.enabled)return;const local=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));const year=Number(local.year),start=Number(local.month)>=4?year:year-1;const fy=String(start).slice(-2)+String(start+1).slice(-2);const key='invoice-'+fy;db.prepare('INSERT INTO counters VALUES(?,1) ON CONFLICT(key) DO UPDATE SET value=value+1').run(key);const n=db.prepare('SELECT value FROM counters WHERE key=?').get(key).value;const number=`${p.tax.prefix}/${fy}/${String(n).padStart(6,'0')}`;if(number.length>16)fail(400,'Invoice number exceeds configured limit.');db.prepare('INSERT INTO invoices VALUES(?,?,?)').run(row.id,number,JSON.stringify({number,date:new Date().toISOString(),orderId:row.id,...p}));}
@@ -69,9 +87,79 @@ if(path==='/api/reviews'){
  return json(res,200,{ok:true,status:'pending',message:'Your review is awaiting approval.'});
 }
 
+if(path==='/api/me/marketing'&&req.method==='GET'){
+ requireUser(user);
+ const row=db.prepare('SELECT * FROM marketing_preferences WHERE user_id=?').get(user.id);
+ return json(res,200,{preferences:row?{cadenceDays:row.cadence_days,festivalUpdates:!!row.festival_opt_in,
+  emailOptIn:!!row.email_opt_in,whatsappOptIn:!!row.whatsapp_opt_in,phone:row.phone,updatedAt:row.updated_at}
+  :{cadenceDays:0,festivalUpdates:false,emailOptIn:false,whatsappOptIn:false,phone:'',updatedAt:null}});
+}
+if(path==='/api/me/marketing'&&req.method==='POST'){
+ requireUser(user);
+ if(!rate('marketing-pref:'+user.id,12))fail(429,'Too many changes. Try again later.');
+ const b=JSON.parse(await body(req)),cadenceDays=Number(b.cadenceDays);
+ if(![0,15,30].includes(cadenceDays))fail(400,'Choose no reminders, every 15 days, or every 30 days.');
+ const emailOptIn=b.emailOptIn===true,whatsappOptIn=b.whatsappOptIn===true,festivalUpdates=b.festivalUpdates===true;
+ const subscribed=(cadenceDays>0||festivalUpdates)&&(emailOptIn||whatsappOptIn);
+ if((cadenceDays>0||festivalUpdates)&&!subscribed)fail(400,'Choose at least one channel for updates.');
+ if(subscribed&&b.explicitConsent!==true)fail(400,'Please agree to receive the selected updates.');
+ const phone=whatsappOptIn?businessPhone(b.phone):'';
+ const now=new Date().toISOString();
+ C.tx(()=>{
+   const previous=db.prepare('SELECT * FROM marketing_preferences WHERE user_id=?').get(user.id);
+   const same=!!previous&&previous.cadence_days===cadenceDays&&previous.email_opt_in===Number(emailOptIn&&subscribed)&&
+     previous.whatsapp_opt_in===Number(whatsappOptIn&&subscribed)&&previous.festival_opt_in===Number(festivalUpdates&&subscribed)&&previous.phone===phone;
+   const consentedAt=subscribed?(same&&previous?.consented_at?previous.consented_at:now):null;
+   db.prepare('INSERT INTO marketing_preferences(user_id,phone,email_opt_in,whatsapp_opt_in,cadence_days,festival_opt_in,consented_at,updated_at,last_reorder_contact_at,last_festival_contact_at) '+
+     'VALUES(?,?,?,?,?,?,?,?,NULL,NULL) ON CONFLICT(user_id) DO UPDATE SET phone=excluded.phone,email_opt_in=excluded.email_opt_in,whatsapp_opt_in=excluded.whatsapp_opt_in,'+
+     'cadence_days=excluded.cadence_days,festival_opt_in=excluded.festival_opt_in,consented_at=excluded.consented_at,updated_at=excluded.updated_at,'+
+     'last_reorder_contact_at=CASE WHEN ? THEN marketing_preferences.last_reorder_contact_at ELSE NULL END,'+
+     'last_festival_contact_at=CASE WHEN ? THEN marketing_preferences.last_festival_contact_at ELSE NULL END')
+    .run(user.id,phone,Number(emailOptIn&&subscribed),Number(whatsappOptIn&&subscribed),
+      subscribed?cadenceDays:0,Number(festivalUpdates&&subscribed),consentedAt,now,Number(same),Number(same));
+   C.audit(user.id,subscribed?'marketing.optin':'marketing.optout',user.id,{cadenceDays,festivalUpdates});
+ });
+ return json(res,200,{ok:true,subscribed});
+}
 if(path==='/api/me/claim-order'&&req.method==='POST'){requireUser(user);const b=JSON.parse(await body(req));C.tx(()=>{const row=db.prepare('SELECT * FROM orders WHERE id=? AND token=?').get(String(b.id),String(b.token));if(!row||row.user_id&&row.user_id!==user.id||JSON.parse(row.payload).customer.email.toLowerCase()!==user.email)fail(404,'Order not found for this account.');db.prepare('UPDATE orders SET user_id=? WHERE id=?').run(user.id,row.id);C.audit(user.id,'order.claim',row.id);});return json(res,200,{ok:true});}
 if(path==='/api/me/orders'&&req.method==='GET'){requireUser(user);return json(res,200,{orders:db.prepare('SELECT * FROM orders WHERE user_id=? ORDER BY created DESC LIMIT 100').all(user.id).map(C.publicOrder)});}
 if(path==='/api/invoice'&&req.method==='POST'){const b=JSON.parse(await body(req)),row=db.prepare('SELECT * FROM orders WHERE id=?').get(String(b.id));if(!accessible(row,user,b.token))fail(404,'Order not found.');const inv=db.prepare('SELECT data FROM invoices WHERE order_id=?').get(row.id);if(!inv)fail(404,'No GST invoice issued for this order.');return json(res,200,{invoice:JSON.parse(inv.data)});}
+
+if(path==='/api/dealer/register'&&req.method==='POST'){
+ if(!rate('dealer-auth:'+ip,5))fail(429,'Too many registration attempts. Try again later.');
+ const b=JSON.parse(await body(req)),mail=email(b.email),name=clean(b.name,100),details=businessDetails(b);
+ if(!rate('account:'+hash(mail),8))fail(429,'Too many attempts for this email.');
+ const pass=await passwordHash(b.password);
+ let account;
+ C.tx(()=>{
+   if(db.prepare('SELECT id FROM users WHERE email=?').get(mail))fail(409,'An account already exists. Sign in to apply for business pricing.');
+   const id=randomUUID(),now=new Date().toISOString();
+   db.prepare('INSERT INTO users VALUES(?,?,?,?,?,?)').run(id,mail,name,pass,'customer',now);
+   db.prepare("INSERT INTO dealers(user_id,kind,business,gstin,status,reviewed_by,created) VALUES(?,?,?,?, 'pending',NULL,?)").run(id,details.kind,details.business,details.gstin,now);
+   db.prepare('INSERT INTO dealer_profiles(user_id,phone,city,address,pincode,notes,updated) VALUES(?,?,?,?,?,?,?)')
+     .run(id,details.phone,details.city,details.address,details.pincode,'',now);
+   C.audit(id,'dealer.register',id,{kind:details.kind});
+   account=db.prepare('SELECT * FROM users WHERE id=?').get(id);
+ });
+ cookie(res,C.issueSession(account));
+ return json(res,201,{user:C.safeUser(account),status:'pending'});
+}
+if(path==='/api/dealer/apply'&&req.method==='POST'){
+ requireUser(user);
+ if(!rate('dealer-apply:'+user.id,5))fail(429,'Please try again later.');
+ const details=businessDetails(JSON.parse(await body(req)));
+ C.tx(()=>{
+   const previous=db.prepare('SELECT status FROM dealers WHERE user_id=?').get(user.id);
+   if(previous&&previous.status!=='rejected')fail(409,'A business application is already under review.');
+   const now=new Date().toISOString();
+   db.prepare("INSERT INTO dealers(user_id,kind,business,gstin,status,reviewed_by,created) VALUES(?,?,?,?, 'pending',NULL,?) ON CONFLICT(user_id) DO UPDATE SET kind=excluded.kind,business=excluded.business,gstin=excluded.gstin,status='pending',reviewed_by=NULL")
+     .run(user.id,details.kind,details.business,details.gstin,now);
+   db.prepare('INSERT INTO dealer_profiles(user_id,phone,city,address,pincode,notes,updated) VALUES(?,?,?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET phone=excluded.phone,city=excluded.city,address=excluded.address,pincode=excluded.pincode,updated=excluded.updated')
+     .run(user.id,details.phone,details.city,details.address,details.pincode,'',now);
+   C.audit(user.id,'dealer.apply',user.id,{kind:details.kind});
+ });
+ return json(res,200,{user:C.safeUser(user),status:'pending'});
+}
 if(['/api/register','/api/login'].includes(path)&&req.method==='POST'){
 if(!rate('auth:'+ip,10))fail(429,'Too many attempts. Try again in a minute.');const b=JSON.parse(await body(req)),mail=email(b.email);if(!rate('account:'+hash(mail),10))fail(429,'Too many attempts. Try again in a minute.');let account;
 if(path==='/api/register'){const pass=await passwordHash(b.password),name=clean(b.name,100);if(db.prepare('SELECT id FROM users WHERE email=?').get(mail))fail(400,'Unable to register with these details.');const id=randomUUID();db.prepare('INSERT INTO users VALUES(?,?,?,?,?,?)').run(id,mail,name,pass,'customer',new Date().toISOString());account=db.prepare('SELECT * FROM users WHERE id=?').get(id);C.audit(id,'account.register',id);}else{account=db.prepare('SELECT * FROM users WHERE email=?').get(mail);const dummy='0123456789abcdef0123456789abcdef:'+('0'.repeat(128));const valid=await passwordMatches(b.password,account?.password||dummy);if(!account||!valid)fail(401,'Email or password is incorrect.');}
@@ -91,7 +179,36 @@ if(path==='/api/verify'&&req.method==='POST'){const b=JSON.parse(await body(req)
 if(path==='/api/webhook'&&req.method==='POST'){const raw=await body(req);if(!signatureMatches(raw,req.headers['x-razorpay-signature'],process.env.RAZORPAY_WEBHOOK_SECRET))fail(400,'Invalid signature.');const b=JSON.parse(raw),p=b.payload?.payment?.entity;if(['payment.captured','order.paid'].includes(b.event)&&p){const row=db.prepare('SELECT * FROM orders WHERE provider_id=?').get(p.order_id);if(!row)fail(503,'Payment order is awaiting reconciliation.');fulfil(row,p);}return json(res,200,{received:true});}
 if(path==='/api/order-status'&&req.method==='POST'){const b=JSON.parse(await body(req)),row=db.prepare('SELECT * FROM orders WHERE id=?').get(String(b.id));if(!accessible(row,user,b.token))fail(404,'Order not found.');return json(res,200,C.publicOrder(row));}
 if(path.startsWith('/api/admin/')){admin(user);
-if(path==='/api/admin/overview'&&req.method==='GET')return json(res,200,{products:C.catalogue(user,true),dealers:db.prepare('SELECT d.*,u.email,u.name FROM dealers d JOIN users u ON u.id=d.user_id ORDER BY d.created DESC LIMIT 100').all(),orders:db.prepare('SELECT * FROM orders ORDER BY created DESC LIMIT 100').all().map(C.publicOrder),store:C.setting('store'),tax:C.setting('tax'),shippingReady:!!shippingReady(),paymentReady:!!enabled(),reviews:db.prepare('SELECT r.*,u.name FROM product_reviews r JOIN users u ON u.id=r.user_id ORDER BY r.updated DESC LIMIT 100').all(),audit:db.prepare('SELECT * FROM audit ORDER BY id DESC LIMIT 100').all()});
+if(path==='/api/admin/marketing/audience'&&req.method==='GET'){
+ const members=db.prepare('SELECT u.id,u.name,u.email,m.phone,m.email_opt_in,m.whatsapp_opt_in,'+
+ 'm.cadence_days,m.festival_opt_in,m.consented_at,m.last_reorder_contact_at,m.last_festival_contact_at '+
+ 'FROM marketing_preferences m JOIN users u ON u.id=m.user_id '+
+ 'WHERE m.consented_at IS NOT NULL AND (m.email_opt_in=1 OR m.whatsapp_opt_in=1) '+
+ 'ORDER BY u.created DESC LIMIT 500').all();
+ const now=Date.now();
+ return json(res,200,{automaticSending:false,subscribers:members.map(m=>{
+ const last=m.last_reorder_contact_at||m.consented_at;
+ const nextDue=m.cadence_days>0?new Date(Date.parse(last)+m.cadence_days*86400000).toISOString():null;
+ return {id:m.id,name:m.name,email:m.email,phone:m.phone,emailOptIn:!!m.email_opt_in,
+ whatsappOptIn:!!m.whatsapp_opt_in,cadenceDays:m.cadence_days,festivalUpdates:!!m.festival_opt_in,
+ nextDue,reorderDue:nextDue?Date.parse(nextDue)<=now:false};
+ })});
+}
+if(path==='/api/admin/marketing/mark'&&req.method==='POST'){
+ const b=JSON.parse(await body(req));
+ if(!['reorder','festival'].includes(b.kind))fail(400,'Unknown contact category.');
+ const person=db.prepare('SELECT * FROM marketing_preferences WHERE user_id=?').get(String(b.userId||''));
+ if(!person?.consented_at||(!person.email_opt_in&&!person.whatsapp_opt_in))fail(409,'No active permission to contact this customer.');
+ if((b.kind==='reorder'&&!person.cadence_days)||(b.kind==='festival'&&!person.festival_opt_in))
+   fail(409,'Customer has not consented to this message type.');
+ const col=b.kind==='reorder'?'last_reorder_contact_at':'last_festival_contact_at';
+ C.tx(()=>{
+  db.prepare('UPDATE marketing_preferences SET '+col+'=? WHERE user_id=?').run(new Date().toISOString(),b.userId);
+  C.audit(user.id,'marketing.manual_contact_recorded',b.userId,{kind:b.kind});
+ });
+ return json(res,200,{ok:true});
+}
+if(path==='/api/admin/overview'&&req.method==='GET')return json(res,200,{products:C.catalogue(user,true),dealers:db.prepare('SELECT d.*,u.email,u.name,dp.phone,dp.city,dp.address,dp.pincode FROM dealers d JOIN users u ON u.id=d.user_id LEFT JOIN dealer_profiles dp ON dp.user_id=d.user_id ORDER BY d.created DESC LIMIT 100').all(),orders:db.prepare('SELECT * FROM orders ORDER BY created DESC LIMIT 100').all().map(C.publicOrder),store:C.setting('store'),tax:C.setting('tax'),shippingReady:!!shippingReady(),paymentReady:!!enabled(),reviews:db.prepare('SELECT r.*,u.name FROM product_reviews r JOIN users u ON u.id=r.user_id ORDER BY r.updated DESC LIMIT 100').all(),audit:db.prepare('SELECT * FROM audit ORDER BY id DESC LIMIT 100').all()});
 if(req.method!=='POST')fail(405,'Method not allowed.');const b=JSON.parse(await body(req));
 if(path==='/api/admin/review'){
  if(!['approved','rejected'].includes(b.status))fail(400,'Choose an approved review status.');
