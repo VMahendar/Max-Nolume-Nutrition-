@@ -74,18 +74,12 @@
         "label": "3 kg · Pack to confirm",
         "pricePaise": 259900,
         "stock": null,
-        "image": "https://unicornproseries.com/wp-content/uploads/2026/07/Nitro-Mass-1-300x300.png",
+        "image": null,
         "prices": {
           "wholesale": 195000,
           "gym": 215000
         },
-        "images": [
-          {
-            "src": "https://unicornproseries.com/wp-content/uploads/2026/07/Nitro-Mass-1-300x300.png",
-            "label": "Official product image (3 kg pack)",
-            "alt": "Unicorn Pro Series Nitro Mass white and blue 3 kg product pack; representative image for other sizes"
-          }
-        ]
+        "images": []
       }
     ],
     "brand": "Unicorn Pro Series"
