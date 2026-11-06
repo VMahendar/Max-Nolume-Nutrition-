@@ -169,6 +169,20 @@ try {
     await accountPage.locator('[data-password-for="loginPassword"]').click();
     assert.equal(await accountPage.locator('#loginPassword').getAttribute('type'),'password',preset.name+' password hidden again');
     await accountPage.screenshot({path:reportDir+'/'+preset.name+'-account.png',fullPage:true,animations:'disabled'});
+    await accountPage.goto(origin+'/wholesale-account.html',{waitUntil:'domcontentloaded'});
+    await accountPage.locator('#b2bRegister input[name="business"]').waitFor({state:'visible'});
+    assert.equal(await accountPage.locator('#b2bRegister input[name="gstin"]').count(),1,preset.name+' dedicated GSTIN on wholesale registration');
+    assert.equal(await accountPage.locator('#b2bRegister input[name="pincode"]').count(),1,preset.name+' dedicated shop PIN code on wholesale registration');
+    const wholesaleOverflow=await accountPage.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+    assert.ok(wholesaleOverflow<=2,preset.name+' wholesale registration has no horizontal overflow');
+    await accountPage.screenshot({path:reportDir+'/'+preset.name+'-wholesale.png',fullPage:true,animations:'disabled'});
+    await accountPage.goto(origin+'/support.html',{waitUntil:'domcontentloaded'});
+    await accountPage.locator('.support-faq').first().waitFor({state:'visible'});
+    assert.ok(await accountPage.locator('.support-certificate img').isVisible(),preset.name+' original certificate shown in Help Center');
+    const helpOverflow=await accountPage.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+    assert.ok(helpOverflow<=2,preset.name+' Help Center has no horizontal overflow');
+    await accountPage.screenshot({path:reportDir+'/'+preset.name+'-support.png',fullPage:true,animations:'disabled'});
+
     assert.deepEqual(failures,[],preset.name+' account JavaScript must not throw');
     await accountPage.close();
   }
