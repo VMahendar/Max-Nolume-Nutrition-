@@ -16,7 +16,9 @@
         "prices": {
           "wholesale": 385000,
           "gym": 420000
-        }
+        },
+        "image": null,
+        "images": []
       },
       {
         "id": "whey-coffee",
@@ -27,7 +29,15 @@
         "prices": {
           "wholesale": 385000,
           "gym": 420000
-        }
+        },
+        "image": "assets/potency-whey-coffee-5lb.webp",
+        "images": [
+          {
+            "src": "assets/potency-whey-coffee-5lb.webp",
+            "label": "Coffee flavour — front",
+            "alt": "Unicorn Pro Series Potency Whey Coffee flavour 5 lb 2.27 kg original front pack"
+          }
+        ]
       }
     ],
     "brand": "Unicorn Pro Series",
