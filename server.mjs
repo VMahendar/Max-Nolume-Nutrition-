@@ -31,6 +31,24 @@ const limits=new Map();function rate(key,max){const now=Date.now();if(limits.siz
 async function body(req){const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>65536)fail(413,'Request too large.');chunks.push(chunk);}return Buffer.concat(chunks).toString('utf8');}
 const cookie=(res,token)=>res.setHeader('Set-Cookie',`mvn_session=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${token?604800:0}${production||origin.startsWith('https:')?'; Secure':''}`);
 const requireUser=user=>user||fail(401,'Please sign in.');
+
+function businessPhone(value){
+ const valueText=clean(value,25).replace(/[\s()+.-]/g,'');
+ const digits=valueText.startsWith('91')&&valueText.length===12?valueText.slice(2):valueText;
+ if(!/^[6-9]\d{9}$/.test(digits))fail(400,'Enter a valid 10-digit Indian mobile number.');
+ return '91'+digits;
+}
+function businessDetails(b){
+ const kind=String(b.kind||'');
+ if(!['gym','wholesale'].includes(kind))fail(400,'Choose a gym/studio or a wholesale/supplement retailer.');
+ const business=clean(b.business,200),phone=businessPhone(b.phone),city=clean(b.city,100),address=clean(b.address,350);
+ const pincode=clean(b.pincode,6);
+ if(!/^[1-9]\d{5}$/.test(pincode))fail(400,'Enter a valid six-digit PIN code.');
+ const gstin=typeof b.gstin==='string'?b.gstin.trim().toUpperCase():'';
+ if(gstin&&!/^\d{2}[A-Z0-9]{13}$/.test(gstin))fail(400,'Invalid GSTIN format.');
+ return {kind,business,phone,city,address,pincode,gstin};
+}
+
 const admin=user=>{if(requireUser(user).role!=='admin')fail(403,'Administrator access required.');return user;};
 const accessible=(row,user,token)=>row&&(user?.role==='admin'||row.user_id&&row.user_id===user?.id||typeof token==='string'&&row.token===token);
 function invoice(row,p){if(!p.tax?.enabled)return;const local=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));const year=Number(local.year),start=Number(local.month)>=4?year:year-1;const fy=String(start).slice(-2)+String(start+1).slice(-2);const key='invoice-'+fy;db.prepare('INSERT INTO counters VALUES(?,1) ON CONFLICT(key) DO UPDATE SET value=value+1').run(key);const n=db.prepare('SELECT value FROM counters WHERE key=?').get(key).value;const number=`${p.tax.prefix}/${fy}/${String(n).padStart(6,'0')}`;if(number.length>16)fail(400,'Invoice number exceeds configured limit.');db.prepare('INSERT INTO invoices VALUES(?,?,?)').run(row.id,number,JSON.stringify({number,date:new Date().toISOString(),orderId:row.id,...p}));}
@@ -72,6 +90,42 @@ if(path==='/api/reviews'){
 if(path==='/api/me/claim-order'&&req.method==='POST'){requireUser(user);const b=JSON.parse(await body(req));C.tx(()=>{const row=db.prepare('SELECT * FROM orders WHERE id=? AND token=?').get(String(b.id),String(b.token));if(!row||row.user_id&&row.user_id!==user.id||JSON.parse(row.payload).customer.email.toLowerCase()!==user.email)fail(404,'Order not found for this account.');db.prepare('UPDATE orders SET user_id=? WHERE id=?').run(user.id,row.id);C.audit(user.id,'order.claim',row.id);});return json(res,200,{ok:true});}
 if(path==='/api/me/orders'&&req.method==='GET'){requireUser(user);return json(res,200,{orders:db.prepare('SELECT * FROM orders WHERE user_id=? ORDER BY created DESC LIMIT 100').all(user.id).map(C.publicOrder)});}
 if(path==='/api/invoice'&&req.method==='POST'){const b=JSON.parse(await body(req)),row=db.prepare('SELECT * FROM orders WHERE id=?').get(String(b.id));if(!accessible(row,user,b.token))fail(404,'Order not found.');const inv=db.prepare('SELECT data FROM invoices WHERE order_id=?').get(row.id);if(!inv)fail(404,'No GST invoice issued for this order.');return json(res,200,{invoice:JSON.parse(inv.data)});}
+
+if(path==='/api/dealer/register'&&req.method==='POST'){
+ if(!rate('dealer-auth:'+ip,5))fail(429,'Too many registration attempts. Try again later.');
+ const b=JSON.parse(await body(req)),mail=email(b.email),name=clean(b.name,100),details=businessDetails(b);
+ if(!rate('account:'+hash(mail),8))fail(429,'Too many attempts for this email.');
+ const pass=await passwordHash(b.password);
+ let account;
+ C.tx(()=>{
+   if(db.prepare('SELECT id FROM users WHERE email=?').get(mail))fail(409,'An account already exists. Sign in to apply for business pricing.');
+   const id=randomUUID(),now=new Date().toISOString();
+   db.prepare('INSERT INTO users VALUES(?,?,?,?,?,?)').run(id,mail,name,pass,'customer',now);
+   db.prepare("INSERT INTO dealers(user_id,kind,business,gstin,status,reviewed_by,created) VALUES(?,?,?,?, 'pending',NULL,?)").run(id,details.kind,details.business,details.gstin,now);
+   db.prepare('INSERT INTO dealer_profiles(user_id,phone,city,address,pincode,notes,updated) VALUES(?,?,?,?,?,?,?)')
+     .run(id,details.phone,details.city,details.address,details.pincode,'',now);
+   C.audit(id,'dealer.register',id,{kind:details.kind});
+   account=db.prepare('SELECT * FROM users WHERE id=?').get(id);
+ });
+ cookie(res,C.issueSession(account));
+ return json(res,201,{user:C.safeUser(account),status:'pending'});
+}
+if(path==='/api/dealer/apply'&&req.method==='POST'){
+ requireUser(user);
+ if(!rate('dealer-apply:'+user.id,5))fail(429,'Please try again later.');
+ const details=businessDetails(JSON.parse(await body(req)));
+ C.tx(()=>{
+   const previous=db.prepare('SELECT status FROM dealers WHERE user_id=?').get(user.id);
+   if(previous&&previous.status!=='rejected')fail(409,'A business application is already under review.');
+   const now=new Date().toISOString();
+   db.prepare("INSERT INTO dealers(user_id,kind,business,gstin,status,reviewed_by,created) VALUES(?,?,?,?, 'pending',NULL,?) ON CONFLICT(user_id) DO UPDATE SET kind=excluded.kind,business=excluded.business,gstin=excluded.gstin,status='pending',reviewed_by=NULL")
+     .run(user.id,details.kind,details.business,details.gstin,now);
+   db.prepare('INSERT INTO dealer_profiles(user_id,phone,city,address,pincode,notes,updated) VALUES(?,?,?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET phone=excluded.phone,city=excluded.city,address=excluded.address,pincode=excluded.pincode,updated=excluded.updated')
+     .run(user.id,details.phone,details.city,details.address,details.pincode,'',now);
+   C.audit(user.id,'dealer.apply',user.id,{kind:details.kind});
+ });
+ return json(res,200,{user:C.safeUser(user),status:'pending'});
+}
 if(['/api/register','/api/login'].includes(path)&&req.method==='POST'){
 if(!rate('auth:'+ip,10))fail(429,'Too many attempts. Try again in a minute.');const b=JSON.parse(await body(req)),mail=email(b.email);if(!rate('account:'+hash(mail),10))fail(429,'Too many attempts. Try again in a minute.');let account;
 if(path==='/api/register'){const pass=await passwordHash(b.password),name=clean(b.name,100);if(db.prepare('SELECT id FROM users WHERE email=?').get(mail))fail(400,'Unable to register with these details.');const id=randomUUID();db.prepare('INSERT INTO users VALUES(?,?,?,?,?,?)').run(id,mail,name,pass,'customer',new Date().toISOString());account=db.prepare('SELECT * FROM users WHERE id=?').get(id);C.audit(id,'account.register',id);}else{account=db.prepare('SELECT * FROM users WHERE email=?').get(mail);const dummy='0123456789abcdef0123456789abcdef:'+('0'.repeat(128));const valid=await passwordMatches(b.password,account?.password||dummy);if(!account||!valid)fail(401,'Email or password is incorrect.');}
