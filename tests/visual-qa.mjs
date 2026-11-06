@@ -143,18 +143,47 @@ try {
   assert.ok(await page.locator('form#login').isVisible(),'account login visible');
   assert.equal((await page.goto(origin+'/dealer.html')).status(),200,'dealer route');
   assert.equal((await page.goto(origin+'/admin.html')).status(),200,'admin route served; authorization protected by API');
+  // Public account experience must be visually consistent, responsive and usable
+  // before registering the isolated test buyers below.
+  for(const preset of [{name:'desktop',viewport:{width:1440,height:900},isMobile:false},{name:'mobile',viewport:{width:390,height:844},isMobile:true}]){
+    const accountPage=await browser.newPage({viewport:preset.viewport,isMobile:preset.isMobile,deviceScaleFactor:1});
+    const failures=[];
+    accountPage.on('pageerror',e=>failures.push(e.message));
+    const pageResponse=await accountPage.goto(origin+'/account.html',{waitUntil:'domcontentloaded'});
+    assert.equal(pageResponse.status(),200,preset.name+' account page HTTP 200');
+    await accountPage.locator('#register input[name="email"]').waitFor({state:'visible'});
+    assert.equal(await accountPage.locator('#anonymous .account-panel').count(),2,preset.name+' login and registration panels');
+    assert.ok(await accountPage.locator('h1').isVisible(),preset.name+' prominent account title');
+    assert.equal(await accountPage.locator('.account-mainnav a[href="admin.html"]').count(),0,preset.name+' no admin link in customer header');
+    const metrics=await accountPage.evaluate(()=>{
+      const h=document.querySelector('.account-masthead'),logo=document.querySelector('.account-brand');
+      return {width:innerWidth,scrollWidth:document.documentElement.scrollWidth,headerBg:getComputedStyle(h).backgroundColor,logoImage:getComputedStyle(logo).backgroundImage,logoFilter:getComputedStyle(logo).filter};
+    });
+    assert.ok(metrics.scrollWidth<=metrics.width+2,preset.name+' account page has no horizontal overflow: '+JSON.stringify(metrics));
+    assert.equal(metrics.headerBg,'rgb(20, 24, 30)',preset.name+' integrated dark account header');
+    assert.ok(metrics.logoImage.includes('max-volume-logo-wide.png'),preset.name+' original owner logo');
+    assert.ok(metrics.logoFilter.includes('mvnGoldKey'),preset.name+' logo matte removed');
+    await accountPage.locator('#loginPassword').fill('test passphrase visible');
+    await accountPage.locator('[data-password-for="loginPassword"]').click();
+    assert.equal(await accountPage.locator('#loginPassword').getAttribute('type'),'text',preset.name+' accessible show-password control');
+    await accountPage.locator('[data-password-for="loginPassword"]').click();
+    assert.equal(await accountPage.locator('#loginPassword').getAttribute('type'),'password',preset.name+' password hidden again');
+    await accountPage.screenshot({path:reportDir+'/'+preset.name+'-account.png',fullPage:true,animations:'disabled'});
+    assert.deepEqual(failures,[],preset.name+' account JavaScript must not throw');
+    await accountPage.close();
+  }
   // Full customer and business-account workflow in an isolated test database.
   const buyer=await browser.newPage();
   await buyer.goto(origin+'/account.html');
   await buyer.locator('#register input[name="name"]').fill('Launch Test Customer');
   await buyer.locator('#register input[name="email"]').fill('launch-buyer@example.test');
   await buyer.locator('#register input[name="password"]').fill('LaunchQA-Passphrase-2026');
-  await buyer.locator('#register button').click();
+  await buyer.locator('#register button[type="submit"]').click();
   await buyer.locator('#signedIn').waitFor({state:'visible',timeout:12000});
   assert.match(await buyer.locator('#tier').innerText(),/retail/i,'new account must start at retail tier');
   await buyer.locator('#dealer select[name="kind"]').selectOption('wholesale');
   await buyer.locator('#dealer input[name="business"]').fill('Launch QA Supplement Outlet');
-  await buyer.locator('#dealer button').click();
+  await buyer.locator('#dealer button[type="submit"]').click();
   await buyer.waitForFunction(()=>document.querySelector('#dealerStatus')?.textContent.includes('pending'),null,{timeout:12000});
   const denied=await buyer.evaluate(async()=>(await fetch('/api/dealer/catalog')).status);
   assert.equal(denied,403,'pending dealers cannot see private wholesale prices');
@@ -163,7 +192,7 @@ try {
   await adminPage.locator('#register input[name="name"]').fill('Launch QA Admin');
   await adminPage.locator('#register input[name="email"]').fill('launch-admin@example.test');
   await adminPage.locator('#register input[name="password"]').fill('LaunchAdmin-Passphrase-2026');
-  await adminPage.locator('#register button').click();
+  await adminPage.locator('#register button[type="submit"]').click();
   await adminPage.locator('#signedIn').waitFor({state:'visible',timeout:12000});
   const qaDb=new DatabaseSync(dataDir+'/orders.sqlite');
   try{assert.equal(qaDb.prepare("UPDATE users SET role='admin' WHERE email=?").run('launch-admin@example.test').changes,1);}
@@ -186,7 +215,7 @@ try {
   await buyer.locator('#anonymous').waitFor({state:'visible',timeout:12000});
   await buyer.locator('#login input[name="email"]').fill('launch-buyer@example.test');
   await buyer.locator('#login input[name="password"]').fill('LaunchQA-Passphrase-2026');
-  await buyer.locator('#login button').click();
+  await buyer.locator('#login button[type="submit"]').click();
   await buyer.waitForFunction(()=>document.querySelector('#tier')?.textContent.includes('wholesale'),null,{timeout:12000});
   console.log('ACCOUNT_WHOLESALE_QA_PASS',JSON.stringify({register:true,login:true,dealerApplication:true,adminApproval:true,privatePricing:true,publicRetailOnly:true}));
   await buyer.close();await adminPage.close();
