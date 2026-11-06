@@ -59,8 +59,8 @@ test('marketing is optional, authenticated, and not falsely advertised as automa
  assert.ok(server.includes("path==='/api/admin/marketing/audience'"));
  assert.ok(server.includes('requireUser(user);'));
  assert.ok(admin.includes('id="marketingAudience"'));
- const js=read('public/admin.js');
- assert.ok(js.includes('if(eventTitle&&!customer.festivalUpdates)'), 'manual festival drafts require festival opt-in');
- assert.ok(js.includes('if(!eventTitle&&!customer.cadenceDays)'), 'manual replenishment drafts require reminder opt-in');
+ const adminJs=read('public/admin.js');
+ assert.ok(adminJs.includes('if(eventTitle&&!customer.festivalUpdates)'), 'manual festival drafts require festival opt-in');
+ assert.ok(adminJs.includes('if(!eventTitle&&!customer.cadenceDays)'), 'manual replenishment drafts require reminder opt-in');
  assert.ok(html.includes('not automatically sent'));
 });
