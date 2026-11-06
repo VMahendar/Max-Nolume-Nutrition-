@@ -26,14 +26,14 @@ html{scroll-behavior:smooth;scroll-padding-top:130px}
   gap:28px!important;align-items:center!important;
 }
 .retail-home .brand-identity{
-  background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important;
+  background:transparent!important;background-image:url('max-volume-logo-wide.png')!important;background-size:100% auto!important;background-repeat:no-repeat!important;background-position:center center!important;mix-blend-mode:screen!important;border:0!important;box-shadow:none!important;
   width:270px!important;min-width:0!important;max-width:100%!important;
   height:70px!important;min-height:70px!important;max-height:70px!important;
   padding:0!important;border-radius:0!important;overflow:visible!important;
   display:flex!important;align-items:center!important;justify-content:flex-start!important;
 }
 .retail-home .brand-identity .original-brand-logo{
-  opacity:1!important;visibility:visible!important;display:block!important;
+  opacity:0!important;visibility:visible!important;display:block!important;
   width:100%!important;height:70px!important;max-height:70px!important;
   max-width:100%!important;object-fit:contain!important;object-position:left center!important;
   filter:none!important;mix-blend-mode:screen;
@@ -355,3 +355,7 @@ html{scroll-behavior:smooth;scroll-padding-top:130px}
  .retail-home .card .photo img{max-height:209px!important}
 }
 @media(prefers-reduced-motion:reduce){.retail-home .card{transition:none!important}}
+
+/* Keep original square-source logo artwork visible at intended wide-banner
+   proportions; suppress duplicate missing-image overlays when the photo loads. */
+.retail-home .placeholder[hidden],.retail-home .photo img[hidden],.retail-home .detail-photo img[hidden]{display:none!important}
