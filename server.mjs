@@ -1,3 +1,4 @@
+import {startLocalBackupScheduler} from './deploy/local-backups.mjs';
 import http from 'node:http';
 import {stagingGate} from './staging.mjs';
 const allowStaging=stagingGate();
@@ -132,5 +133,6 @@ function validImage(value){
  if((!local&&!legacy&&!official)||value.includes('..'))fail(400,'Use an approved local asset or manufacturer image.');
  return value;
 }
+startLocalBackupScheduler();
 server.requestTimeout=30000;server.headersTimeout=15000;const portArg=process.argv.indexOf('--port');server.listen(Number(portArg>=0?process.argv[portArg+1]:process.env.PORT)||3000,process.env.HOST||'0.0.0.0',()=>console.log('Store running at '+origin));
 for(const signal of ['SIGTERM','SIGINT'])process.on(signal,()=>server.close(()=>{db.close();process.exit(0);}));
