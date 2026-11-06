@@ -370,3 +370,12 @@
  .retail-home .card .photo{height:240px}
  .retail-home .card .photo img{max-height:210px}
 }
+
+
+/* WhatsApp-first checkout, no payment collection */
+.retail-home .checkout-heading{font-size:15px;font-weight:900;letter-spacing:.04em;color:#122c57;margin:3px 0 9px}
+.retail-home .checkout-message{font-size:12px;line-height:1.6;background:#edf4ff;color:#143a71;padding:13px 14px;border-left:3px solid #1559e6;border-radius:5px;margin:9px 0}
+.retail-home .checkout-message strong{display:block;margin-bottom:4px;color:#0d3069}
+.retail-home .drawerfoot .send{font-size:12px;letter-spacing:.02em;min-height:47px;border-radius:6px}
+.retail-home .drawerfoot input:focus{outline:2px solid #1559e6;outline-offset:1px}
+.retail-home .store-notice{line-height:1.6}
