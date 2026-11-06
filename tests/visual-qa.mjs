@@ -34,7 +34,7 @@ try {
     assert.ok(await page.locator('.hero h1').isVisible(),preset.name+' hero visible');
     assert.match(await page.locator('.hero h1').innerText(),/FUEL EVERY\s+REP/i,preset.name+' product-first hero headline');
     assert.match(await page.locator('.hero-declaration').innerText(),/AUTHORIZED UNICORN PRO SERIES DISTRIBUTOR/i,preset.name+' distribution identity');
-    assert.ok(await page.locator('#brands .brands-intro').isVisible(),preset.name+' upcoming brands section');
+    assert.ok(await page.locator('#brands .motion-stage').isVisible(),preset.name+' upcoming GLOTECH feature');
     const originalLogo=await page.locator('header .original-brand-logo').evaluate(img=>{
       const r=img.getBoundingClientRect(),h=img.closest('header').getBoundingClientRect();
       return {loaded:img.complete&&img.naturalWidth>0,width:r.width,height:r.height,left:r.left,right:r.right,headerLeft:h.left,headerRight:h.right};
