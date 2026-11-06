@@ -36,7 +36,7 @@ test('verified certificate, territorial launch, responsible media and Help Cente
  const html=read('public/index.html'),support=read('public/support.html'),css=read('public/flagship.css');
  assert.match(html,/assets\/IMG-20261102-WA0019.jpg/);
  assert.match(support,/assets\/IMG-20261102-WA0019.jpg/);
- assert.match(html,/GLOTECH/);
+ assert.match(html,/GLOB TECH/);
  assert.match(html,/TAMIL NADU/);
  assert.match(html,/PUDUCHERRY/);
  assert.match(css,/mvnProgress/);
