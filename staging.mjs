@@ -14,7 +14,10 @@ export function stagingGate(env=process.env){
   const salt=randomBytes(32),failures=new Map();let accepted=null,busy=0;
   const digest=s=>createHash('sha256').update(salt).update(s).digest('hex');
   return async(req,res)=>{
-    res.setHeader('X-Robots-Tag','noindex, nofollow, noarchive');
+    // Only the public storefront may be indexed when explicitly opted in. All account,
+    // admin, dealer and API routes remain noindex, including when browsing is public.
+    const publicIndexing=publicBrowsing&&env.STAGING_PUBLIC_INDEXING==='true'&&['GET','HEAD'].includes(req.method)&&['/','/index.html','/robots.txt','/sitemap.xml'].includes(new URL(req.url,'http://localhost').pathname);
+    if(!publicIndexing)res.setHeader('X-Robots-Tag','noindex, nofollow, noarchive');
     res.setHeader('Cache-Control','no-store');
     // Customer/admin authorization remains enforced by the application's own routes.
     if(publicBrowsing)return true;
