@@ -152,7 +152,7 @@ try {
     const pageResponse=await accountPage.goto(origin+'/account.html',{waitUntil:'domcontentloaded'});
     assert.equal(pageResponse.status(),200,preset.name+' account page HTTP 200');
     await accountPage.locator('#register input[name="email"]').waitFor({state:'visible'});
-    assert.equal(await accountPage.locator('.account-panel').count(),2,preset.name+' login and registration panels');
+    assert.equal(await accountPage.locator('#anonymous .account-panel').count(),2,preset.name+' login and registration panels');
     assert.ok(await accountPage.locator('h1').isVisible(),preset.name+' prominent account title');
     assert.equal(await accountPage.locator('.account-mainnav a[href="admin.html"]').count(),0,preset.name+' no admin link in customer header');
     const metrics=await accountPage.evaluate(()=>{
