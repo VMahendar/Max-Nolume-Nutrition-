@@ -239,7 +239,7 @@ try {
   assert.ok(audience.subscribers.some(p=>p.email==='launch-buyer@example.test'&&p.cadenceDays===15&&p.festivalUpdates),'only opted-in buyers join marketing audience');
   assert.equal(audience.automaticSending,false,'no unconfigured auto-sending');
 
-  await adminPage.locator('#dealerTable button[data-status="approved"]').first().click();
+  await adminPage.locator('#dealerTable tr').filter({hasText:'launch-buyer@example.test'}).locator('button[data-status="approved"]').click();
   await adminPage.waitForFunction(()=>document.querySelector('#dealerTable')?.textContent.includes('approved'),null,{timeout:12000});
   await buyer.reload();
   await buyer.waitForFunction(()=>document.querySelector('#tier')?.textContent.includes('wholesale'),null,{timeout:12000});
