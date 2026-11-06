@@ -28,7 +28,7 @@ test('legacy MRP references preserve explicit overrides, selling prices and stoc
 test('approved 5 kg image replaces legacy references while retaining stock, prices and custom pack images',()=>{
  const dir=mkdtempSync(resolve(tmpdir(),'mvn-mass-photo-')),C=openCommerce(dir);
  try{
-  const p=C.catalogue(null,true).find(p=>p.id==='nitro-mass'),old='assets/nitro-mass-5kg.jpg',approved='assets/Screenshot_2026_1103_003852.jpg';
+  const p=C.catalogue(null,true).find(p=>p.id==='nitro-mass'),old='assets/nitro-mass-5kg.jpg',approved='https://unicornproseries.com/wp-content/uploads/2026/07/Nitro-Mass-1-300x300.png';
   p.image=old;p.variants.find(v=>v.id==='mass-5kg').image=old;
   C.db.prepare('UPDATE products SET data=? WHERE id=?').run(JSON.stringify(p),p.id);
   C.db.prepare('UPDATE inventory SET on_hand=7 WHERE variant_id=?').run('mass-5kg');
