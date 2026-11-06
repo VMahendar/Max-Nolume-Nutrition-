@@ -1,0 +1,21 @@
+/* Dedicated MVN wholesale identity — extends account-premium.css. */
+.wholesale-page .wholesale-intro{background:linear-gradient(110deg,#ffffff 5%,#f8f6f1 100%)}
+.wholesale-page .wholesale-intro-note{padding:28px;background:#181d24;color:#e9e5db;border-left:4px solid #cba668;box-shadow:0 14px 28px #11182412}
+.wholesale-page .wholesale-intro-note>span{font-size:10px;font-weight:800;color:#d7b47e;letter-spacing:.12em}
+.wholesale-page .wholesale-intro-note strong{display:block;font-size:25px;line-height:1.12;margin:13px 0;letter-spacing:-.04em}
+.wholesale-page .wholesale-intro-note p{font-size:12px;line-height:1.7;color:#cbd1d5;margin:0}
+.wholesale-page .wholesale-auth-grid{grid-template-columns:minmax(270px,.82fr) minmax(0,1.65fr);align-items:start}
+.wholesale-page .wholesale-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 17px}
+.wholesale-page .wholesale-form-grid>div{min-width:0}
+.wholesale-page .wholesale-form-grid>.field-span{grid-column:1/-1}
+.wholesale-page .account-main textarea{display:block;width:100%;min-height:82px;resize:vertical;margin:0 0 20px;padding:11px 14px;font:inherit;border:1px solid #cfd6dd;border-radius:3px;background:#fff;color:#212a32}
+.wholesale-page .account-main textarea:focus{outline:2px solid #c7a56e;outline-offset:1px}
+.wholesale-page .wholesale-smallprint{font-size:11px;color:#78838e;line-height:1.6;margin:16px 0 0}
+.wholesale-page .wholesale-smallprint a{color:#866839;text-decoration:underline;text-underline-offset:3px}
+.wholesale-page .wholesale-status-card{background:#fff;border:1px solid #e2e6e9;border-left:4px solid #c8a26b;padding:28px;margin:0 0 24px}
+.wholesale-page .wholesale-status-card p{color:#53606b;line-height:1.7}
+.wholesale-page .inline-button{max-width:330px;text-decoration:none}
+.wholesale-page .account-profile{margin-top:0}
+.wholesale-page .wholesale-signed{max-width:900px;margin:0 auto}
+@media(max-width:1000px){.wholesale-page .wholesale-auth-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.wholesale-page .wholesale-form-grid{grid-template-columns:1fr}.wholesale-page .wholesale-intro-note{padding:23px}.wholesale-page .wholesale-intro-note strong{font-size:22px}}
