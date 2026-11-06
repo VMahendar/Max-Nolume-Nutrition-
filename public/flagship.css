@@ -19,7 +19,7 @@ html{scroll-behavior:smooth;scroll-padding-top:130px}
 .retail-home .announce .live-dot{background:#b89050!important;box-shadow:none!important}
 .retail-home .announce a{color:#e8d0a1!important;border-bottom:1px solid #78613d!important;white-space:nowrap}
 .retail-home .storehead{
-  background:var(--mvn-night)!important;position:sticky!important;top:0;z-index:20!important;
+  background:var(--mvn-night)!important;position:relative!important;top:auto!important;z-index:20!important;
   border:0!important;box-shadow:0 1px 0 #30343a!important;
   height:auto!important;min-height:94px!important;padding:11px max(22px,calc((100% - 1280px)/2))!important;
   display:grid!important;grid-template-columns:270px minmax(240px,1fr) auto!important;
