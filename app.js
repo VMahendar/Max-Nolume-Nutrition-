@@ -59,10 +59,10 @@ function closeBag(){$("shade").hidden=true;$("drawer").classList.remove("open");
 function retailEnquiry(){
 const entries=Object.entries(cart).filter(([k])=>getItem(k));if(!entries.length)return;
 const name=$("customerName").value.trim(),phone=$("customerPhone").value.trim();
-if(!name||!phone){$("checkoutFields").reportValidity();return}
+if(!name||!/^[0-9]{10}$/.test(phone)){$("checkoutFields").reportValidity();return}
 const lines=entries.map(([k,n])=>{const {p,v}=getItem(k);return p.name+" — "+v.label+" × "+n+" = "+money(n*v.price)});
 const {subtotal}=totals();
-const msg="Hello Max Volume Nutrition, I would like to enquire about availability:\n\n"+lines.join("\n")+"\n\nProduct subtotal: "+money(subtotal)+"\n\nName: "+name+"\nPhone: "+phone+"\n\nPlease confirm product availability. This is an enquiry only; payment and delivery are disabled.";
+const msg="Hello Max Volume Nutrition, I would like to confirm my order request via WhatsApp:\n\nSelected products:\n"+lines.join("\n")+"\n\nProducts total: "+money(subtotal)+"\n\nCustomer name: "+name+"\nMobile number: "+phone+"\n\nOnline payment is temporarily unavailable. Please confirm stock, delivery charges, payment method and order acceptance with me on WhatsApp.";
 window.open("https://wa.me/"+PHONE+"?text="+encodeURIComponent(msg),"_blank","noopener");
 }
 $("bag").onclick=openBag;if($("floatingCart"))$("floatingCart").onclick=openBag;$("close").onclick=closeBag;$("shade").onclick=closeBag;
