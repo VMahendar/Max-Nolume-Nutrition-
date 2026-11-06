@@ -87,6 +87,40 @@ if(path==='/api/reviews'){
  return json(res,200,{ok:true,status:'pending',message:'Your review is awaiting approval.'});
 }
 
+if(path==='/api/me/marketing'&&req.method==='GET'){
+ requireUser(user);
+ const row=db.prepare('SELECT * FROM marketing_preferences WHERE user_id=?').get(user.id);
+ return json(res,200,{preferences:row?{cadenceDays:row.cadence_days,festivalUpdates:!!row.festival_opt_in,
+  emailOptIn:!!row.email_opt_in,whatsappOptIn:!!row.whatsapp_opt_in,phone:row.phone,updatedAt:row.updated_at}
+  :{cadenceDays:0,festivalUpdates:false,emailOptIn:false,whatsappOptIn:false,phone:'',updatedAt:null}});
+}
+if(path==='/api/me/marketing'&&req.method==='POST'){
+ requireUser(user);
+ if(!rate('marketing-pref:'+user.id,12))fail(429,'Too many changes. Try again later.');
+ const b=JSON.parse(await body(req)),cadenceDays=Number(b.cadenceDays);
+ if(![0,15,30].includes(cadenceDays))fail(400,'Choose no reminders, every 15 days, or every 30 days.');
+ const emailOptIn=b.emailOptIn===true,whatsappOptIn=b.whatsappOptIn===true,festivalUpdates=b.festivalUpdates===true;
+ const subscribed=(cadenceDays>0||festivalUpdates)&&(emailOptIn||whatsappOptIn);
+ if((cadenceDays>0||festivalUpdates)&&!subscribed)fail(400,'Choose at least one channel for updates.');
+ if(subscribed&&b.explicitConsent!==true)fail(400,'Please agree to receive the selected updates.');
+ const phone=whatsappOptIn?businessPhone(b.phone):'';
+ const now=new Date().toISOString();
+ C.tx(()=>{
+   const previous=db.prepare('SELECT * FROM marketing_preferences WHERE user_id=?').get(user.id);
+   const same=!!previous&&previous.cadence_days===cadenceDays&&previous.email_opt_in===Number(emailOptIn&&subscribed)&&
+     previous.whatsapp_opt_in===Number(whatsappOptIn&&subscribed)&&previous.festival_opt_in===Number(festivalUpdates&&subscribed)&&previous.phone===phone;
+   const consentedAt=subscribed?(same&&previous?.consented_at?previous.consented_at:now):null;
+   db.prepare('INSERT INTO marketing_preferences(user_id,phone,email_opt_in,whatsapp_opt_in,cadence_days,festival_opt_in,consented_at,updated_at,last_reorder_contact_at,last_festival_contact_at) '+
+     'VALUES(?,?,?,?,?,?,?,?,NULL,NULL) ON CONFLICT(user_id) DO UPDATE SET phone=excluded.phone,email_opt_in=excluded.email_opt_in,whatsapp_opt_in=excluded.whatsapp_opt_in,'+
+     'cadence_days=excluded.cadence_days,festival_opt_in=excluded.festival_opt_in,consented_at=excluded.consented_at,updated_at=excluded.updated_at,'+
+     'last_reorder_contact_at=CASE WHEN ? THEN marketing_preferences.last_reorder_contact_at ELSE NULL END,'+
+     'last_festival_contact_at=CASE WHEN ? THEN marketing_preferences.last_festival_contact_at ELSE NULL END')
+    .run(user.id,phone,Number(emailOptIn&&subscribed),Number(whatsappOptIn&&subscribed),
+      subscribed?cadenceDays:0,Number(festivalUpdates&&subscribed),consentedAt,now,Number(same),Number(same));
+   C.audit(user.id,subscribed?'marketing.optin':'marketing.optout',user.id,{cadenceDays,festivalUpdates});
+ });
+ return json(res,200,{ok:true,subscribed});
+}
 if(path==='/api/me/claim-order'&&req.method==='POST'){requireUser(user);const b=JSON.parse(await body(req));C.tx(()=>{const row=db.prepare('SELECT * FROM orders WHERE id=? AND token=?').get(String(b.id),String(b.token));if(!row||row.user_id&&row.user_id!==user.id||JSON.parse(row.payload).customer.email.toLowerCase()!==user.email)fail(404,'Order not found for this account.');db.prepare('UPDATE orders SET user_id=? WHERE id=?').run(user.id,row.id);C.audit(user.id,'order.claim',row.id);});return json(res,200,{ok:true});}
 if(path==='/api/me/orders'&&req.method==='GET'){requireUser(user);return json(res,200,{orders:db.prepare('SELECT * FROM orders WHERE user_id=? ORDER BY created DESC LIMIT 100').all(user.id).map(C.publicOrder)});}
 if(path==='/api/invoice'&&req.method==='POST'){const b=JSON.parse(await body(req)),row=db.prepare('SELECT * FROM orders WHERE id=?').get(String(b.id));if(!accessible(row,user,b.token))fail(404,'Order not found.');const inv=db.prepare('SELECT data FROM invoices WHERE order_id=?').get(row.id);if(!inv)fail(404,'No GST invoice issued for this order.');return json(res,200,{invoice:JSON.parse(inv.data)});}
