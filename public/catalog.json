@@ -12,14 +12,24 @@
         "label": "5 lb · Chocolate",
         "pricePaise": 499900,
         "stock": null,
-        "mrpPaise": 859900
+        "mrpPaise": 859900,
+        "image": null,
+        "images": []
       },
       {
         "id": "whey-coffee",
         "label": "5 lb · Coffee",
         "pricePaise": 499900,
         "stock": null,
-        "mrpPaise": 859900
+        "mrpPaise": 859900,
+        "image": "assets/potency-whey-coffee-5lb.webp",
+        "images": [
+          {
+            "src": "assets/potency-whey-coffee-5lb.webp",
+            "label": "Coffee flavour — front",
+            "alt": "Unicorn Pro Series Potency Whey Coffee flavour 5 lb 2.27 kg original front pack"
+          }
+        ]
       }
     ],
     "brand": "Unicorn Pro Series",
