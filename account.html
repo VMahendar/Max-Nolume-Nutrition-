@@ -1,1 +1,142 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Your account | Max Volume Nutrition</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="commerce.css"><script type="module" src="account.js"></script><link rel="icon" href="max-volume-logo.png" type="image/png"></head><body><header class="account-header"><a class="brand" href="index.html"><span class="mvmark">MV</span><span><b>MAX VOLUME</b><small>NUTRITION</small></span></a><nav><a href="/">Shop</a><a href="dealer.html">Dealer portal</a><a href="admin.html">Administration</a></nav></header><main class="section commerce"><p class="eyebrow">MAX VOLUME NUTRITION</p><h1>Your account.</h1><p id="message" role="status"></p><div id="anonymous" class="panel-grid"><form id="login" class="panel"><h2>Sign in</h2><label>Email<input name="email" type="email" autocomplete="username" required maxlength="199"></label><label>Password<input name="password" type="password" autocomplete="current-password" required maxlength="128"></label><button class="btn">Sign in</button></form><form id="register" class="panel"><h2>Create an account</h2><label>Name<input name="name" autocomplete="name" required maxlength="100"></label><label>Email<input name="email" type="email" autocomplete="username" required maxlength="199"></label><label>Password · at least 12 characters<input name="password" type="password" autocomplete="new-password" required minlength="12" maxlength="128"></label><button class="btn">Register</button></form></div><section id="signedIn" hidden><div class="panel"><h2 id="welcome"></h2><p id="tier"></p><button class="btn" id="logout">Sign out</button></div><div class="panel-grid"><form class="panel" id="dealer"><h2>Apply for business pricing</h2><p id="dealerStatus">An administrator reviews each application. Retail prices apply until approval.</p><label>Business type<select name="kind"><option value="gym">Gym / studio</option><option value="wholesale">Wholesale / retailer</option></select></label><label>Business name<input name="business" required maxlength="200"></label><label>GSTIN, if applicable<input name="gstin" maxlength="15"></label><button class="btn">Submit application</button></form><form class="panel" id="password"><h2>Change password</h2><label>Current password<input name="currentPassword" type="password" required autocomplete="current-password"></label><label>New password<input name="password" type="password" required minlength="12" maxlength="128" autocomplete="new-password"></label><button class="btn">Change and sign out</button></form></div><div class="panel"><h2>Your orders</h2><p>Orders placed while signed in appear here. Guest orders remain accessible using their saved order reference.</p><div id="orders"></div></div></section></main></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#15191f">
+  <meta name="robots" content="noindex,follow">
+  <title>My Account | Max Volume Nutrition</title>
+  <meta name="description" content="Sign in or create a Max Volume Nutrition account to review your orders and request approved dealer access.">
+  <link rel="icon" type="image/png" href="max-volume-logo.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="commerce.css">
+  <link rel="stylesheet" href="account-premium.css">
+  <script type="module" src="account.js"></script>
+</head>
+<body class="account-page">
+  <svg class="logo-filter-defs" width="0" height="0" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <defs><filter id="mvnGoldKey" color-interpolation-filters="sRGB" x="-2%" y="-2%" width="104%" height="104%">
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  1.25 1.45 0.10 0 -0.70"/>
+    </filter></defs>
+  </svg>
+  <div class="account-utility">
+    <span>MAX VOLUME NUTRITION <span class="utility-divider">/</span> CHENNAI, TAMIL NADU</span>
+    <a href="https://wa.me/917708830513" target="_blank" rel="noopener noreferrer">ORDER SUPPORT <span aria-hidden="true">↗</span></a>
+  </div>
+  <header class="account-masthead">
+    <div class="account-masthead-inner">
+      <a class="account-brand" href="index.html" aria-label="Max Volume Nutrition — home">
+        <img src="max-volume-logo-wide.png" alt="Max Volume Nutrition" width="270" height="78">
+      </a>
+      <nav class="account-mainnav" aria-label="Primary navigation">
+        <a href="index.html#shop">Shop products</a>
+        <a href="dealer.html">Wholesale &amp; dealers</a>
+        <a href="account.html" aria-current="page">My account</a>
+      </nav>
+      <a class="account-store-link" href="index.html#shop">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 9V6a3 3 0 0 1 6 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <span>Browse store</span>
+      </a>
+    </div>
+  </header>
+
+  <section class="account-intro" aria-labelledby="accountTitle">
+    <div class="account-intro-inner">
+      <div class="account-intro-copy">
+        <p class="account-eyebrow">YOUR SPACE <span aria-hidden="true">/</span> MAX VOLUME NUTRITION</p>
+        <h1 id="accountTitle">Your account<span>.</span></h1>
+        <p>Sign in to view your orders, manage your account and request business pricing. New here? Create a free customer account.</p>
+      </div>
+      <div class="account-support">
+        <span class="support-symbol" aria-hidden="true">
+          <svg width="27" height="27" viewBox="0 0 24 24" fill="none"><path d="M6 9a6 6 0 0 1 12 0v6a3 3 0 0 1-3 3h-2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><rect x="3" y="10" width="3" height="6" rx="1.2" stroke="currentColor" stroke-width="1.7"/><rect x="18" y="10" width="3" height="6" rx="1.2" stroke="currentColor" stroke-width="1.7"/></svg>
+        </span>
+        <div><strong>Need help with your order?</strong><p>Speak directly with the MVN team.</p><a href="https://wa.me/917708830513" target="_blank" rel="noopener noreferrer">Chat on WhatsApp <span aria-hidden="true">↗</span></a></div>
+      </div>
+    </div>
+  </section>
+
+  <main class="account-main commerce">
+    <p id="message" class="account-message" role="status" aria-live="polite" hidden></p>
+
+    <div id="anonymous" class="account-auth-grid">
+      <section class="account-panel login-panel" aria-labelledby="signInTitle">
+        <div class="panel-heading">
+          <span class="panel-step">01 <span aria-hidden="true">/</span> EXISTING CUSTOMER</span>
+          <h2 id="signInTitle">Welcome back.</h2>
+          <p>Access your orders and customer account.</p>
+        </div>
+        <form id="login">
+          <label for="loginEmail">Email address</label>
+          <input id="loginEmail" name="email" type="email" autocomplete="username" placeholder="you@example.com" required maxlength="199">
+          <label for="loginPassword">Password</label>
+          <div class="password-control"><input id="loginPassword" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required maxlength="128"><button type="button" class="show-password" data-password-for="loginPassword" aria-label="Show password">Show</button></div>
+          <button type="submit" class="account-submit">Sign in to my account <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="panel-footnote">Order confirmations are currently handled directly by our team.</p>
+      </section>
+
+      <section class="account-panel registration-panel" aria-labelledby="registerTitle">
+        <div class="panel-heading">
+          <span class="panel-step">02 <span aria-hidden="true">/</span> NEW CUSTOMER</span>
+          <h2 id="registerTitle">Join Max Volume.</h2>
+          <p>Create an account for order history and dealer enquiries.</p>
+        </div>
+        <form id="register">
+          <label for="registerName">Full name</label>
+          <input id="registerName" name="name" autocomplete="name" placeholder="Your full name" required maxlength="100">
+          <label for="registerEmail">Email address</label>
+          <input id="registerEmail" name="email" type="email" autocomplete="username" placeholder="you@example.com" required maxlength="199">
+          <label for="registerPassword">Create password <small>At least 12 characters</small></label>
+          <div class="password-control"><input id="registerPassword" name="password" type="password" autocomplete="new-password" placeholder="Create a strong password" required minlength="12" maxlength="128"><button type="button" class="show-password" data-password-for="registerPassword" aria-label="Show password">Show</button></div>
+          <button type="submit" class="account-submit">Create customer account <span aria-hidden="true">→</span></button>
+        </form>
+      </section>
+    </div>
+
+    <section id="signedIn" class="account-dashboard" hidden>
+      <div class="account-profile">
+        <div><span class="panel-step">ACCOUNT OVERVIEW</span><h2 id="welcome">Welcome back.</h2><p id="tier"></p></div>
+        <button type="button" class="account-signout" id="logout">Sign out <span aria-hidden="true">→</span></button>
+      </div>
+      <div class="account-dashboard-grid">
+        <section class="account-panel orders-panel" aria-labelledby="ordersTitle">
+          <div class="panel-heading"><span class="panel-step">YOUR PURCHASES</span><h2 id="ordersTitle">Order history</h2><p>Orders linked to your signed-in account appear below. Guest orders remain accessible with their saved reference.</p></div>
+          <div id="orders"></div>
+          <a class="inline-link" href="index.html#shop">Continue shopping <span aria-hidden="true">→</span></a>
+        </section>
+        <div class="account-sidebar">
+          <section class="account-panel" aria-labelledby="dealerTitle">
+            <div class="panel-heading"><span class="panel-step">FOR GYMS & RETAILERS</span><h2 id="dealerTitle">Business pricing</h2><p id="dealerStatus">An administrator reviews applications. Retail prices apply until approval.</p></div>
+            <form id="dealer">
+              <label for="dealerKind">Business type</label>
+              <select id="dealerKind" name="kind"><option value="gym">Gym / fitness studio</option><option value="wholesale">Supplement retailer / wholesale</option></select>
+              <label for="dealerBusiness">Business name</label>
+              <input id="dealerBusiness" name="business" placeholder="Your business name" required maxlength="200">
+              <label for="dealerGstin">GSTIN <small>Optional, if applicable</small></label>
+              <input id="dealerGstin" name="gstin" maxlength="15" placeholder="GST registration number">
+              <button class="account-submit" type="submit">Request dealer review <span aria-hidden="true">→</span></button>
+            </form>
+          </section>
+          <section class="account-panel" aria-labelledby="securityTitle">
+            <div class="panel-heading"><span class="panel-step">ACCOUNT SECURITY</span><h2 id="securityTitle">Change password</h2><p>Update your password securely. You'll be signed out afterward.</p></div>
+            <form id="password">
+              <label for="currentPassword">Current password</label>
+              <input id="currentPassword" name="currentPassword" type="password" autocomplete="current-password" required maxlength="128" placeholder="Current password">
+              <label for="newPassword">New password <small>At least 12 characters</small></label>
+              <div class="password-control"><input id="newPassword" name="password" type="password" autocomplete="new-password" required minlength="12" maxlength="128" placeholder="New strong password"><button type="button" class="show-password" data-password-for="newPassword" aria-label="Show password">Show</button></div>
+              <button type="submit" class="account-submit secondary-action">Update password <span aria-hidden="true">→</span></button>
+            </form>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <section class="account-bottom-note"><div><strong>RETAIL &amp; WHOLESALE · CHENNAI</strong><p>Explore supplements, request business pricing and confirm orders with our team. Online payments and automated shipping are currently disabled.</p></div><a href="index.html#shop">Explore the store <span aria-hidden="true">↗</span></a></section>
+  <footer class="account-footer">
+    <span>© 2026 MAX VOLUME NUTRITION</span>
+    <span>Chennai, Tamil Nadu · <a href="dealer.html">Wholesale enquiries</a> · <a href="https://wa.me/917708830513">Contact</a></span>
+  </footer>
+</body>
+</html>
