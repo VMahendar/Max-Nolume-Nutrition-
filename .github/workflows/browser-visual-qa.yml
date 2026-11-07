@@ -34,6 +34,8 @@ jobs:
         run: node tests/owner-desk-qa.mjs
       - name: Check actual launch gate and automatic opening on website and app
         run: node tests/launch-gate-qa.mjs
+      - name: Check secure payment review, verification and disabled-provider behaviour
+        run: node tests/secure-payments-qa.mjs
       - name: Preserve browser screenshots and QA report
         if: always()
         uses: actions/upload-artifact@v4

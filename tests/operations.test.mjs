@@ -269,3 +269,17 @@ test('My Work is admin-only, retry-safe and keeps private change requests out of
   await owner('/api/logout',{});assert.equal((await owner('/api/admin/my-work')).status,401);
  }finally{await f.close();}
 });
+
+test('retail storefront checkout keeps retail prices for an approved dealer and rejects an invented pricing tier',async()=>{
+ const f=await fixture();try{
+ const dealer=f.client();await dealer('/api/register',{name:'Retail buying dealer',email:customer.email,password});
+ const user=(await dealer('/api/session')).body.user;
+ f.db.prepare('INSERT INTO dealers VALUES(?,?,?,?,?,?,?)').run(user.id,'wholesale','Test business','','approved',null,new Date().toISOString());
+ assert.equal((await dealer('/api/catalog')).body.tier,'wholesale');
+ const payload={items:[{variantId:'a',quantity:1}],customer,acceptedTerms:true,pricing:'retail'};
+ const result=await dealer('/api/checkout',payload,{'Idempotency-Key':randomUUID()});assert.equal(result.status,200);assert.equal(result.body.amount,10500);
+ const stored=JSON.parse(f.db.prepare('SELECT payload FROM orders WHERE id=?').get(result.body.id).payload);assert.equal(stored.tier,'retail');assert.equal(stored.lines[0].unitPaise,10000);
+ assert.equal((await dealer('/api/checkout',{...payload,pricing:'wholesale'})).status,400);
+ const overview=await dealer('/api/retail/catalog');assert.equal(overview.body.products[0].variants[0].prices,undefined);
+ }finally{await f.close();}
+});
