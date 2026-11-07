@@ -47,3 +47,7 @@
  .retail-home .storehead .head-actions{grid-column:1!important;grid-row:2!important;width:100%;min-width:0;justify-content:space-between!important;gap:8px!important}
  .retail-home .storehead .header-search{grid-column:1!important;grid-row:3!important;width:100%;min-width:0}
 }
+.retail-home.app-store .collection-filters .filter-heading,.retail-home.app-store .collection-filters .filter-hint{display:none!important}
+.retail-home.app-store .collection-filters{align-items:center!important}
+.retail-home.app-store .collection-filters label{margin:0!important}
+.retail-home.app-store .collection-results .info>p{display:none!important}
