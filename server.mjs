@@ -2,6 +2,7 @@ import {startLocalBackupScheduler} from './deploy/local-backups.mjs';
 import {startDriveBackupScheduler} from './deploy/drive-backup.mjs';
 import http from 'node:http';
 import {validateCampaign,activeCampaigns,campaignQuote} from './promotions.mjs';
+import {initializeMarketing,marketingReadiness,enqueueMarketing,startMarketingScheduler,verifyUnsubscribe} from './marketing-automation.mjs';
 import {stagingGate} from './staging.mjs';
 const allowStaging=stagingGate();
 import {isIP} from 'node:net';
@@ -18,6 +19,7 @@ if(C.setting('campaigns')===null&&existsSync(campaignSeed)){
  const campaigns=JSON.parse(readFileSync(campaignSeed,'utf8')).map(validateCampaign);
  C.tx(()=>{C.set('campaigns',campaigns);C.audit('system','campaigns.initialize','campaigns',{count:campaigns.length});});
 }
+initializeMarketing(C);
 const origin=process.env.PUBLIC_ORIGIN||'http://localhost:3000',production=process.env.NODE_ENV==='production';
 const previousStoreOrigin='https://max-volume-nutrition-preview.onrender.com';
 function canonicalStoreOrigin(){
@@ -63,8 +65,14 @@ function fulfil(row,payment){return C.tx(()=>{row=db.prepare('SELECT * FROM orde
 function checkoutResponse(row){const p=JSON.parse(row.payload);if(row.status==='paid')fail(409,'This order is already paid. View your order history.');if(!row.provider_id)fail(409,'Payment creation needs reconciliation. Do not create another order.');if(row.status!=='pending')fail(409,'This checkout is no longer payable.');return {id:row.id,token:row.token,key:process.env.RAZORPAY_KEY_ID,providerOrderId:row.provider_id,amount:p.totalPaise,currency:'INR'};}
 const server=http.createServer(async(req,res)=>{res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','DENY');res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline'; img-src 'self' https://revakanya.com https://unicornproseries.com https://www.unicornproseries.com data: https://static.wixstatic.com; connect-src 'self' https://*.razorpay.com; frame-src https://*.razorpay.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'");if(production)res.setHeader('Strict-Transport-Security','max-age=31536000; includeSubDomains');
 try{if(!await allowStaging(req,res))return;const u=new URL(req.url,'http://localhost');if(u.pathname==='/healthz')return json(res,200,{ok:true});if(u.pathname.startsWith('/api/')){
-const forwarded=String(req.headers['x-forwarded-for']||'').split(',').at(-1).trim();const ip=process.env.TRUST_PROXY==='true'&&isIP(forwarded)?forwarded:req.socket.remoteAddress;if(!rate('general:'+ip,240))fail(429,'Please try again in a minute.');if(req.method==='POST'&&u.pathname!=='/api/webhook'&&req.headers.origin!==origin)fail(403,'Request origin not allowed.');const user=C.session(req),path=u.pathname;
+const forwarded=String(req.headers['x-forwarded-for']||'').split(',').at(-1).trim();const ip=process.env.TRUST_PROXY==='true'&&isIP(forwarded)?forwarded:req.socket.remoteAddress;if(!rate('general:'+ip,240))fail(429,'Please try again in a minute.');if(req.method==='POST'&&!['/api/webhook','/api/marketing/unsubscribe'].includes(u.pathname)&&req.headers.origin!==origin)fail(403,'Request origin not allowed.');const user=C.session(req),path=u.pathname;
 if(path==='/api/catalog'&&req.method==='GET'){const s=C.setting('store');return json(res,200,{products:C.catalogue(user),store:{name:s.name,phone:s.phone,currency:s.currency,shippingPaise:s.shippingPaise,serviceStates:s.serviceStates},tier:C.pricingTier(user),paymentReady:!!enabled()});}
+if(path==='/api/marketing/unsubscribe'&&req.method==='GET'){res.writeHead(302,{Location:'/unsubscribe.html?token='+encodeURIComponent(u.searchParams.get('token')||'')});res.end();return;}
+if(path==='/api/marketing/unsubscribe'&&req.method==='POST'){
+ let token;try{token=verifyUnsubscribe(u.searchParams.get('token'),process.env.MARKETING_LINK_SECRET);}catch(error){fail(400,error.message);}
+ await body(req);
+ C.tx(()=>{const now=new Date().toISOString();db.prepare("UPDATE marketing_preferences SET cadence_days=0,festival_opt_in=0,email_opt_in=0,whatsapp_opt_in=0,phone='',consented_at=NULL,updated_at=? WHERE user_id=? AND consented_at=?").run(now,token.u,token.c);db.prepare("UPDATE marketing_outbox SET status='cancelled' WHERE user_id=? AND consent=? AND status='queued'").run(token.u,token.c);});return json(res,200,{ok:true});
+}
 if(path==='/api/promotions'&&req.method==='GET')return json(res,200,{campaigns:activeCampaigns(C.setting('campaigns'),u.searchParams.get('surface')||'web')});
 if(path==='/api/promotion-quote'&&req.method==='POST'){
  if(C.pricingTier(user)!=='retail')fail(403,'These offers are for retail customers. Wholesale and gym quotations have separate prices and trade schemes.');
@@ -191,6 +199,14 @@ if(path==='/api/verify'&&req.method==='POST'){const b=JSON.parse(await body(req)
 if(path==='/api/webhook'&&req.method==='POST'){const raw=await body(req);if(!signatureMatches(raw,req.headers['x-razorpay-signature'],process.env.RAZORPAY_WEBHOOK_SECRET))fail(400,'Invalid signature.');const b=JSON.parse(raw),p=b.payload?.payment?.entity;if(['payment.captured','order.paid'].includes(b.event)&&p){const row=db.prepare('SELECT * FROM orders WHERE provider_id=?').get(p.order_id);if(!row)fail(503,'Payment order is awaiting reconciliation.');fulfil(row,p);}return json(res,200,{received:true});}
 if(path==='/api/order-status'&&req.method==='POST'){const b=JSON.parse(await body(req)),row=db.prepare('SELECT * FROM orders WHERE id=?').get(String(b.id));if(!accessible(row,user,b.token))fail(404,'Order not found.');return json(res,200,C.publicOrder(row));}
 if(path.startsWith('/api/admin/')){admin(user);
+if(path==='/api/admin/marketing/automation'&&req.method==='GET')return json(res,200,{config:C.setting('marketingAutomation'),readiness:marketingReadiness(),counts:db.prepare('SELECT status,COUNT(*) count FROM marketing_outbox GROUP BY status').all(),recent:db.prepare('SELECT id,kind,status,created,accepted,error FROM marketing_outbox ORDER BY created DESC LIMIT 30').all()});
+if(path==='/api/admin/marketing/automation'&&req.method==='POST'){
+ const b=JSON.parse(await body(req));if(!Array.isArray(b.announcements)||b.announcements.length>30)fail(400,'Provide up to 30 announcements.');
+ const announcements=b.announcements.map(a=>{const id=clean(a.id,60),title=clean(a.title,120),text=clean(a.text,1000),startsAt=String(a.startsAt||''),endsAt=String(a.endsAt||'');if(!/^[a-z0-9-]+$/.test(id)||!Number.isFinite(Date.parse(startsAt))||!Number.isFinite(Date.parse(endsAt))||Date.parse(startsAt)>=Date.parse(endsAt)||!/(?:Z|[+-]\d\d:\d\d)$/.test(startsAt)||!/(?:Z|[+-]\d\d:\d\d)$/.test(endsAt))fail(400,'Use valid IDs and timezone-aware notification dates.');return {id,title,text,startsAt,endsAt,enabled:a.enabled===true}});
+ if(new Set(announcements.map(a=>a.id)).size!==announcements.length)fail(400,'Announcement IDs must be unique.');
+ C.tx(()=>{C.set('marketingAutomation',{enabled:b.enabled===true,announcements});C.audit(user.id,'marketing.automation.configure','marketing',{enabled:b.enabled===true,announcements:announcements.length});});return json(res,200,{ok:true,readiness:marketingReadiness()});
+}
+if(path==='/api/admin/marketing/preview'&&req.method==='POST'){const added=enqueueMarketing(C);return json(res,200,{added,sent:0});}
 if(path==='/api/admin/marketing/audience'&&req.method==='GET'){
  const members=db.prepare('SELECT u.id,u.name,u.email,m.phone,m.email_opt_in,m.whatsapp_opt_in,'+
  'm.cadence_days,m.festival_opt_in,m.consented_at,m.last_reorder_contact_at,m.last_festival_contact_at '+
@@ -198,7 +214,7 @@ if(path==='/api/admin/marketing/audience'&&req.method==='GET'){
  'WHERE m.consented_at IS NOT NULL AND (m.email_opt_in=1 OR m.whatsapp_opt_in=1) '+
  'ORDER BY u.created DESC LIMIT 500').all();
  const now=Date.now();
- return json(res,200,{automaticSending:false,subscribers:members.map(m=>{
+ return json(res,200,{automaticSending:marketingReadiness().ready&&C.setting('marketingAutomation')?.enabled===true,subscribers:members.map(m=>{
  const last=m.last_reorder_contact_at||m.consented_at;
  const nextDue=m.cadence_days>0?new Date(Date.parse(last)+m.cadence_days*86400000).toISOString():null;
  return {id:m.id,name:m.name,email:m.email,phone:m.phone,emailOptIn:!!m.email_opt_in,
@@ -248,7 +264,7 @@ if(path==='/api/admin/shipment'){if(!shippingReady())fail(503,'Shiprocket is dis
 if(path==='/api/admin/tracking'){const row=db.prepare('SELECT * FROM shipments WHERE order_id=?').get(String(b.id));const shipment=row?JSON.parse(row.data):null;if(!shipment?.shipmentId)fail(409,'No provider shipment to track.');const tracking=await ship.track(shipment.shipmentId);C.tx(()=>{const latest=JSON.parse(db.prepare('SELECT data FROM shipments WHERE order_id=?').get(b.id).data);db.prepare('UPDATE shipments SET data=? WHERE order_id=?').run(JSON.stringify({...latest,tracking}),b.id);});return json(res,200,{tracking});}
 fail(404,'Endpoint not found.');}
 fail(404,'Endpoint not found.');}
-if(!['GET','HEAD'].includes(req.method))fail(405,'Method not allowed.');const path=resolve(root,'.'+decodeURIComponent(['/','/mobile-app.html'].includes(u.pathname)?'/index.html':u.pathname));if(!path.startsWith(root+sep))fail(403,'Forbidden');let file;try{if(!realpathSync(path).startsWith(root+sep))fail(403,'Forbidden');file=readFileSync(path);if(storePublicUrl!==previousStoreOrigin&&['/','/index.html','/robots.txt','/sitemap.xml'].includes(u.pathname))file=Buffer.from(file.toString('utf8').replaceAll(previousStoreOrigin,storePublicUrl));if(u.pathname==='/mobile-app.html')file=Buffer.from(file.toString('utf8').replace('class="retail-home"','class="retail-home app-store"'));if(process.env.STAGING_MODE==='true'&&extname(path)==='.html'){const storefront=process.env.STAGING_PUBLIC_BROWSING==='true'&&['/','/index.html','/mobile-app.html'].includes(u.pathname);const banner=`${process.env.STAGING_PUBLIC_BROWSING==='true'?'TEST PREVIEW':'PRIVATE STAGING'} · TEST DATA ONLY · PAYMENTS AND SHIPPING DISABLED`;if(!storefront)file=Buffer.from(file.toString('utf8').replace(/<body(?:\s[^>]*)?>/i,openTag=>`${openTag}<div class="staging-banner" role="status">${banner}</div>`));}}catch(e){if(e instanceof Problem)throw e;fail(404,'Page not found.');}const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript','.css':'text/css','.webmanifest':'application/manifest+json','.json':'application/json','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.xml':'application/xml; charset=utf-8','.txt':'text/plain; charset=utf-8'};res.writeHead(200,{'Content-Type':mime[extname(path)]||'application/octet-stream'});res.end(req.method==='HEAD'?undefined:file);
+if(!['GET','HEAD'].includes(req.method))fail(405,'Method not allowed.');const path=resolve(root,'.'+decodeURIComponent(u.pathname==='/'?'/index.html':u.pathname));if(!path.startsWith(root+sep))fail(403,'Forbidden');let file;try{if(!realpathSync(path).startsWith(root+sep))fail(403,'Forbidden');file=readFileSync(path);if(storePublicUrl!==previousStoreOrigin&&['/','/index.html','/robots.txt','/sitemap.xml'].includes(u.pathname))file=Buffer.from(file.toString('utf8').replaceAll(previousStoreOrigin,storePublicUrl));if(process.env.STAGING_MODE==='true'&&extname(path)==='.html'){const storefront=process.env.STAGING_PUBLIC_BROWSING==='true'&&['/','/index.html','/mobile-app.html'].includes(u.pathname);const banner=`${process.env.STAGING_PUBLIC_BROWSING==='true'?'TEST PREVIEW':'PRIVATE STAGING'} · TEST DATA ONLY · PAYMENTS AND SHIPPING DISABLED`;if(!storefront)file=Buffer.from(file.toString('utf8').replace(/<body(?:\s[^>]*)?>/i,openTag=>`${openTag}<div class="staging-banner" role="status">${banner}</div>`));}}catch(e){if(e instanceof Problem)throw e;fail(404,'Page not found.');}const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript','.css':'text/css','.webmanifest':'application/manifest+json','.json':'application/json','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.xml':'application/xml; charset=utf-8','.txt':'text/plain; charset=utf-8'};res.writeHead(200,{'Content-Type':mime[extname(path)]||'application/octet-stream'});res.end(req.method==='HEAD'?undefined:file);
 }catch(e){if(!(e instanceof Problem)&&!(e instanceof SyntaxError))console.error('Request failed:',e.code||e.name);json(res,e instanceof Problem?e.status:e instanceof SyntaxError?400:500,{error:e instanceof Problem?e.message:e instanceof SyntaxError?'Invalid request.':'Request could not be completed. Contact support before retrying.'});}});
 function validImages(value){
  if(value===null)return [];
@@ -271,6 +287,7 @@ function validImage(value){
  return value;
 }
 startLocalBackupScheduler();
+const stopMarketing=startMarketingScheduler(C);
 const stopDriveBackup=startDriveBackupScheduler(resolve(process.env.DATA_DIR||'runtime'));
 server.requestTimeout=30000;server.headersTimeout=15000;const portArg=process.argv.indexOf('--port');server.listen(Number(portArg>=0?process.argv[portArg+1]:process.env.PORT)||3000,process.env.HOST||'0.0.0.0',()=>console.log('Store running at '+origin));
-for(const signal of ['SIGTERM','SIGINT'])process.on(signal,()=>{stopDriveBackup?.();server.close(()=>{db.close();process.exit(0);});});
+for(const signal of ['SIGTERM','SIGINT'])process.on(signal,()=>{stopMarketing();stopDriveBackup?.();server.close(()=>{db.close();process.exit(0);});});

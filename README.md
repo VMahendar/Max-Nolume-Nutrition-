@@ -71,3 +71,9 @@ The website and installed app show separate Unicorn Pro Series certificate and G
 Retail launch campaigns are initialized once from `data/retail-campaigns.json`, preserving later administrator edits and deactivations. `MVNOPEN5` gives 5% off, capped at ₹300; `DIWALI8` gives 8% off, capped at ₹400. Both require a ₹1,500 products subtotal, run 7–9 November 2026 IST, and expire at midnight starting 10 November. They appear on both platforms. Only one code applies. These are separate from trade pricing and trade free-gift schemes; approved wholesale/gym accounts cannot use retail promotion quotes. No wholesale source prices are included in the retail campaign configuration.
 
 Administrators can manage draft/active campaigns, audiences, dates, minimums, caps and terms in Offers. Discounts are priced server-side and revalidated before the WhatsApp message. They are quotations, with stock, delivery and acceptance confirmed by the store; no automatic payment or redemption record is created. Future campaigns need explicit new dates and amounts. Existing consent preferences handle opt-in festival/launch announcements; automatic push/email/WhatsApp sending is not configured.
+
+## App-specific interface and WhatsApp automation
+
+The website keeps a permanent Open MVN app link. The app now serves an independent compact header, search and tab-based screens; the catalogue and WhatsApp ordering logic remain shared. Confirmed MRP, regular retail price, limited offer price and expiry are shown without introducing unverified MRPs. Expired campaigns refresh automatically.
+
+WhatsApp-only reminder and campaign delivery is implemented with a persistent queue and administrator controls, but is paused and blocked on staging until provider and production setup are complete. See [the delivery setup guide](docs/MARKETING_AUTOMATION.md). No customer messages were sent during implementation.

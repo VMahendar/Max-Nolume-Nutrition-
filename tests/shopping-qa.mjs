@@ -17,6 +17,8 @@ try{
  for(const width of [1440,390,320]){
  const page=await browser.newPage({viewport:{width,height:950}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(base+'/');
+ await page.evaluate(()=>dispatchEvent(new Event('appinstalled')));
+ assert.equal(await page.locator('.permanent-app-link').isVisible(),true);
  await page.locator('#priceRange').selectOption('under1000');
  assert.equal(await page.locator('#grid .card').count(),2);
  await page.locator('#priceRange').selectOption('1000to3000');
@@ -104,15 +106,23 @@ try{
  let offerUrl='';let offerRequested;const offerSent=new Promise(done=>offerRequested=done);
  await promo.route('https://wa.me/**',async route=>{offerUrl=route.request().url();offerRequested();await route.abort()});
  await promo.goto(base+'/mobile-app.html');
+ await promo.locator('.app-bottom-nav a[href="#brands"]').click();await promo.locator('#brands').waitFor({state:'visible'});
  assert.equal(await promo.locator('#brands').isVisible(),true);
+ assert.equal(await promo.locator('#certificate').isVisible(),false);
+ await promo.locator('.app-bottom-nav a[href="#certificate"]').click();await promo.locator('#certificate').waitFor({state:'visible'});
  assert.equal(await promo.locator('#certificate').isVisible(),true);
+ await promo.locator('.app-bottom-nav a[href="#shop"]').click();await promo.locator('#shop').waitFor({state:'visible'});
  assert.match(await promo.locator('#brands').textContent(),/AUTHORIZED EXCLUSIVE DISTRIBUTOR/);
  assert.equal(await promo.locator('.app-bottom-nav').isVisible(),true);
  assert.equal((await (await promo.request.get(base+'/api/promotions?surface=web')).json()).campaigns.length,0);
+ await promo.locator('.app-bottom-nav a[href="#offers"]').click();await promo.locator('#offers').waitFor({state:'visible'});
  await promo.getByRole('button',{name:'Use TESTAPP',exact:true}).waitFor();
+ await promo.locator('.app-bottom-nav a[href="#shop"]').click();await promo.locator('#shop').waitFor({state:'visible'});
  await promo.waitForFunction(()=>document.querySelector('#price-whey .retail-offer-price')?.textContent.includes('4,899'));
- await promo.locator('#brands').scrollIntoViewIfNeeded();await promo.screenshot({path:reportDir+'/app-launch.png'});
+ await promo.locator('.app-bottom-nav a[href="#brands"]').click();await promo.locator('#brands').waitFor({state:'visible'});await promo.screenshot({path:reportDir+'/app-launch.png'});
  assert.equal(await promo.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'app marketing overflow');
+ await promo.locator('.app-bottom-nav a[href="#shop"]').click();await promo.locator('#shop').waitFor({state:'visible'});
+ assert.equal(await promo.locator('.storehead').count(),0,'app has a separate compact header');
  await promo.locator('.add[data-id="whey"]').click();
  await promo.locator('#offerCode').fill('TESTAPP');await promo.locator('#applyOffer').click();
  await promo.waitForFunction(()=>document.querySelector('#offerMessage').textContent.includes('Applied TESTAPP'));
