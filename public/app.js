@@ -8,6 +8,16 @@ const P=[
 {id:"creatine",name:"Pro Creatine",cat:"creatine",featuredIndex:1,variants:[{label:"Blueberry · 100 g",price:899,mrp:1499,img:null},{label:"Cranberry · 100 g",price:899,mrp:1499,img:null}],desc:"Creatine supplement in two flavour options.",img:""},
 {id:"vitamins",name:"Multivitamin",cat:"vitamins",variants:[{label:"1 pack",price:699}],desc:"Daily multivitamin supplement.",img:""}
 ];
+const retailVariantIds={whey:['whey-chocolate','whey-coffee'],mass:['mass-3kg','mass-5kg'],pre:['pre-watermelon'],creatine:['creatine-blueberry','creatine-cranberry'],vitamins:['musclevite-pack']};
+async function refreshRetailPrices(){
+ const response=await fetch('/api/retail/catalog',{cache:'no-store',signal:AbortSignal.timeout(8000)});
+ if(!response.ok)throw Error('Current prices are unavailable. Please reconnect and try again.');
+ const data=await response.json();
+ if(!Array.isArray(data.products)||data.tier!=='retail')throw Error('Current retail prices could not be verified.');
+ const variants=new Map(data.products.flatMap(p=>p.variants||[]).map(v=>[v.id,v]));
+ const updates=P.flatMap(p=>p.variants.map((v,index)=>{const current=variants.get(retailVariantIds[p.id][index]);if(!current||!Number.isSafeInteger(current.pricePaise)||current.pricePaise<=0)throw Error('A selected pack needs price confirmation. Please contact our team.');return {v,current}}));
+ for(const {v,current} of updates){v.price=current.pricePaise/100;delete v.mrp;if(Number.isSafeInteger(current.mrpPaise)&&current.mrpPaise>current.pricePaise)v.mrp=current.mrpPaise/100;}
+}
 const $=id=>document.getElementById(id);
 const money=n=>"₹"+Number(n).toLocaleString("en-IN");
 let cat="all",q="",cart={},mode="retail";
@@ -88,14 +98,19 @@ document.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>{const k=b.dat
 let bagOpener=null;
 function openBag(){bagOpener=document.activeElement;for(const el of document.body.children){if(!["drawer","shade"].includes(el.id)&&!['SCRIPT','SVG'].includes(el.tagName)){el.dataset.bagInert=String(el.inert);el.inert=true;}}$("shade").hidden=false;$("drawer").classList.add("open");$("drawer").setAttribute("aria-hidden","false");document.body.classList.add("cart-open");$("close").focus()}
 function closeBag(){$("shade").hidden=true;$("drawer").classList.remove("open");$("drawer").setAttribute("aria-hidden","true");document.body.classList.remove("cart-open");document.querySelectorAll("[data-bag-inert]").forEach(el=>{el.inert=el.dataset.bagInert==="true";delete el.dataset.bagInert});(bagOpener?.isConnected?bagOpener:$("bag")).focus()}
-function retailEnquiry(){
-const entries=Object.entries(cart).filter(([k])=>getItem(k));if(!entries.length)return;
+async function retailEnquiry(){
+let entries=Object.entries(cart).filter(([k])=>getItem(k));if(!entries.length)return;
 const name=$("customerName").value.trim(),phone=$("customerPhone").value.trim();
 if(!name||!/^[0-9]{10}$/.test(phone)){$("checkoutFields").reportValidity();return}
+const message=$("priceMessage");const previous=totals().subtotal;$("send").disabled=true;message.textContent="Checking current prices…";
+try{await refreshRetailPrices();drawCart();renderRecent();document.querySelectorAll('.variant').forEach(select=>{const p=P.find(item=>item.id===select.id.slice(2));$("price-"+p.id).innerHTML=priceMarkup(p.variants[Number(select.value)])});}catch(error){message.textContent=error.message;$("send").disabled=false;return;}
+if(totals().subtotal!==previous){message.textContent="Prices have been updated. Please review your cart total and confirm again.";return;}
+message.textContent="";
+entries=Object.entries(cart).filter(([k])=>getItem(k));if(!entries.length)return;
 const lines=entries.map(([k,n])=>{const {p,v}=getItem(k);return p.name+" — "+v.label+" × "+n+" = "+money(n*v.price)});
 const {subtotal}=totals();
 const msg="Hello Max Volume Nutrition, I would like to confirm my order request via WhatsApp:\n\nSelected products:\n"+lines.join("\n")+"\n\nProducts total: "+money(subtotal)+"\n\nCustomer name: "+name+"\nMobile number: "+phone+"\n\nOnline payment is temporarily unavailable. Please confirm stock, delivery charges, payment method and order acceptance with me on WhatsApp.";
-window.open("https://wa.me/"+PHONE+"?text="+encodeURIComponent(msg),"_blank","noopener");
+window.location.assign("https://wa.me/"+PHONE+"?text="+encodeURIComponent(msg));
 }
 $("bag").onclick=openBag;if($("floatingCart"))$("floatingCart").onclick=openBag;$("close").onclick=closeBag;$("shade").onclick=closeBag;
 document.querySelectorAll("[data-cat]").forEach(x=>x.onclick=e=>{e.preventDefault();setCat(x.dataset.cat)});
@@ -113,6 +128,7 @@ document.addEventListener("keydown",e=>{
  if(e.key==="Tab"){const controls=[...$("drawer").querySelectorAll('button:not(:disabled),input,a[href],select')].filter(el=>el.getClientRects().length);const first=controls[0],last=controls.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}
 });
 render();drawCart();renderRecent();
+refreshRetailPrices().then(()=>{render();drawCart();renderRecent()}).catch(error=>{if($("priceMessage"))$("priceMessage").textContent=error.message});
 
 function showDetail(id){
  const p=P.find(x=>x.id===id);if(!p)return;

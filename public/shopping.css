@@ -71,3 +71,19 @@
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}.retail-home *{transition:none!important;scroll-behavior:auto!important}}
 /* Visibility must change immediately so focus can enter the opening cart. */
 .retail-home #drawer{transition-property:transform}
+
+/* The installed app uses the same products and cart in a product-first view. */
+.retail-home .app-intro{display:none}
+.app-store .announce,.app-store .nav,.app-store .hero,.app-store .benefits,.app-store .certificate-feature,.app-store #brands,.app-store #dealer,.app-store .store-faq,.app-store .site-footer,.app-store .store-service-strip{display:none!important}
+.retail-home.app-store .app-intro{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;max-width:1280px;margin:auto;padding:28px 24px 0}
+.app-store .app-intro span{font-size:10px;font-weight:800;letter-spacing:.14em;color:#9b7840}
+.app-store .app-intro h1{font-size:28px;letter-spacing:-.7px;margin:7px 0}
+.app-store .app-intro p{font-size:13px;color:#647080;line-height:1.8;margin:0}
+.app-store .app-intro button{border:0;background:#182334;color:white;padding:12px 18px;border-radius:3px;cursor:pointer}
+.app-store .app-install-help{width:100%;font-size:12px;color:#647080;border-bottom:1px solid #e4e7eb;padding-bottom:14px}
+.app-store .app-install-help summary{cursor:pointer;font-weight:650;color:#182334}
+.retail-home.app-store #shop{padding-top:24px!important}
+.app-store #shop>.section-title{display:none!important}
+#priceMessage{font-size:12px;line-height:1.6;color:#76561f}
+#priceMessage:empty{display:none}
+@media(max-width:700px){.retail-home.app-store .app-intro{padding:22px 14px 0}.app-store .app-intro h1{font-size:24px}}

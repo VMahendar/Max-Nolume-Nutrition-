@@ -3,7 +3,7 @@
   "name": "Max Volume Nutrition",
   "short_name": "MVN Store",
   "description": "Sports nutrition, customer accounts and WhatsApp order confirmation.",
-  "start_url": "/",
+  "start_url": "/mobile-app.html",
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -23,6 +23,10 @@
     }
   ],
   "shortcuts": [
+    {
+      "name": "Shop products",
+      "url": "/mobile-app.html"
+    },
     {
       "name": "My Account",
       "url": "/account.html"

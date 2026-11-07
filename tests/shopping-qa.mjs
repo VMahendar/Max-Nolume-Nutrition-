@@ -59,4 +59,40 @@ try{
  assert.deepEqual(errors,[]);
  await page.close();console.log('PASS collection search, price/pack selection, sorting, categories, history, cart keyboard/focus, layout at '+width);
  }
+ const app=await browser.newPage({viewport:{width:390,height:844}});
+ const catalogue=await (await app.request.get(base+'/api/retail/catalog')).json();
+ let livePrice=512300,failPrices=false,whatsapp='';
+ await app.route('**/api/retail/catalog',async route=>{
+   if(failPrices)return route.fulfill({status:503,contentType:'application/json',body:'{}'});
+   const current=structuredClone(catalogue);current.products.find(p=>p.id==='potency-whey').variants.find(v=>v.id==='whey-coffee').pricePaise=livePrice;
+   await route.fulfill({contentType:'application/json',body:JSON.stringify(current)});
+ });
+ let whatsappRequested;const sentToWhatsApp=new Promise(done=>whatsappRequested=done);
+ await app.route('https://wa.me/**',async route=>{whatsapp=route.request().url();whatsappRequested();await route.abort();});
+ await app.goto(base+'/mobile-app.html');
+ await app.waitForFunction(()=>document.querySelector('#price-whey').textContent.includes('5,123'));
+ assert.equal(await app.locator('body.app-store').count(),1);
+ assert.equal(await app.locator('.hero').isVisible(),false);
+ assert.equal(await app.locator('#grid .card').count(),5);
+ const manifest=await (await app.request.get(base+'/manifest.webmanifest')).json();assert.equal(manifest.start_url,'/mobile-app.html');
+ await app.locator('.add[data-id="whey"]').click();
+ await app.locator('[data-plus]').click();
+ await app.locator('#customerName').fill('App Customer');
+ await app.locator('#customerPhone').fill('9876543210');
+ failPrices=true;
+ await app.locator('#send').click();
+ await app.waitForFunction(()=>document.querySelector('#priceMessage').textContent.includes('unavailable'));
+ assert.equal(whatsapp,'');
+ failPrices=false;livePrice=522300;
+ await app.locator('#send').click();
+ await app.waitForFunction(()=>document.querySelector('#priceMessage').textContent.includes('review your cart'));
+ assert.equal(whatsapp,'');
+ assert.match(await app.locator('#cart-totals').textContent(),/10,446/);
+ await Promise.all([sentToWhatsApp,app.locator('#send').click()]);
+ const target=new URL(whatsapp);assert.equal(target.pathname,'/917708830513');
+ const text=target.searchParams.get('text');
+ for(const expected of ['Potency Whey','Coffee','× 2','10,446','App Customer','9876543210'])assert.ok(text.includes(expected),expected);
+ console.log('PASS product-first app, live retail prices, failed-price protection, price change review and WhatsApp order contents');
+ await app.close();
+
 }finally{await browser?.close();if(child.exitCode===null){const stopped=new Promise(done=>child.once('exit',done));child.kill();await stopped;}rmSync(dataDir,{recursive:true,force:true});}
