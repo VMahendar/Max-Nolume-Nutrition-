@@ -25,16 +25,22 @@ jobs:
       - name: Install Playwright test runner
         run: npm install --no-save --package-lock=false playwright@1.55.0
       - name: Install Chromium browser
+        id: chromium
         run: npx playwright install --with-deps chromium
       - name: Run desktop, mobile and commerce browser checks
+        if: ${{ !cancelled() && steps.chromium.outcome == 'success' }}
         run: node tests/visual-qa.mjs
       - name: Check collection filtering, browsing history and accessible cart
+        if: ${{ !cancelled() && steps.chromium.outcome == 'success' }}
         run: node tests/shopping-qa.mjs
       - name: Check owner purchase preview, ad photo upload and shared launch updates
+        if: ${{ !cancelled() && steps.chromium.outcome == 'success' }}
         run: node tests/owner-desk-qa.mjs
       - name: Check actual launch gate and automatic opening on website and app
+        if: ${{ !cancelled() && steps.chromium.outcome == 'success' }}
         run: node tests/launch-gate-qa.mjs
       - name: Check secure payment review, verification and disabled-provider behaviour
+        if: ${{ !cancelled() && steps.chromium.outcome == 'success' }}
         run: node tests/secure-payments-qa.mjs
       - name: Preserve browser screenshots and QA report
         if: always()
