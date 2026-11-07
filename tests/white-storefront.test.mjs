@@ -4,16 +4,16 @@ import {readFileSync,existsSync} from 'node:fs';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 
 test('retail flagship keeps original logo, integrates masthead and leads with products',()=>{
- const html=read('public/index.html'),css=read('public/flagship.css');
- assert.ok(html.includes('<link rel="stylesheet" href="flagship.css">'));
+ const html=read('public/index.html'),css=read('public/editorial-store.css');
+ assert.ok(html.includes('<link rel="stylesheet" href="editorial-store.css">'));
+ assert.ok(html.indexOf('editorial-store.css')>html.indexOf('copper-home.css'),'final editorial stylesheet is last');
  assert.match(css,/background:#fff!important/,'white retail shopping canvas');
- assert.match(css,/\.retail-home \.storehead\{\s*background:var\(--mvn-night\)!important/);
- assert.match(css,/\.retail-home \.brand-identity\{\s*background:transparent!important/,'logo has no separate pasted-on backdrop');
- assert.match(css,/background-image:url\('max-volume-logo-wide.png'\)/,'original source artwork is scaled as a continuous masthead image');
- assert.match(css,/mix-blend-mode:screen/,'original black-background logo integrates with masthead');
- assert.match(css,/\.retail-home \.placeholder\[hidden\]/,'hidden placeholders must remain hidden after a real product image loads');
+ assert.match(css,/\.storehead\{/,'clean storefront masthead');
+ assert.match(css,/\.brand-identity\{/,'original logo has a dedicated readable background');
+ assert.match(css,/background-image:none!important/,'no duplicated background logo');
+ assert.match(css,/mix-blend-mode:screen/,'original logo lettering integrates into matte header');
  assert.ok(html.includes('src="max-volume-logo-wide.png"'),'original full logo retained');
- assert.ok(html.includes('FUEL EVERY<br><strong>REP.</strong>'),'product-first hero rather than duplicating company name');
+ assert.ok(html.includes('THE PERFORMANCE<br><strong>EDIT.</strong>'),'multi-brand editorial hero');
  assert.ok(!html.includes('distribution-feature'),'repeated Unicorn promotion removed');
  assert.ok(!html.includes('category-tiles'),'no duplicated category lists');
  assert.match(html,/section class="benefits" aria-label="Shop by category"/);
