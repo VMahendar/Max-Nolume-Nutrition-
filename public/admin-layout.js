@@ -1,7 +1,7 @@
 const $=id=>document.getElementById(id);
 const screens={
- 'my-work':['My Work','Save a private request and hand it to ChatGPT or Codex.'],
- 'daily-desk':['Overview','A clear view of your store. One task at a time.'],
+ 'my-work':['My Work','Your store change requests, all in one place.'],
+ 'daily-desk':['Overview','Your store at a glance.'],
  sales:['Sales','Record completed shop and WhatsApp sales.'],purchases:['Purchases','Receive goods and keep your supplier bill records together.'],
  inventory:['Stock','Check quantities, reservations and available packs.'],orders:['Online orders','Review checkouts, payment status and delivery.'],products:['Products','Add products, pack photos and clear customer prices.'],
  marketing:['Customers','Follow up with customers who asked to hear from you.'],dealers:['Dealers & distributors','Review business applications and access to trade prices.'],
