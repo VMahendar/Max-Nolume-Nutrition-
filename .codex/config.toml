@@ -1,0 +1,5 @@
+# Max Volume Nutrition Codex project MCP configuration.
+# Uses Postman's OAuth flow; no API key or tokens are stored in Git.
+# Codex CLI / IDE loads project-scoped MCP config when the repository is trusted.
+[mcp_servers.postman]
+url = "https://mcp.postman.com/minimal"
