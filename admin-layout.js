@@ -1,5 +1,6 @@
 const $=id=>document.getElementById(id);
 const screens={
+ 'my-work':['My Work','Save a private request and hand it to ChatGPT or Codex.'],
  'daily-desk':['Overview','A clear view of your store. One task at a time.'],
  sales:['Sales','Record completed shop and WhatsApp sales.'],purchases:['Purchases','Receive goods and keep your supplier bill records together.'],
  inventory:['Stock','Check quantities, reservations and available packs.'],orders:['Online orders','Review checkouts, payment status and delivery.'],products:['Products','Add products, pack photos and clear customer prices.'],
@@ -25,7 +26,7 @@ function navigate(){
 addEventListener('hashchange',()=>{navigate();$('adminScreenTitle').focus({preventScroll:true});});navigate();
 $('adminToday').textContent=new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',weekday:'short',day:'numeric',month:'short',year:'numeric'}).format(new Date());
 function attention(label,detail,count,href){const a=document.createElement('a'),number=document.createElement('span'),copy=document.createElement('div'),title=document.createElement('b'),sub=document.createElement('small'),arrow=document.createElement('span');a.href=href;number.textContent=count;title.textContent=label;sub.textContent=detail;arrow.textContent='→';copy.append(title,sub);a.append(number,copy,arrow);return a;}
-const actions={'product.save':'Product details updated','inventory.adjust':'Stock count updated','owner.purchase':'Stock received','owner.sale':'Manual sale recorded','store-updates.save':'Store announcements saved','store-update.draft':'WhatsApp draft received','campaigns.save':'Retail offers updated','dealer.approved':'Dealer application approved','dealer.rejected':'Dealer access updated','marketing.automation.configure':'Message schedule updated','payment.captured':'Online payment verified'};
+const actions={'owner-work.save':'Owner change request saved','product.save':'Product details updated','inventory.adjust':'Stock count updated','owner.purchase':'Stock received','owner.sale':'Manual sale recorded','store-updates.save':'Store announcements saved','store-update.draft':'WhatsApp draft received','campaigns.save':'Retail offers updated','dealer.approved':'Dealer application approved','dealer.rejected':'Dealer access updated','marketing.automation.configure':'Message schedule updated','payment.captured':'Online payment verified'};
 document.addEventListener('admin-overview',event=>{
  const data=event.detail,variants=data.products.flatMap(p=>p.variants),low=variants.filter(v=>Number.isSafeInteger(v.stock)&&v.stock<=3),unknown=variants.filter(v=>!Number.isSafeInteger(v.stock)),orders=data.orders.filter(o=>!['failed','expired','cancelled'].includes(o.status)&&o.fulfilment!=='delivered'),dealers=data.dealers.filter(d=>d.status==='pending');
  $('statProducts').textContent=data.products.length;$('statPacks').textContent=variants.length+' product packs';$('statLowStock').textContent=low.length;$('statUnconfirmed').textContent=unknown.length?unknown.length+' packs need a stock count':'Packs with 3 or fewer available';$('statOrders').textContent=orders.length;$('statDealers').textContent=dealers.length;
