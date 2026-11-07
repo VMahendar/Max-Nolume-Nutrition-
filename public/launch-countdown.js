@@ -15,40 +15,26 @@ function installOpeningCountdown() {
   banner.setAttribute('aria-label', 'Max Volume Nutrition grand opening countdown');
   banner.innerHTML = `
     <div class="mvn-clock-inner">
-      <header class="mvn-launch-top">
-        <img class="mvn-clock-logo" src="/max-volume-logo-wide.png" alt="Max Volume Nutrition" width="430" height="118">
-        <span>SPORTS NUTRITION&nbsp; / &nbsp;RETAIL &amp; DISTRIBUTION</span>
-      </header>
-      <div class="mvn-launch-layout">
-        <div class="mvn-clock-label">
-          <span class="mvn-clock-eyebrow">INTRODUCING THE MVN ONLINE STORE</span>
-          <h1 class="mvn-clock-headline" id="mvn-clock-title">THE<br>PERFORMANCE<br>EDIT<span>.</span></h1>
-          <p class="mvn-clock-description">A curated destination for sports nutrition. Explore established product ranges, discover new brands and connect with us for wholesale supply.</p>
-          <span class="mvn-clock-date">${LAUNCH_DATE_LABEL}</span>
-          <div class="mvn-clock-time" id="mvn-clock-time" role="timer" aria-label="Time remaining until store launch">
-            <span><strong data-clock="days">00</strong><small>DAYS</small></span>
-            <i aria-hidden="true">:</i>
-            <span><strong data-clock="hours">00</strong><small>HOURS</small></span>
-            <i aria-hidden="true">:</i>
-            <span><strong data-clock="minutes">00</strong><small>MINS</small></span>
-            <i aria-hidden="true">:</i>
-            <span><strong data-clock="seconds">00</strong><small>SECS</small></span>
-          </div>
-          <div class="mvn-clock-footer">
-            <span id="mvn-clock-note">ONLINE STORE LAUNCH · 8 NOVEMBER · 11 PM IST</span>
-            <a id="mvn-clock-link" href="#shop" hidden>EXPLORE THE COLLECTION →</a>
-          </div>
-        </div>
-        <div class="mvn-launch-visual" aria-label="Current verified Unicorn Pro Series product photography">
-          <div class="mvn-launch-visual-top"><span>FEATURED NOW</span><strong>UNICORN PRO SERIES</strong></div>
-          <div class="mvn-launch-product-stage">
-            <img class="mvn-launch-product-main" src="/assets/Screenshot_2026_1103_003852.jpg" alt="Unicorn Pro Series Nitro Mass 5 kg bucket" loading="eager">
-            <img class="mvn-launch-product-secondary" src="/assets/potency-whey-coffee-5lb.webp" alt="Unicorn Pro Series Potency Whey Coffee 5 lb" loading="eager">
-          </div>
-          <div class="mvn-launch-visual-bottom"><span>THE CURRENT COLLECTION</span><span>MORE BRANDS TO FOLLOW</span></div>
-        </div>
+      <div class="mvn-clock-label">
+        <img class="mvn-clock-logo" src="/max-volume-logo-wide.png" alt="Max Volume Nutrition" width="390" height="88">
+        <span class="mvn-clock-eyebrow">CHENNAI · RETAIL · WHOLESALE & DISTRIBUTION</span>
+        <strong class="mvn-clock-headline" id="mvn-clock-title">SOMETHING POWERFUL IS COMING.</strong>
+        <span class="mvn-clock-date">${LAUNCH_DATE_LABEL}</span>
+        <p class="mvn-clock-description">Our new online store opens soon. The collection is coming into focus.</p>
       </div>
-      <div class="mvn-launch-bottom"><span>MAX VOLUME NUTRITION · CHENNAI</span><span>RETAIL / WHOLESALE / DISTRIBUTION</span></div>
+      <div class="mvn-clock-time" id="mvn-clock-time" role="timer" aria-label="Time remaining until store launch">
+        <span><strong data-clock="days">00</strong><small>DAYS</small></span>
+        <i aria-hidden="true">:</i>
+        <span><strong data-clock="hours">00</strong><small>HOURS</small></span>
+        <i aria-hidden="true">:</i>
+        <span><strong data-clock="minutes">00</strong><small>MINUTES</small></span>
+        <i aria-hidden="true">:</i>
+        <span><strong data-clock="seconds">00</strong><small>SECONDS</small></span>
+      </div>
+      <div class="mvn-clock-footer">
+        <span id="mvn-clock-note">THE FULL STORE UNLOCKS AT 11:00 PM IST</span>
+        <a id="mvn-clock-link" href="#shop" hidden>EXPLORE THE COLLECTION →</a>
+      </div>
     </div>`;
 
   const anchor = document.querySelector('.announce');

@@ -284,8 +284,8 @@
  .retail-home{padding-bottom:66px}
  .retail-home #bag{min-width:100px;justify-content:space-between}
  .retail-home #bag span{display:inline;font-size:9px}
- .retail-home .floating-cart{display:flex;align-items:center;justify-content:space-between;gap:18px;position:fixed;bottom:15px;right:15px;z-index:19;padding:13px 18px;min-height:53px;border:1px solid #b78360;border-radius:3px;box-shadow:0 6px 22px #00000022;background:#202020;color:white;font-weight:900;font-size:12px;letter-spacing:.04em}
- .retail-home .floating-cart strong{display:inline-grid;place-items:center;background:#d8a27d;color:#171717;border-radius:50%;height:27px;min-width:27px;font-size:12px;padding:0 5px}
+ .retail-home .floating-cart{display:flex;align-items:center;justify-content:space-between;gap:18px;position:fixed;bottom:15px;right:15px;z-index:19;padding:13px 18px;min-height:53px;border:1px solid #7baaff;border-radius:30px;box-shadow:0 6px 22px #061d4b55;background:#1559e6;color:white;font-weight:900;font-size:12px;letter-spacing:.04em}
+ .retail-home .floating-cart strong{display:inline-grid;place-items:center;background:#fff;color:#1559e6;border-radius:50%;height:27px;min-width:27px;font-size:12px;padding:0 5px}
  .retail-home.cart-open .floating-cart{display:none}
  .retail-home #drawer{width:100%;max-width:100%;padding:15px 20px 22px}
  .retail-home #drawer .drawerfoot{max-height:65dvh;overflow-y:auto}
