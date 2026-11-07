@@ -14,11 +14,22 @@ async function refreshRetailPrices(){
  if(!response.ok)throw Error('Current prices are unavailable. Please reconnect and try again.');
  const data=await response.json();
  if(!Array.isArray(data.products)||data.tier!=='retail')throw Error('Current retail prices could not be verified.');
+ const mappedIds=new Set(Object.entries(retailVariantIds).filter(([id])=>!id.startsWith('catalog-')).flatMap(([,ids])=>ids));
+ for(const product of data.products){
+  const packs=(product.variants||[]).filter(v=>Number.isSafeInteger(v.pricePaise)&&v.pricePaise>0);
+  if(!packs.length||packs.every(v=>mappedIds.has(v.id)))continue;
+  const id='catalog-'+product.id;if(!/^[a-z0-9-]+$/.test(id))continue;
+  let item=P.find(p=>p.id===id);if(!item){item={id,name:product.name,brand:product.brand,cat:['whey','mass','pre','creatine','vitamins'].includes(product.category)?product.category:'other',desc:product.description||product.subtitle||'',img:product.image||'',variants:[]};P.push(item);}
+  item.name=product.name;item.brand=product.brand;item.desc=product.description||product.subtitle||'';item.img=product.image||'';
+  const previous=new Map(item.variants.map((v,i)=>[retailVariantIds[id]?.[i],v]));
+  item.variants=packs.map(v=>({...previous.get(v.id),label:v.label,price:v.pricePaise/100,img:v.image||product.image||'',...(Number.isSafeInteger(v.mrpPaise)?{mrp:v.mrpPaise/100}:{})}));retailVariantIds[id]=packs.map(v=>v.id);
+ }
  const variants=new Map(data.products.flatMap(p=>p.variants||[]).map(v=>[v.id,v]));
  const updates=P.flatMap(p=>p.variants.map((v,index)=>{const current=variants.get(retailVariantIds[p.id][index]);if(!current||!Number.isSafeInteger(current.pricePaise)||current.pricePaise<=0)throw Error('A selected pack needs price confirmation. Please contact our team.');return {v,current}}));
  for(const {v,current} of updates){v.price=current.pricePaise/100;delete v.mrp;if(Number.isSafeInteger(current.mrpPaise)&&current.mrpPaise>current.pricePaise)v.mrp=current.mrpPaise/100;}
 }
 const $=id=>document.getElementById(id);
+const safe=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>"₹"+Number(n).toLocaleString("en-IN");
 let cat="all",q="",cart={},mode="retail";
 let priceRange="all",recent=[],appliedOffer=null,availableOffers=[];
@@ -42,8 +53,8 @@ function renderRecent(){
  }));
 }
 try{const v=JSON.parse(localStorage.getItem("mvn-cart-v2")||"{}");if(v&&typeof v==="object")cart=v}catch(e){}
-function getItem(k){if(!/^(whey|mass|pre|creatine|vitamins)\|[0-9]+$/.test(k))return null;const [id,i]=k.split("|");const p=P.find(x=>x.id===id),v=p&&p.variants[Number(i)];return p&&v?{p,v}:null}
-cart=Object.fromEntries(Object.entries(cart).filter(([k,v])=>getItem(k)&&Number.isSafeInteger(v)&&v>0&&v<=999));
+function getItem(k){if(!/^[a-z0-9-]+\|[0-9]+$/.test(k))return null;const [id,i]=k.split("|");const p=P.find(x=>x.id===id),v=p&&p.variants[Number(i)];return p&&v?{p,v}:null}
+cart=Object.fromEntries(Object.entries(cart).filter(([k,v])=>/^[a-z0-9-]+\|[0-9]+$/.test(k)&&Number.isSafeInteger(v)&&v>0&&v<=999));
 function persist(){try{localStorage.setItem("mvn-cart-v2",JSON.stringify(cart))}catch{}drawCart()}
 function coverImage(p,i){const v=p.variants[Number(i)];return v&&Object.prototype.hasOwnProperty.call(v,"img")?(v.img||""):(p.img||"")}
 function swapPhoto(host,src,name){
@@ -70,11 +81,11 @@ function priceMarkup(v){
  '<small class="selling-caption">Regular retail price</small>'+retailOfferMarkup(v);
 }
 function card(p){
-const featured=displayVariant(p);const cover=coverImage(p,featured);const pic=cover?'<img loading="lazy" src="'+cover+'" alt="'+p.name+'"><div class="placeholder" hidden><b>'+p.name+'</b>Photo coming soon</div>':'<div class="placeholder"><b>'+p.name+'</b>Correct pack photo being verified</div>';
-return '<article class="card"><div class="photo">'+pic+'</div><div class="info"><small>UNICORN PRO SERIES</small><h3>'+p.name+'</h3><p>'+p.desc+'</p><label class="variant-label" for="v-'+p.id+'">FLAVOUR / PACK SIZE</label><select id="v-'+p.id+'" class="variant">'+p.variants.map((v,i)=>'<option value="'+i+'"'+(i===featured?' selected':'')+'>'+v.label+'</option>').join("")+'</select><div class="price" id="price-'+p.id+'">'+priceMarkup(p.variants[featured])+'</div><button class="details-link" type="button" data-detail="'+p.id+'">VIEW PRODUCT DETAILS →</button><button class="add" data-id="'+p.id+'">ADD TO CART +</button></div></article>';
+const featured=displayVariant(p);const cover=coverImage(p,featured);const pic=cover?'<img loading="lazy" src="'+safe(cover)+'" alt="'+safe(p.name)+'"><div class="placeholder" hidden><b>'+safe(p.name)+'</b>Photo coming soon</div>':'<div class="placeholder"><b>'+safe(p.name)+'</b>Correct pack photo being verified</div>';
+return '<article class="card"><div class="photo">'+pic+'</div><div class="info"><small>'+safe(p.brand||'Unicorn Pro Series')+'</small><h3>'+safe(p.name)+'</h3><p>'+safe(p.desc)+'</p><label class="variant-label" for="v-'+p.id+'">FLAVOUR / PACK SIZE</label><select id="v-'+p.id+'" class="variant">'+p.variants.map((v,i)=>'<option value="'+i+'"'+(i===featured?' selected':'')+'>'+safe(v.label)+'</option>').join("")+'</select><div class="price" id="price-'+p.id+'">'+priceMarkup(p.variants[featured])+'</div><button class="details-link" type="button" data-detail="'+p.id+'">VIEW PRODUCT DETAILS →</button><button class="add" data-id="'+p.id+'">ADD TO CART +</button></div></article>';
 }
 function render(){
-const items=P.filter(p=>(cat==="all"||p.cat===cat)&&p.variants.some(matchesPrice)&&((p.name+" "+p.variants.map(v=>v.label).join(" ")).toLowerCase().includes(q.toLowerCase())));
+const items=P.filter(p=>(cat==="all"||p.cat===cat)&&p.variants.some(matchesPrice)&&((p.name+" "+(p.brand||"Unicorn Pro Series")+" "+p.variants.map(v=>v.label).join(" ")).toLowerCase().includes(q.toLowerCase())));
 if($("sort").value==="default")items.sort((a,b)=>Number(Boolean(coverImage(b,b.featuredIndex||0)))-Number(Boolean(coverImage(a,a.featuredIndex||0))));
 if($("sort").value==="name")items.sort((a,b)=>a.name.localeCompare(b.name));
 if($("sort").value==="low")items.sort((a,b)=>a.variants[displayVariant(a)].price-b.variants[displayVariant(b)].price);
@@ -95,7 +106,7 @@ function totals(){let n=0,subtotal=0;for(const [k,qty] of Object.entries(cart)){
 function drawCart(){
 const {n,subtotal,discount,total}=totals();$("count").textContent=n;if($("floatingCount"))$("floatingCount").textContent=n;
 let html=n?"":'<p class="empty-cart">Your cart is empty. Choose your supplements to get started.</p>';
-for(const [k,qty] of Object.entries(cart)){const item=getItem(k);if(!item)continue;html+='<div class="row"><b>'+item.p.name+'</b><small>'+item.v.label+' · '+money(item.v.price)+'</small><div class="qty"><button data-minus="'+k+'" aria-label="Decrease quantity">−</button><span>'+qty+'</span><button data-plus="'+k+'" aria-label="Increase quantity">+</button><strong>'+money(item.v.price*qty)+'</strong></div></div>'}
+for(const [k,qty] of Object.entries(cart)){const item=getItem(k);if(!item)continue;html+='<div class="row"><b>'+safe(item.p.name)+'</b><small>'+safe(item.v.label)+' · '+money(item.v.price)+'</small><div class="qty"><button data-minus="'+k+'" aria-label="Decrease quantity">−</button><span>'+qty+'</span><button data-plus="'+k+'" aria-label="Increase quantity">+</button><strong>'+money(item.v.price*qty)+'</strong></div></div>'}
 $("items").innerHTML=html;
 $("cart-totals").innerHTML=n?'<div><span>Subtotal</span><b>'+money(subtotal)+'</b></div>'+(discount?'<div><span>Offer savings</span><b>−'+money(discount)+'</b></div><div><span>Products total</span><b>'+money(total)+'</b></div>':''):"";
 $("send").disabled=!n;
@@ -172,8 +183,8 @@ function showDetail(id){
  recent=[id,...recent.filter(value=>value!==id)].slice(0,4);try{localStorage.setItem("mvn-recent-v1",JSON.stringify(recent))}catch{}renderRecent();
  const dlg=$("productDialog"),root=$("productDetail");
  const initialIndex=Number($("v-"+id)?.value ?? p.featuredIndex ?? 0);
- const cover=coverImage(p,initialIndex);const photo=cover?'<img src="'+cover+'" alt="'+p.name+'" loading="lazy"><div class="placeholder" hidden>Verified product image pending</div>':'<div class="placeholder"><b>'+p.name+'</b>Verified product image pending</div>';
- root.innerHTML='<div class="detail-layout"><div class="detail-photo">'+photo+'</div><div class="detail-copy"><span class="eyebrow dark">UNICORN PRO SERIES</span><h2>'+p.name+'</h2><p>'+p.desc+'</p><p class="detail-note">Product pack and flavour availability are confirmed before fulfilment. Front/back pack-label and ingredient photos will be added after verification; please request the current label when ordering.</p><label for="detail-variant">FLAVOUR / PACK SIZE</label><select id="detail-variant">'+p.variants.map((v,i)=>'<option value="'+i+'"'+(i===initialIndex?' selected':'')+'>'+v.label+'</option>').join("")+'</select><div class="price detail-price" id="detail-price">'+priceMarkup(p.variants[initialIndex])+'</div><button class="primary" id="detail-add">ADD TO CART +</button></div></div>';
+ const cover=coverImage(p,initialIndex);const photo=cover?'<img src="'+safe(cover)+'" alt="'+safe(p.name)+'" loading="lazy"><div class="placeholder" hidden>Verified product image pending</div>':'<div class="placeholder"><b>'+safe(p.name)+'</b>Verified product image pending</div>';
+ root.innerHTML='<div class="detail-layout"><div class="detail-photo">'+photo+'</div><div class="detail-copy"><span class="eyebrow dark">'+safe(p.brand||'Unicorn Pro Series')+'</span><h2>'+safe(p.name)+'</h2><p>'+safe(p.desc)+'</p><p class="detail-note">Product pack and flavour availability are confirmed before fulfilment. Front/back pack-label and ingredient photos will be added after verification; please request the current label when ordering.</p><label for="detail-variant">FLAVOUR / PACK SIZE</label><select id="detail-variant">'+p.variants.map((v,i)=>'<option value="'+i+'"'+(i===initialIndex?' selected':'')+'>'+safe(v.label)+'</option>').join("")+'</select><div class="price detail-price" id="detail-price">'+priceMarkup(p.variants[initialIndex])+'</div><button class="primary" id="detail-add">ADD TO CART +</button></div></div>';
  swapPhoto(root.querySelector(".detail-photo"),coverImage(p,initialIndex),p.name);
  const sel=$("detail-variant");sel.onchange=()=>{$("detail-price").innerHTML=priceMarkup(p.variants[Number(sel.value)]);swapPhoto(root.querySelector(".detail-photo"),coverImage(p,sel.value),p.name)};
  $("detail-add").onclick=()=>{const k=p.id+"|"+sel.value;cart[k]=Math.min(999,(cart[k]||0)+1);persist();dlg.close();openBag()};
