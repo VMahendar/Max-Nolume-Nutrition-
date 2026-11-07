@@ -91,7 +91,7 @@ try {
     console.log('CART_TEXT',preset.name,JSON.stringify(cartText));
     await page.screenshot({path:reportDir+'/'+preset.name+'-cart.png',fullPage:false,animations:'disabled'});
     assert.ok(/4[,\\s]?999/.test(cartText||''),preset.name+' correct cart price: '+JSON.stringify(cartText));
-    assert.match(await page.locator('#checkoutFields').innerText(),/online payment is temporarily unavailable|payment and delivery are temporarily disabled/i,preset.name+' enquiry mode');
+    assert.match(await page.locator('#checkoutFields').innerText(),/payment and delivery arranged on WhatsApp|online payment is temporarily unavailable|payment and delivery are temporarily disabled/i,preset.name+' enquiry mode');
     await page.locator('#close').click();
     if(preset.name==='mobile'){
       await page.locator('#floatingCart').click();

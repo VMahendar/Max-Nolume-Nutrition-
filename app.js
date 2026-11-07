@@ -108,7 +108,9 @@ function closeBag(){$("shade").hidden=true;$("drawer").classList.remove("open");
 async function retailEnquiry(){
 let entries=Object.entries(cart).filter(([k])=>getItem(k));if(!entries.length)return;
 const name=$("customerName").value.trim(),phone=$("customerPhone").value.trim();
-if(!name||!/^[0-9]{10}$/.test(phone)){$("checkoutFields").reportValidity();return}
+const address=$("customerAddress").value.trim(),city=$("customerCity").value.trim(),state=$("customerState").value.trim(),pincode=$("customerPincode").value.trim(),payment=$("paymentPreference").value;
+for(const id of ['customerName','customerAddress','customerCity','customerState'])$(id).setCustomValidity($(id).value.trim()?'':'Please complete this field.');
+if(!$("checkoutFields").reportValidity()||!name||!/^[0-9]{10}$/.test(phone)||!address||!city||!state||!/^[1-9][0-9]{5}$/.test(pincode))return;
 const message=$("priceMessage");const previous=totals().total;$("send").disabled=true;message.textContent="Checking current prices…";
 try{await refreshRetailPrices();if($("offerCode").value.trim())await quoteOffer();drawCart();renderRecent();document.querySelectorAll('.variant').forEach(select=>{const p=P.find(item=>item.id===select.id.slice(2));$("price-"+p.id).innerHTML=priceMarkup(p.variants[Number(select.value)])});}catch(error){message.textContent=error.message;$("send").disabled=false;return;}
 if(totals().total!==previous){message.textContent="Prices have been updated. Please review your cart total and confirm again.";return;}
@@ -117,7 +119,7 @@ entries=Object.entries(cart).filter(([k])=>getItem(k));if(!entries.length)return
 const lines=entries.map(([k,n])=>{const {p,v}=getItem(k);return p.name+" — "+v.label+" × "+n+" = "+money(n*v.price)});
 const {subtotal,discount,total}=totals();
 const offerText=discount?"\nOffer code: "+appliedOffer.campaign.code+"\nOffer savings: "+money(discount)+"\nProducts total after offer: "+money(total):"";
-const msg="Hello Max Volume Nutrition, I would like to confirm my order request via WhatsApp:\n\nSelected products:\n"+lines.join("\n")+"\n\nProducts total: "+money(subtotal)+offerText+"\n\nCustomer name: "+name+"\nMobile number: "+phone+"\n\nOnline payment is temporarily unavailable. Please confirm stock, delivery charges, payment method and order acceptance with me on WhatsApp.";
+const msg="Hello Max Volume Nutrition, I would like to confirm my order request via WhatsApp:\n\nSelected products:\n"+lines.join("\n")+"\n\nProducts total: "+money(subtotal)+offerText+"\n\nCustomer name: "+name+"\nMobile number: "+phone+"\n\nDelivery address: "+address+"\nCity: "+city+"\nState: "+state+"\nPIN code: "+pincode+"\nPayment preference: "+payment+"\n\nPlease confirm stock, delivery availability, shipping charges and final payable total. Share the payment instructions or payment link on WhatsApp. This message is an order request; payment and shipment are confirmed separately by your team.";
 window.location.assign("https://wa.me/"+PHONE+"?text="+encodeURIComponent(msg));
 }
 async function quoteOffer(){
@@ -151,6 +153,7 @@ document.querySelectorAll("[data-cat]").forEach(x=>x.onclick=e=>{e.preventDefaul
 $("sort").onchange=render;
 $("search").onsubmit=e=>{e.preventDefault();q=$("q").value;cat="all";render();$("shop").scrollIntoView({behavior:"smooth"})};
 $("q").oninput=e=>{q=e.target.value;render()};
+for(const id of ['customerName','customerAddress','customerCity','customerState'])$(id).addEventListener('input',()=>$(id).setCustomValidity(''));
 $("checkoutFields").onsubmit=e=>{e.preventDefault();retailEnquiry()};
 function resetFilters(){cat="all";q="";priceRange="all";$("q").value="";if($("priceRange"))$("priceRange").value="all";$("sort").value="default";render()}
 if($("priceRange"))$("priceRange").onchange=e=>{priceRange=e.target.value;render()};

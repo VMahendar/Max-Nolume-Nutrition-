@@ -79,3 +79,7 @@ The website keeps a permanent Open MVN app link. The app now serves an independe
 WhatsApp-only reminder and campaign delivery is implemented with a persistent queue and administrator controls, but is paused and blocked on staging until provider and production setup are complete. See [the delivery setup guide](docs/MARKETING_AUTOMATION.md). No customer messages were sent during implementation.
 
 The website app entry is **Install MVN app**, with the native prompt when available and Android/iPhone instructions otherwise. It does not open the app shopping interface inside a normal browser. Standalone-mode detection controls presentation only; it is not an authentication or device-attestation mechanism. Product shopping on the regular website remains available.
+
+## WhatsApp payment and delivery coordination
+
+The website and installed app collect the customer name, phone, street address, city, state, PIN code and payment preference. They verify current retail prices and offer codes, then open a WhatsApp order request containing the full delivery/payment details and products total. Shipping charges and the final payable amount are confirmed by the team. UPI, bank transfer and COD are requests to discuss availability, not confirmed payment methods. Addresses and payment preferences are not stored in localStorage. No payment is captured and no courier booking is created by sending the message. The team shares approved payment instructions/links and delivery/tracking information directly.
