@@ -60,7 +60,7 @@ Consult [docs/PRODUCTION.md](docs/PRODUCTION.md), [docs/STAGING.md](docs/STAGING
 
 ## Mobile apps
 
-The browser-installable store at `/mobile-app.html` opens directly to products, pack choices, prices and the same WhatsApp cart as the website. Both views refresh retail prices from the backend and verify them again before preparing a WhatsApp order; changed totals require review. It uses the original MVN logo and a network-only service worker: customer accounts, stock, prices and orders are never cached. Internet access is required. Installation does not enable online payments.
+The installed home-screen app opens `/mobile-app.html` with products, pack choices, prices and the same WhatsApp cart as the website. Normal browser visits to that app URL show installation guidance first. Both views refresh retail prices from the backend and verify them again before preparing a WhatsApp order; changed totals require review. It uses the original MVN logo and a network-only service worker: customer accounts, stock, prices and orders are never cached. Internet access is required. Installation does not enable online payments.
 
 Android and iPhone development preview projects and release requirements are in [mobile/README.md](mobile/README.md). These are not signed store releases.
 
@@ -77,3 +77,5 @@ Administrators can manage draft/active campaigns, audiences, dates, minimums, ca
 The website keeps a permanent Open MVN app link. The app now serves an independent compact header, search and tab-based screens; the catalogue and WhatsApp ordering logic remain shared. Confirmed MRP, regular retail price, limited offer price and expiry are shown without introducing unverified MRPs. Expired campaigns refresh automatically.
 
 WhatsApp-only reminder and campaign delivery is implemented with a persistent queue and administrator controls, but is paused and blocked on staging until provider and production setup are complete. See [the delivery setup guide](docs/MARKETING_AUTOMATION.md). No customer messages were sent during implementation.
+
+The website app entry is **Install MVN app**, with the native prompt when available and Android/iPhone instructions otherwise. It does not open the app shopping interface inside a normal browser. Standalone-mode detection controls presentation only; it is not an authentication or device-attestation mechanism. Product shopping on the regular website remains available.
