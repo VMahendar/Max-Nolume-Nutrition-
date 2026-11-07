@@ -137,7 +137,7 @@ let whatsappMessage=msg;
   const items=entries.map(([k,quantity])=>{const [id,index]=k.split('|');return {variantId:retailVariantIds[id][Number(index)],quantity};});
   const response=await fetch('/api/enquiries',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requestKey:retailLeadKey,kind:'retail',name,phone,address,city,state,pincode,paymentPreference:payment,items,offerCode:$("offerCode").value.trim(),acknowledgeStorage:$("leadConsent").checked}),signal:AbortSignal.timeout(10000)});
   const result=await response.json();if(!response.ok||!result.recorded)throw Error(result.error||'Enquiry not saved');
-  whatsappMessage+='\\n\\nEnquiry reference: '+result.id;
+  whatsappMessage+='\n\nEnquiry reference: '+result.id;
   message.textContent='Your enquiry was recorded as '+result.id+'. WhatsApp will now open. Press Send to contact our team.';
  }catch(error){
   message.textContent='Your enquiry was NOT saved on the website. Please press Send in WhatsApp to contact us directly.';
