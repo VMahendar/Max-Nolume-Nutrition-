@@ -57,3 +57,9 @@ npm run launch:audit -- --report
 CI also runs Playwright Chromium desktop/mobile shopping and account/wholesale flows. A strict `npm run start:production` command is included but must refuse to start until all launch prerequisites pass. Do not change the live Render service to it prematurely.
 
 Consult [docs/PRODUCTION.md](docs/PRODUCTION.md), [docs/STAGING.md](docs/STAGING.md) and [docs/LAUNCH_STATUS.md](docs/LAUNCH_STATUS.md) before a production cutover.
+
+## Mobile apps
+
+The browser-installable store is available at `/mobile-app.html` after deployment. It uses the original MVN logo and a network-only service worker: customer accounts, stock, prices and orders are never cached. Internet access is required. Installation does not enable online payments.
+
+Android and iPhone development preview projects and release requirements are in [mobile/README.md](mobile/README.md). These are not signed store releases.
