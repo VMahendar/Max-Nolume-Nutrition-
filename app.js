@@ -59,7 +59,7 @@ function swapPhoto(host,src,name){
 function retailOfferMarkup(v){
  const subtotal=Math.round(v.price*100);let best=null;
  for(const campaign of availableOffers){if(Date.parse(campaign.endsAt)<=Date.now()||subtotal<campaign.minimumPaise||!/^[A-Z0-9-]{3,30}$/.test(campaign.code))continue;let discount=campaign.type==='percent'?Math.floor(subtotal*campaign.amount/100):campaign.amount;if(campaign.capPaise>0)discount=Math.min(discount,campaign.capPaise);discount=Math.min(discount,subtotal);if(!best||discount>best.discount)best={campaign,discount};}
- return best?'<div class="retail-offer-price"><strong>'+money((subtotal-best.discount)/100)+'</strong><span>With '+best.campaign.code+' · apply code in cart</span></div>':'';
+ return best?'<div class="retail-offer-price"><span class="limited-deal-label">LIMITED '+(best.campaign.occasion?.toLowerCase().includes('diwali')?'DIWALI':'RETAIL')+' OFFER</span><strong>'+money((subtotal-best.discount)/100)+'</strong><span>With '+best.campaign.code+' · apply code in cart</span><span>Ends '+new Date(Date.parse(best.campaign.endsAt)-1).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'})+' IST</span></div>':'';
 }
 function priceMarkup(v){
  const hasMrp=Number.isSafeInteger(v.mrp)&&v.mrp>v.price;
@@ -67,7 +67,7 @@ function priceMarkup(v){
  return '<div class="price-main"><b class="selling-price">'+money(v.price)+'</b>'+
  (hasMrp?'<del class="mrp-value" aria-label="MRP '+money(v.mrp)+'">MRP '+money(v.mrp)+'</del>':'')+
  '</div>'+(hasMrp?'<span class="discount-value">'+percent+'% OFF · SAVE '+money(v.mrp-v.price)+'</span>':'')+
- '<small class="selling-caption">Selling price</small>'+retailOfferMarkup(v);
+ '<small class="selling-caption">Regular retail price</small>'+retailOfferMarkup(v);
 }
 function card(p){
 const featured=displayVariant(p);const cover=coverImage(p,featured);const pic=cover?'<img loading="lazy" src="'+cover+'" alt="'+p.name+'"><div class="placeholder" hidden><b>'+p.name+'</b>Photo coming soon</div>':'<div class="placeholder"><b>'+p.name+'</b>Correct pack photo being verified</div>';
@@ -134,14 +134,18 @@ async function quoteOffer(){
 $("offerCode").oninput=()=>{appliedOffer=null;$("offerMessage").textContent="";$("removeOffer").hidden=true;drawCart()};
 $("applyOffer").onclick=async()=>{const button=$("applyOffer");button.disabled=true;try{await refreshRetailPrices();await quoteOffer();drawCart()}catch(error){$("offerMessage").textContent=error.message}finally{button.disabled=false}};
 $("removeOffer").onclick=()=>{appliedOffer=null;$("offerCode").value='';$("offerMessage").textContent='';$("removeOffer").hidden=true;drawCart()};
+let offerExpiryTimer;
+const defaultOfferMarkup=$("offerCards").innerHTML;
 async function loadOffers(){
- try{const response=await fetch('/api/promotions?surface='+offerSurface,{cache:'no-store'});if(!response.ok)return;const {campaigns}=await response.json();if(!campaigns?.length)return;availableOffers=campaigns;document.querySelectorAll('.variant').forEach(select=>{const p=P.find(item=>item.id===select.id.slice(2));$("price-"+p.id).innerHTML=priceMarkup(p.variants[Number(select.value)])});
- $("offerCards").replaceChildren(...campaigns.map(c=>{const card=document.createElement('article');card.className='offer-card';
+ try{const response=await fetch('/api/promotions?surface='+offerSurface,{cache:'no-store'});if(!response.ok)return;const {campaigns}=await response.json();availableOffers=campaigns||[];clearTimeout(offerExpiryTimer);if(availableOffers.length){const next=Math.min(...availableOffers.map(c=>Date.parse(c.endsAt)));offerExpiryTimer=setTimeout(()=>void loadOffers(),Math.max(1000,Math.min(86400000,next-Date.now()+500)));}document.querySelectorAll('.variant').forEach(select=>{const p=P.find(item=>item.id===select.id.slice(2));$("price-"+p.id).innerHTML=priceMarkup(p.variants[Number(select.value)])});
+ if(!availableOffers.length){$("offerCards").innerHTML=defaultOfferMarkup;return;}
+ $("offerCards").replaceChildren(...availableOffers.map(c=>{const card=document.createElement('article');card.className='offer-card';
  for(const [tag,text] of [['span',c.occasion||'MVN SPECIAL'],['h3',c.title],['p',c.description],['small','Retail customers only · Ends '+new Date(Date.parse(c.endsAt)-1).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'})+' IST']]){const el=document.createElement(tag);el.textContent=text;card.append(el)}
  const terms=document.createElement('details'),summary=document.createElement('summary'),copy=document.createElement('p');summary.textContent='Offer terms';copy.textContent=c.terms;terms.append(summary,copy);card.append(terms);
  const button=document.createElement('button');button.type='button';button.textContent='Use '+c.code;button.onclick=()=>{openBag();appliedOffer=null;$("offerCode").value=c.code;drawCart();$("offerMessage").textContent='Add your products, then apply this code.';$("offerCode").focus()};card.append(button);return card;}));
  }catch{} }
 loadOffers();
+window.addEventListener("focus",()=>void loadOffers());
 $("bag").onclick=openBag;if($("floatingCart"))$("floatingCart").onclick=openBag;$("close").onclick=closeBag;$("shade").onclick=closeBag;
 document.querySelectorAll("[data-cat]").forEach(x=>x.onclick=e=>{e.preventDefault();setCat(x.dataset.cat)});
 $("sort").onchange=render;
