@@ -76,7 +76,11 @@ function checkoutResponse(row){const p=JSON.parse(row.payload);if(row.status==='
 const server=http.createServer(async(req,res)=>{res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','DENY');res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline'; img-src 'self' https://revakanya.com https://unicornproseries.com https://www.unicornproseries.com data: https://static.wixstatic.com; connect-src 'self' https://*.razorpay.com; frame-src https://*.razorpay.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'");if(production)res.setHeader('Strict-Transport-Security','max-age=31536000; includeSubDomains');
 try{if(!await allowStaging(req,res))return;const u=new URL(req.url,'http://localhost');if(u.pathname==='/healthz')return json(res,200,{ok:true});
 if(u.pathname==='/owner-preview'&&['GET','HEAD'].includes(req.method)){
-  admin(C.session(req));
+  const previewUser=C.session(req);
+  if(!previewUser||previewUser.role!=='admin'){
+    res.writeHead(302,{'Location':'/admin.html#ownerAccess','Cache-Control':'no-store','X-Robots-Tag':'noindex, nofollow'});
+    return res.end();
+  }
   const view=u.searchParams.get('view')==='app'?'app':u.searchParams.get('view')==='mobile'?'mobile':'desktop';
   const page=u.searchParams.get('page')|| (view==='app'?'mobile-app.html':'index.html');
   const allowed=new Set(['index.html','mobile-app.html','account.html','wholesale-account.html','dealer.html','support.html','admin.html']);
