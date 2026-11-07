@@ -1,0 +1,21 @@
+/* Launch announcement only; doesn't alter store access or checkout. */
+.mvn-opening-countdown{background:linear-gradient(110deg,#07172f 0%,#0d2954 58%,#104ac8 100%);color:#fff;border-bottom:2px solid #7aaafc;box-shadow:0 8px 30px rgba(4,21,57,.15);font-family:Arial,Helvetica,sans-serif;position:relative;isolation:isolate;z-index:5}
+.mvn-clock-inner{max-width:1420px;margin:auto;padding:13px 28px;display:grid;grid-template-columns:minmax(220px,1fr) auto minmax(200px,.7fr);align-items:center;gap:22px}
+.mvn-clock-label{display:flex;flex-direction:column;gap:3px;min-width:0}
+.mvn-clock-eyebrow{font-size:9px;letter-spacing:.2em;font-weight:750;color:#adcafa}
+.mvn-clock-headline{font-size:18px;letter-spacing:.06em;line-height:1.18;font-weight:900}
+.mvn-clock-date{font-size:11px;letter-spacing:.07em;color:#dce8ff}
+.mvn-clock-time{display:flex;align-items:center;gap:7px;font-variant-numeric:tabular-nums}
+.mvn-clock-time>span{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:49px;padding:5px 7px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.17);border-radius:7px}
+.mvn-clock-time strong{font-size:24px;font-weight:850;line-height:1.1;letter-spacing:.02em}
+.mvn-clock-time small{color:#c5d7fa;font-size:8px;letter-spacing:.15em;font-weight:800;margin-top:4px}
+.mvn-clock-time i{font-style:normal;color:#9dc3ff;font-weight:800}
+.mvn-clock-footer{display:flex;align-items:flex-end;flex-direction:column;gap:5px;text-align:right}
+.mvn-clock-footer>span{font-size:9px;letter-spacing:.065em;color:#d9e7ff;font-weight:700}
+.mvn-clock-footer a{display:inline-flex;align-items:center;justify-content:center;color:#11274d!important;background:#fff;border-radius:5px;padding:7px 12px;font-size:10px;font-weight:900;letter-spacing:.06em;text-decoration:none!important;white-space:nowrap}
+.mvn-clock-open{background:linear-gradient(110deg,#09203b,#0f3c7e)}
+.mvn-clock-open .mvn-clock-inner{grid-template-columns:1fr auto}
+.mvn-clock-open .mvn-clock-headline{font-size:21px}
+@media(max-width:1000px){.mvn-clock-inner{grid-template-columns:minmax(180px,1fr) auto;gap:12px}.mvn-clock-footer{grid-column:1/-1;flex-direction:row;justify-content:space-between;text-align:left;align-items:center}.mvn-clock-open .mvn-clock-footer{grid-column:auto;flex-direction:column;align-items:flex-end}}
+@media(max-width:620px){.mvn-clock-inner{display:flex;flex-direction:column;align-items:stretch;gap:10px;padding:14px 18px}.mvn-clock-label{text-align:center;align-items:center}.mvn-clock-headline{font-size:16px}.mvn-clock-time{justify-content:center;gap:8px}.mvn-clock-time>span{min-width:53px;padding:6px 8px}.mvn-clock-time strong{font-size:23px}.mvn-clock-footer{width:100%;display:flex;flex-direction:row;align-items:center;text-align:left;gap:10px}.mvn-clock-footer>span{font-size:8px;flex:1}.mvn-clock-footer a{font-size:9px;padding:8px 9px}.mvn-clock-open .mvn-clock-inner{display:flex}.mvn-clock-open .mvn-clock-footer{align-items:center;flex-direction:row}}
+@media(prefers-reduced-motion:reduce){.mvn-opening-countdown *{transition:none!important;animation:none!important}}
