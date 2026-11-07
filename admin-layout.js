@@ -1,3 +1,4 @@
+const previewBadge=document.querySelector('.owner-preview-status');if(previewBadge)document.querySelector('.admin-topbar nav').prepend(previewBadge);
 const $=id=>document.getElementById(id);
 const screens={
  'my-work':['My Work','Your store change requests, all in one place.'],
