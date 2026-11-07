@@ -244,3 +244,28 @@ test('store updates require admin, preserve concurrent drafts, filter public sch
   const badImage=await a('/api/admin/store-update-image',{jpeg:'data:image/jpeg;base64,'+Buffer.from('<svg>unsafe</svg>').toString('base64')});assert.equal(badImage.status,400);
  }finally{await f.close();}
 });
+
+test('My Work is admin-only, retry-safe and keeps private change requests out of public catalogues',async()=>{
+ const f=await fixture();try{
+  const guest=f.client(),owner=f.client(),customerClient=f.client();
+  assert.equal((await guest('/api/admin/my-work')).status,401);
+  assert.equal((await guest('/api/admin/my-work',{request:'Do not publish this request',requestKey:randomUUID()})).status,401);
+  await customerClient('/api/register',{name:'Customer',email:'my-work-customer@example.com',password});
+  assert.equal((await customerClient('/api/admin/my-work')).status,403);
+  assert.equal((await customerClient('/api/admin/my-work',{request:'Customer request',requestKey:randomUUID()})).status,403);
+  await owner('/api/register',{name:'Owner',email:'my-work-owner@example.com',password});
+  f.db.prepare("UPDATE users SET role='admin' WHERE email='my-work-owner@example.com'").run();
+  const before=(await guest('/api/retail/catalog')).body;
+  const payload={request:'Private owner request: <img src=x onerror=alert(1)> — make photos larger',requestKey:randomUUID()};
+  const created=await owner('/api/admin/my-work',payload);assert.equal(created.status,200);assert.equal(created.body.connection,'manual-handoff');
+  const retry=await owner('/api/admin/my-work',payload);assert.equal(retry.body.request.id,created.body.request.id);
+  assert.equal((await owner('/api/admin/my-work',{...payload,request:'Different request'})).status,409);
+  for(const request of ['', ' ', 'x'.repeat(6001)])assert.equal((await owner('/api/admin/my-work',{request,requestKey:randomUUID()})).status,400);
+  assert.equal((await owner('/api/admin/my-work',{...payload,requestKey:'invalid'})).status,400);
+  const saved=await owner('/api/admin/my-work');assert.equal(saved.status,200);assert.equal(saved.headers.get('cache-control'),'no-store');assert.equal(saved.body.requests.length,1);assert.equal(saved.body.requests[0].request,payload.request);assert.equal(saved.body.workspaceId,'tea-dbjqt8nlk1mc73a26c10');
+  assert.deepEqual((await guest('/api/retail/catalog')).body,before);
+  assert.equal(JSON.stringify((await guest('/api/catalog')).body).includes('Private owner request'),false);
+  assert.equal(f.db.prepare("SELECT COUNT(*) n FROM audit WHERE action='owner-work.save'").get().n,1);
+  await owner('/api/logout',{});assert.equal((await owner('/api/admin/my-work')).status,401);
+ }finally{await f.close();}
+});
