@@ -88,6 +88,8 @@ try{
  await app.locator('[data-plus]').click();
  await app.locator('#customerName').fill('App Customer');
  await app.locator('#customerPhone').fill('9876543210');await app.locator('#customerAddress').fill('12 Training Street');await app.locator('#customerCity').fill('Chennai');await app.locator('#customerState').fill('Tamil Nadu');await app.locator('#customerPincode').fill('600001');await app.locator('#paymentPreference').selectOption('Request UPI payment instructions');
+ assert.equal(await app.locator('#checkoutFields').evaluate(form=>form.checkValidity()),false,'order enquiry requires storage acknowledgement');
+ await app.locator('#leadConsent').check();
  await app.locator('#customerPincode').fill('123');await app.locator('#send').click();assert.equal(whatsapp,'');assert.equal(await app.locator('#checkoutFields').evaluate(form=>form.checkValidity()),false);await app.locator('#customerPincode').fill('600001');
  failPrices=true;
  await app.locator('#send').click();
@@ -140,6 +142,7 @@ try{
  await promo.waitForFunction(()=>document.querySelector('#offerMessage').textContent.includes('Applied TESTAPP'));
  assert.match(await promo.locator('#cart-totals').textContent(),/4,899/);
  await promo.locator('#customerName').fill('Festival Customer');await promo.locator('#customerPhone').fill('9876543210');await promo.locator('#customerAddress').fill('12 Training Street');await promo.locator('#customerCity').fill('Chennai');await promo.locator('#customerState').fill('Tamil Nadu');await promo.locator('#customerPincode').fill('600001');await promo.locator('#paymentPreference').selectOption('Request UPI payment instructions');
+ await promo.locator('#leadConsent').check();
  await Promise.all([offerSent,promo.locator('#send').click()]);
  const offerText=new URL(offerUrl).searchParams.get('text');
  assert.match(offerText,/Offer code: TESTAPP/);assert.match(offerText,/Offer savings: ₹100/);assert.match(offerText,/Products total after offer: ₹4,899/);
