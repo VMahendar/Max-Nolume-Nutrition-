@@ -1,0 +1,32 @@
+import {chromium} from 'playwright';
+import {spawn} from 'node:child_process';
+import {mkdtempSync,mkdirSync,readFileSync,writeFileSync,symlinkSync,rmSync} from 'node:fs';
+import {resolve} from 'node:path';
+import {tmpdir} from 'node:os';
+import {createHmac} from 'node:crypto';
+import assert from 'node:assert/strict';
+import {unlockStorefront} from './unlocked-storefront.mjs';
+const dir=mkdtempSync(resolve(tmpdir(),'mvn-secure-payments-')),origin='http://127.0.0.1:34985';
+mkdirSync(resolve(dir,'data'));symlinkSync(resolve('public'),resolve(dir,'public'),'dir');
+const products=JSON.parse(readFileSync('data/products.json'));for(const p of products)for(const v of p.variants)v.stock=10;products.find(p=>p.id==='potency-whey').variants.find(v=>v.id==='whey-chocolate').pricePaise=10000;
+writeFileSync(resolve(dir,'data/products.json'),JSON.stringify(products));writeFileSync(resolve(dir,'data/store.json'),JSON.stringify({name:'Test Store',phone:'917708830513',address:'Fixture business',supportEmail:'fixture@example.test',shippingPaise:500,serviceStates:['Tamil Nadu']}));
+const child=spawn(process.execPath,['--import',resolve('tests/mock-provider.mjs'),resolve('server.mjs')],{cwd:dir,env:{...process.env,HOST:'127.0.0.1',PORT:'34985',PUBLIC_ORIGIN:origin,DATA_DIR:resolve(dir,'runtime'),NODE_ENV:'test',STAGING_MODE:'false',PAYMENTS_ENABLED:'true',PAYMENT_MODE:'test',POLICIES_APPROVED:'true',RAZORPAY_TESTED:'true',RAZORPAY_KEY_ID:'rzp_test_fixture',RAZORPAY_KEY_SECRET:'fixture-secret',RAZORPAY_WEBHOOK_SECRET:'fixture-webhook'},stdio:['ignore','pipe','pipe']});
+let browser;
+try{
+ await new Promise((ok,no)=>{const timer=setTimeout(()=>no(Error('Server startup timed out')),10000);child.stdout.once('data',()=>{clearTimeout(timer);ok();});child.once('exit',()=>{clearTimeout(timer);no(Error('Server exited'));});});
+ browser=await chromium.launch({...(process.env.CHROMIUM_EXECUTABLE_PATH?{executablePath:process.env.CHROMIUM_EXECUTABLE_PATH}:{}),args:['--no-sandbox']});
+ const context=await browser.newContext({viewport:{width:390,height:900}});await unlockStorefront(context);
+ await context.addInitScript(()=>{localStorage.setItem('mvn-cart-v2',JSON.stringify({'whey|0':1}));window.Razorpay=class{constructor(options){window.fixturePayment=options;}on(){}open(){window.fixtureOpened=true;}};});
+ const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));await page.goto(origin);
+ await page.waitForSelector('option[value="secure-online"]',{state:'attached'});await page.click('#bag');await page.fill('#customerName','Fixture Customer');await page.fill('#customerPhone','9876543210');await page.fill('#customerAddress','12 Fixture Street');await page.fill('#customerCity','Chennai');await page.fill('#customerState','Tamil Nadu');await page.fill('#customerPincode','600001');await page.check('#leadConsent');
+ await page.selectOption('#paymentPreference','secure-online');await page.fill('#paymentEmail','buyer@example.test');await page.check('#paymentTerms');await page.click('#send');
+ await page.waitForSelector('#securePaymentReview button');assert.match(await page.locator('#securePaymentReview').textContent(),/105\.00/);assert.equal(await page.evaluate(()=>!!window.fixtureOpened),false);
+ await page.click('#securePaymentReview button');await page.waitForFunction(()=>window.fixtureOpened===true);assert.equal(await page.evaluate(()=>window.fixturePayment.amount),10500);
+ await page.evaluate(async()=>window.fixturePayment.handler({razorpay_order_id:'order_fixture',razorpay_payment_id:'pay_fixture',razorpay_signature:'0'.repeat(64)}));assert.match(await page.locator('#securePaymentMessage').textContent(),/verification failed/);assert.equal(await page.locator('#count').textContent(),'1');
+ await page.click('#send');await page.waitForSelector('#securePaymentReview button');await page.click('#securePaymentReview button');
+ const signature=createHmac('sha256','fixture-secret').update('order_fixture|pay_fixture').digest('hex');await page.evaluate(async signature=>window.fixturePayment.handler({razorpay_order_id:'order_fixture',razorpay_payment_id:'pay_fixture',razorpay_signature:signature}),signature);
+ assert.match(await page.locator('#securePaymentMessage').textContent(),/Payment verified/);assert.equal(await page.locator('#count').textContent(),'0');
+ assert.equal(await page.evaluate(()=>Object.values(sessionStorage).some(value=>value.includes('buyer@example.test')||value.includes('12 Fixture Street'))),false);
+ const disabled=await browser.newContext();await unlockStorefront(disabled);await disabled.route('**/api/retail/catalog',async route=>{const response=await route.fetch(),data=await response.json();data.paymentReady=false;await route.fulfill({response,json:data});});const offlinePage=await disabled.newPage();await offlinePage.goto(origin);await offlinePage.waitForSelector('.card');assert.equal(await offlinePage.locator('option[value="secure-online"]').count(),0);
+ assert.deepEqual(errors,[]);console.log('Secure checkout: server total reviewed, failed signature preserves cart, verified payment clears purchased quantities, retry reuses order, no delivery details in session storage, disabled provider hides online option. All provider calls mocked.');
+}finally{await browser?.close();if(child.exitCode===null){const ended=new Promise(r=>child.once('exit',r));child.kill();await ended;}rmSync(dir,{recursive:true,force:true});}
