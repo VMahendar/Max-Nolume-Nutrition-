@@ -19,6 +19,9 @@ try{
  await page.goto(base+'/');
  await page.evaluate(()=>dispatchEvent(new Event('appinstalled')));
  assert.equal(await page.locator('.permanent-app-link').isVisible(),true);
+ await page.locator('.permanent-app-link').click();
+ assert.equal(await page.getByRole('heading',{name:'Install the MVN app',exact:true}).isVisible(),true);
+ await page.getByRole('button',{name:'Close installation help'}).click();
  await page.locator('#priceRange').selectOption('under1000');
  assert.equal(await page.locator('#grid .card').count(),2);
  await page.locator('#priceRange').selectOption('1000to3000');
@@ -63,6 +66,7 @@ try{
  await page.close();console.log('PASS collection search, price/pack selection, sorting, categories, history, cart keyboard/focus, layout at '+width);
  }
  const app=await browser.newPage({viewport:{width:390,height:844}});
+ await app.addInitScript(()=>Object.defineProperty(navigator,'standalone',{get:()=>true}));
  const catalogue=await (await app.request.get(base+'/api/retail/catalog')).json();
  let livePrice=512300,failPrices=false,whatsapp='';
  await app.route('**/api/retail/catalog',async route=>{
@@ -98,11 +102,16 @@ try{
  console.log('PASS product-first app, live retail prices, failed-price protection, price change review and WhatsApp order contents');
  await app.close();
 
+ const installPage=await browser.newPage({viewport:{width:390,height:844}});
+ await installPage.goto(base+'/mobile-app.html');await installPage.locator('#appInstallGate').waitFor({state:'visible'});
+ assert.equal(await installPage.locator('#grid').isVisible(),false,'browser app entry offers installation instead of the shop');
+ await installPage.close();
  // Activate a test-only app campaign in this isolated browser-test database.
  const db=new DatabaseSync(resolve(dataDir,'orders.sqlite'));
  const campaign={id:'browser-app',code:'TESTAPP',title:'Test app festival',description:'Browser fixture only',occasion:'Diwali',surface:'app',type:'fixed',amount:10000,minimumPaise:100000,capPaise:10000,startsAt:new Date(Date.now()-60000).toISOString(),endsAt:new Date(Date.now()+3600000).toISOString(),terms:'Test fixture only',enabled:true};
  db.prepare('INSERT INTO settings VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value').run('campaigns',JSON.stringify([campaign]));db.close();
  const promo=await browser.newPage({viewport:{width:390,height:844}});
+ await promo.addInitScript(()=>Object.defineProperty(navigator,'standalone',{get:()=>true}));
  let offerUrl='';let offerRequested;const offerSent=new Promise(done=>offerRequested=done);
  await promo.route('https://wa.me/**',async route=>{offerUrl=route.request().url();offerRequested();await route.abort()});
  await promo.goto(base+'/mobile-app.html');

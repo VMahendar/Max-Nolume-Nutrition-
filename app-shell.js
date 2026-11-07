@@ -1,3 +1,6 @@
+const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+document.body.classList.toggle('standalone-app',!!standalone);
+const gate=document.getElementById('appInstallGate');if(gate)gate.hidden=!!standalone;
 const screens=['shop','offers','brands','certificate'];
 function showAppScreen(){
  const requested=location.hash.slice(1),active=screens.includes(requested)?requested:'shop';
@@ -7,4 +10,4 @@ function showAppScreen(){
  document.querySelectorAll('.app-bottom-nav a').forEach(link=>{const selected=link.hash==='#'+active;link.classList.toggle('selected',selected);if(selected)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');});
  scrollTo({top:0,behavior:'instant'});
 }
-addEventListener('hashchange',showAppScreen);showAppScreen();
+if(standalone){addEventListener('hashchange',showAppScreen);showAppScreen();}

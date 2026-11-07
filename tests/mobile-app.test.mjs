@@ -25,7 +25,7 @@ test('installation button waits for browser support and hides after installation
  const action={hidden:true,addEventListener:(name,fn)=>handlers.click=fn};
  vm.runInNewContext(readFileSync('public/install-app.js','utf8'),{
   navigator:{},window:{addEventListener:(name,fn)=>handlers[name]=fn},
-  document:{querySelectorAll:()=>[action]},matchMedia:()=>({matches:false})
+  document:{querySelectorAll:selector=>selector==='[data-install-app]'?[action]:[],getElementById:()=>null},matchMedia:()=>({matches:false})
  });
  assert.equal(action.hidden,true);
  handlers.beforeinstallprompt({preventDefault(){},prompt:async()=>calls++,userChoice:Promise.resolve({outcome:'accepted'})});
