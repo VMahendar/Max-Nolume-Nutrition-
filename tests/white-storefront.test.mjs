@@ -11,7 +11,7 @@ test('retail flagship keeps original logo, integrates masthead and leads with pr
  assert.match(css,/\.storehead\{/,'clean storefront masthead');
  assert.match(css,/\.brand-identity\{/,'original logo has a dedicated readable background');
  assert.match(css,/background-image:none!important/,'no duplicated background logo');
- assert.match(css,/mix-blend-mode:screen/,'original logo lettering integrates into matte header');
+ assert.match(css,/filter:url\("#mvnGoldKey"\)/,'original artwork backing is removed on the transparent logo frame');
  assert.ok(html.includes('src="max-volume-logo-wide.png"'),'original full logo retained');
  assert.ok(html.includes('THE PERFORMANCE<br><strong>EDIT.</strong>'),'multi-brand editorial hero');
  assert.ok(!html.includes('distribution-feature'),'repeated Unicorn promotion removed');

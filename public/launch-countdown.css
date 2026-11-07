@@ -1,5 +1,5 @@
 /* MVN — THE PERFORMANCE EDIT
-   Retail-first, international editorial storefront launch. No black/copper theme,
+   Retail-first launch with copper accents and black typography,
    no fake gym photos, no advertising slogans; real product imagery only.
    Visual preview only: the actual checkout launch gate stays separate. */
 html.mvn-prelaunch-pending body{overflow:hidden!important}
@@ -38,14 +38,14 @@ html.mvn-prelaunch-pending #mvn-opening-countdown{
   background:#fafaf9;min-width:0;
 }
 .mvn-clock-eyebrow{
-  display:block;font-size:10px;color:#5c5d5f;font-weight:760;letter-spacing:.22em;
+  display:block;font-size:10px;color:#945b3b;font-weight:760;letter-spacing:.22em;
   text-transform:uppercase;line-height:1.6;
 }
 .mvn-clock-headline{
   color:#111214;font-size:clamp(59px,6.8vw,110px);line-height:.87;letter-spacing:-.07em;
   font-weight:950;margin:0;text-transform:uppercase;text-wrap:balance;
 }
-.mvn-clock-headline>span{color:#9b9d9f}
+.mvn-clock-headline>span{color:#945b3b}
 .mvn-clock-description{
   max-width:425px;color:#545558;font-size:14px;line-height:1.78;margin:0;
 }
@@ -55,14 +55,14 @@ html.mvn-prelaunch-pending #mvn-opening-countdown{
 }
 .mvn-clock-time{
   width:100%;display:flex;gap:9px;align-items:center;justify-content:flex-start;
-  border-top:1px solid #dadbdc;padding:15px 0 8px;font-variant-numeric:tabular-nums;
+  border-top:1px solid #dadbdc;border-bottom:2px solid #945b3b;padding:15px 0 16px;font-variant-numeric:tabular-nums;
 }
 .mvn-clock-time>span{
   display:flex;flex-direction:column;min-width:46px;min-height:0;
   padding:0;gap:5px;background:transparent;border:0;border-radius:0;
 }
 .mvn-clock-time strong{
-  font-weight:760;font-size:clamp(26px,3.6vw,43px);line-height:1;letter-spacing:-.04em;
+  color:#171717;font-weight:760;font-size:clamp(26px,3.6vw,43px);line-height:1;letter-spacing:-.04em;
 }
 .mvn-clock-time small{font-size:9px;color:#707174;font-weight:750;letter-spacing:.1em}
 .mvn-clock-time i{align-self:flex-start;margin-top:4px;color:#b0b0b0;font-size:20px;font-style:normal;font-weight:400}

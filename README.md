@@ -10,11 +10,11 @@ Sports nutrition retail, wholesale and distribution — Chennai, Tamil Nadu.
 
 Render serves the advanced Node.js/SQLite storefront from `public/`, using `server.mjs`. The source branch is `main`. The separately retained root `index.html`, `premium.css`, `retail.css` and `app.js` are static/Codex compatibility files; updating them alone **does not** update Render.
 
-Historic Wix and ChatGPT-hosted versions are not the current production destination. Please do not advertise their old links. The custom domain has not yet been bought or connected.
+Historic Wix, GitHub Pages and ChatGPT-hosted versions are not the current production destination. The GitHub workflow validates source only; it no longer publishes a competing Pages storefront. Please do not advertise their old links. The custom domain has not yet been bought or connected.
 
 ## Identity
 
-Use the **owner's original** Max Volume Nutrition logo from `public/max-volume-logo-wide.png` and `public/max-volume-logo.png` without recreating the lettering, proportions, colours or monogram. The current storefront uses original navy/royal-blue merchandising design; it is not a GNC visual clone. The black/gold **Whey product packaging** is retired and must not be reintroduced. The logo must not be redrawn.
+Use the **owner's original** Max Volume Nutrition logo from `public/max-volume-logo-wide.png` and `public/max-volume-logo.png` without recreating the lettering, proportions, colours or monogram. The website uses black typography, restrained copper accents and neutral product surfaces. The installed app uses the same colour direction with its own compact navigation. Logo transparency does not prescribe the page background. The black/gold **Whey product packaging** is retired and must not be reintroduced. The logo must not be redrawn.
 
 Unicorn Pro Series is the current Tamil Nadu distributor collection; more brands are coming soon. Do not claim exclusive distribution without the supplier's written confirmation.
 
