@@ -22,3 +22,8 @@ window.addEventListener('beforeinstallprompt', event => {
   action.hidden = false;
 });
 window.addEventListener('appinstalled', () => { if (action) action.hidden = true; });
+
+// Existing installations also open the full product-first shopping experience.
+if (typeof location !== 'undefined' && installed() && ['/', '/index.html'].includes(location.pathname)) {
+  location.replace('/mobile-app.html');
+}

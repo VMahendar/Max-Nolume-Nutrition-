@@ -60,6 +60,6 @@ Consult [docs/PRODUCTION.md](docs/PRODUCTION.md), [docs/STAGING.md](docs/STAGING
 
 ## Mobile apps
 
-The browser-installable store is available at `/mobile-app.html` after deployment. It uses the original MVN logo and a network-only service worker: customer accounts, stock, prices and orders are never cached. Internet access is required. Installation does not enable online payments.
+The browser-installable store at `/mobile-app.html` opens directly to products, pack choices, prices and the same WhatsApp cart as the website. Both views refresh retail prices from the backend and verify them again before preparing a WhatsApp order; changed totals require review. It uses the original MVN logo and a network-only service worker: customer accounts, stock, prices and orders are never cached. Internet access is required. Installation does not enable online payments.
 
 Android and iPhone development preview projects and release requirements are in [mobile/README.md](mobile/README.md). These are not signed store releases.
