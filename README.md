@@ -83,3 +83,7 @@ The website app entry is **Install MVN app**, with the native prompt when availa
 ## WhatsApp payment and delivery coordination
 
 The website and installed app collect the customer name, phone, street address, city, state, PIN code and payment preference. They verify current retail prices and offer codes, then open a WhatsApp order request containing the full delivery/payment details and products total. Shipping charges and the final payable amount are confirmed by the team. UPI, bank transfer and COD are requests to discuss availability, not confirmed payment methods. Addresses and payment preferences are not stored in localStorage. No payment is captured and no courier booking is created by sending the message. The team shares approved payment instructions/links and delivery/tracking information directly.
+
+### Owner daily desk and store announcements
+
+Open `/admin.html` with your administrator account for incoming purchases, completed manual sales, stock, customers, dealer applications and retail campaigns. Type a customer announcement or upload a public ad photo, preview it and publish to the website/app on scheduled dates. Private supplier costs stay in the owner ledger. Official WhatsApp owner-to-draft intake is prepared but disconnected until Meta credentials, sender allowlisting and webhook subscription are configured and tested. See [the owner workspace guide](docs/OWNER_DESK.md).

@@ -30,6 +30,8 @@ jobs:
         run: node tests/visual-qa.mjs
       - name: Check collection filtering, browsing history and accessible cart
         run: node tests/shopping-qa.mjs
+      - name: Check owner purchase preview, ad photo upload and shared launch updates
+        run: node tests/owner-desk-qa.mjs
       - name: Preserve browser screenshots and QA report
         if: always()
         uses: actions/upload-artifact@v4
