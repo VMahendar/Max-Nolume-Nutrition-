@@ -68,3 +68,13 @@ Owner stated a **₹2,000–₹3,000** budget target. Before any purchase, confi
 - A serviceability quote is not a booking. The owner must create the shipment, assign AWB, schedule pickup, generate label and manifest, and confirm actual parcel handover. Future auto-booking requires credentials and an agreed pickup procedure, payment capture and reconciliation testing, including failures and RTO.
 - Actual pickup address must be a location where parcels are physically packed and handed to the driver. The non-trading virtual office is not eligible as an assumed package pickup point.
 - No guaranteed next-day delivery or 5-km local delivery: timing requires official courier eligibility and per-route verification.
+
+## Shiprocket signup and pickup handover (7 November 2026)
+- The owner requested a Shiprocket seller account and courier pickup integration. **The signup has NOT been performed.** Shiprocket's official seller registration requires a personal mobile verification code, followed by KYC and address verification.
+- In the **existing** admin dashboard, use `/admin.html#pickup` for setup steps and private read-only connection status. This section never creates third-party accounts, captures bank credentials or sends bookings.
+- Open `https://www.shiprocket.in/`, select Seller signup and confirm the OTP inside Shiprocket, then finish seller KYC/billing and wallet.
+- Set the real parcel pickup address under Shiprocket Settings → Pickup Address → Add New Pickup Address. Name it and verify it appears in Shiprocket's address list. It must be the real collection point, not the virtual office.
+- Create a *different* dedicated API user at Shiprocket Settings → API → Add New API User. Save the permitted credentials only in Render's private environment variables `SHIPROCKET_EMAIL` and `SHIPROCKET_PASSWORD`, along with the exact registered `SHIPROCKET_PICKUP` name. Do not email or paste secrets in chats.
+- Only after sandbox/provider test cases and pickup-provider approval, explicitly enable `SHIPROCKET_TESTED=true` and `SHIPROCKET_ENABLED=true` when already running verified production. Staging hard-disables courier calls regardless.
+- Existing order dashboard already supports Shiprocket order creation, selecting actual serviceable carrier ID, AWB, **Schedule pickup**, courier label/manifest and tracking. The recommended route is Shiprocket to Delhivery when Delhivery is actually available; do not invent a physical pickup schedule or guarantee 5-km/next-day delivery.
+- Wallet funding, carrier shipping fees and RTO handling are separately charged; do not assume that the basic free account includes free shipment transport.
