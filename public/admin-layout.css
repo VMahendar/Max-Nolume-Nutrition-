@@ -278,3 +278,10 @@
 .owner-admin .launch-check-row strong{display:block;line-height:1.35}
 .owner-admin .launch-check-row p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.45}
 .owner-admin #launchRefresh{padding:10px 16px;background:#172e57;color:#fff;border:0;border-radius:7px;cursor:pointer;font-weight:700}
+
+/* Live courier comparison; actual availability only comes from Shiprocket. */
+.owner-admin .courier-choices{display:grid;gap:10px;margin:14px 0}
+.owner-admin .courier-choice{display:flex;align-items:center;justify-content:space-between;gap:15px;border:1px solid #dce2e8;background:#fff;border-radius:8px;padding:12px 14px}
+.owner-admin .courier-choice span{font-size:13px;line-height:1.45}
+.owner-admin .courier-choice button{flex:none;background:#1f3455;color:#fff;border:0;border-radius:6px;padding:9px 13px;font-weight:700;cursor:pointer}
+@media(max-width:640px){.owner-admin .courier-choice{flex-direction:column;align-items:flex-start;gap:10px}}
