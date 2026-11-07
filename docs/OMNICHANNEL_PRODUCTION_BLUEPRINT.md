@@ -60,3 +60,11 @@ Owner stated a **₹2,000–₹3,000** budget target. Before any purchase, confi
 7. Confirm any separate paid-ad budget *after* payment, shipping and customer capture are working. Until then use daily organic content and direct opt-in enquiries.
 
 **No 'launch complete' claim may be made merely because code or a checklist exists.** The owner must see verified live payment, billing, courier and recovery outcomes.
+
+## Nearby Delhivery courier workflow (owner requested 7 November 2026)
+- The owner has described a nearby NXT/Delhivery courier outlet. **Do not assume its pickup service or exact distance until confirmed.**
+- Use the existing Shiprocket integration as the **single** shipping provider; Delhivery is among its courier partners. Avoid separately purchasing/integrating Delhivery One while Shiprocket already handles the route.
+- In Owner > Orders, after a paid order exists, verify actual pickup PIN, destination PIN and packed weight; check **live Shiprocket serviceability**. Delhivery is preferred in returned carrier choices, but only appears if available for that route, weight and account. The returned courier ID is selected for AWB, not pre-guessed or hard-coded.
+- A serviceability quote is not a booking. The owner must create the shipment, assign AWB, schedule pickup, generate label and manifest, and confirm actual parcel handover. Future auto-booking requires credentials and an agreed pickup procedure, payment capture and reconciliation testing, including failures and RTO.
+- Actual pickup address must be a location where parcels are physically packed and handed to the driver. The non-trading virtual office is not eligible as an assumed package pickup point.
+- No guaranteed next-day delivery or 5-km local delivery: timing requires official courier eligibility and per-route verification.
