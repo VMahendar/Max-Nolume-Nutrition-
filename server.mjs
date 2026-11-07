@@ -236,7 +236,20 @@ if(path==='/api/admin/shipping-setup'&&req.method==='GET'){
  const productionMode=process.env.STAGING_MODE!=='true'&&process.env.NODE_ENV==='production';
  const apiCredentialsPresent=!!process.env.SHIPROCKET_EMAIL&&!!process.env.SHIPROCKET_PASSWORD;
  const pickupNamePresent=!!process.env.SHIPROCKET_PICKUP;
- return json(res,200,{provider:'Shiprocket',productionMode,apiCredentialsPresent,pickupNamePresent,pickupApiVerified:process.env.SHIPROCKET_TESTED==='true'&&productionMode,bookingEnabled:!!shippingReady(),pickupScheduledByOwner:true,note:'Only configuration status is shown; this endpoint never makes a courier booking or exposes keys, addresses or credentials.'});
+ // Pickup draft is owner-only and lives in private Render environment settings, not public source or catalogue.
+ // Do not treat a saved address as a pickup location confirmed by Shiprocket.
+ const pickupDraft=process.env.MVN_PICKUP_DRAFT_PIN?{
+  locationName:process.env.MVN_PICKUP_DRAFT_NAME||'',
+  address:process.env.MVN_PICKUP_DRAFT_ADDRESS||'',
+  landmark:process.env.MVN_PICKUP_DRAFT_LANDMARK||'',
+  city:process.env.MVN_PICKUP_DRAFT_CITY||'',
+  state:process.env.MVN_PICKUP_DRAFT_STATE||'',
+  pincode:process.env.MVN_PICKUP_DRAFT_PIN||'',
+  country:'India',
+  contactPhone:process.env.MVN_PICKUP_DRAFT_PHONE||'',
+  verifiedInShiprocket:false
+ }:null;
+ return json(res,200,{provider:'Shiprocket',productionMode,apiCredentialsPresent,pickupNamePresent,pickupApiVerified:process.env.SHIPROCKET_TESTED==='true'&&productionMode,bookingEnabled:!!shippingReady(),pickupScheduledByOwner:true,pickupDraft,note:'Private pickup draft is NOT a registered Shiprocket address; this endpoint never makes a courier booking or exposes API secrets.'});
 }
 if(path==='/api/admin/launch-readiness'&&req.method==='GET'){
  const products=C.catalogue(user,true),store=C.setting('store'),tax=C.setting('tax');
