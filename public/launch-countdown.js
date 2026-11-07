@@ -66,6 +66,7 @@ function installOpeningCountdown() {
   let locked = null;
   let observer = null;
   let timer = null;
+  let ownerPreviewGranted = false;
 
   function setItemLocked(element) {
     if (element === banner || element.tagName === 'SCRIPT' || element.tagName === 'STYLE') return;
@@ -112,6 +113,7 @@ function installOpeningCountdown() {
   }
 
   function tick() {
+    if (ownerPreviewGranted) return;
     const remaining = Math.max(0, OPENING_UTC - Date.now());
     if (remaining <= 0) {
       finish();
@@ -127,6 +129,22 @@ function installOpeningCountdown() {
 
   tick();
   if (pending()) timer = window.setInterval(tick, 1000);
+
+  // The public countdown remains intact. A real owner session can review the
+  // actual homepage without changing launch time or enabling checkout.
+  // Query string alone never grants access; the server must approve admin access.
+  if (new URLSearchParams(location.search).get('owner_preview') === '1') {
+    fetch('/api/admin/overview', { credentials: 'same-origin', cache: 'no-store' })
+      .then(response => {
+        if (!response.ok) return;
+        ownerPreviewGranted = true;
+        if (timer !== null) window.clearInterval(timer);
+        lock(false);
+        banner.remove();
+      })
+      .catch(() => {}); // No private preview if the owner check fails.
+  }
+
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) tick();
   });
