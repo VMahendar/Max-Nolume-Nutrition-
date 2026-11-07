@@ -5,6 +5,7 @@ import {validateCampaign,activeCampaigns,campaignQuote} from './promotions.mjs';
 import {validateUpdate,activeUpdates,updateConfig,initializeUpdates,whatsappUpdateReadiness,validUpdateSignature,receiveWhatsappUpdates} from './store-updates.mjs';
 import {initializeOwnerDesk,recordOwnerEntry} from './owner-desk.mjs';
 import {initializeOwnerWork,saveOwnerWork,workContext} from './owner-work.mjs';
+import {initializeLeadInbox,saveLead,listLeads,updateLead} from './lead-inbox.mjs';
 import {initializeMarketing,marketingReadiness,enqueueMarketing,startMarketingScheduler,verifyUnsubscribe} from './marketing-automation.mjs';
 import {stagingGate} from './staging.mjs';
 const allowStaging=stagingGate();
@@ -26,6 +27,7 @@ initializeMarketing(C);
 initializeUpdates(C);
 initializeOwnerDesk(C);
 initializeOwnerWork(C);
+initializeLeadInbox(C);
 const origin=process.env.PUBLIC_ORIGIN||'http://localhost:3000',production=process.env.NODE_ENV==='production';
 const previousStoreOrigin='https://max-volume-nutrition-preview.onrender.com';
 function canonicalStoreOrigin(){
@@ -219,7 +221,20 @@ try{const remote=await razor('orders',{amount:p.totalPaise,currency:'INR',receip
 if(path==='/api/verify'&&req.method==='POST'){const b=JSON.parse(await body(req)),row=db.prepare('SELECT * FROM orders WHERE id=? AND token=?').get(String(b.id),String(b.token));if(!row)fail(404,'Order not found.');if(b.razorpay_order_id!==row.provider_id||!signatureMatches(row.provider_id+'|'+b.razorpay_payment_id,b.razorpay_signature,process.env.RAZORPAY_KEY_SECRET))fail(400,'Payment verification failed. Contact support.');if(!/^pay_[A-Za-z0-9]+$/.test(b.razorpay_payment_id))fail(400,'Invalid payment reference.');return json(res,200,fulfil(row,await razor('payments/'+b.razorpay_payment_id)));}
 if(path==='/api/webhook'&&req.method==='POST'){const raw=await body(req);if(!signatureMatches(raw,req.headers['x-razorpay-signature'],process.env.RAZORPAY_WEBHOOK_SECRET))fail(400,'Invalid signature.');const b=JSON.parse(raw),p=b.payload?.payment?.entity;if(['payment.captured','order.paid'].includes(b.event)&&p){const row=db.prepare('SELECT * FROM orders WHERE provider_id=?').get(p.order_id);if(!row)fail(503,'Payment order is awaiting reconciliation.');fulfil(row,p);}return json(res,200,{received:true});}
 if(path==='/api/order-status'&&req.method==='POST'){const b=JSON.parse(await body(req)),row=db.prepare('SELECT * FROM orders WHERE id=?').get(String(b.id));if(!accessible(row,user,b.token))fail(404,'Order not found.');return json(res,200,C.publicOrder(row));}
+if(path==='/api/enquiries'&&req.method==='POST'){
+ if(process.env.STAGING_MODE==='true')fail(503,'Enquiry saving is not active on this test storefront. Please send your request through WhatsApp.');
+ if(!rate('lead-ip:'+ip,8))fail(429,'Too many enquiries. Please contact us on WhatsApp.');
+ const b=JSON.parse(await body(req,10000));
+ if(!rate('lead-phone:'+hash(String(b.phone||'')),5))fail(429,'Please contact us on WhatsApp.');
+ const lead=saveLead(C,b);
+ return json(res,201,lead);
+}
 if(path.startsWith('/api/admin/')){admin(user);
+if(path==='/api/admin/leads'&&req.method==='GET')return json(res,200,listLeads(C));
+if(path==='/api/admin/leads'&&req.method==='POST'){
+ if(!rate('lead-review:'+user.id,30))fail(429,'Please wait before saving another change.');
+ return json(res,200,updateLead(C,user,JSON.parse(await body(req))));
+}
 if(path==='/api/admin/my-work'&&req.method==='GET')return json(res,200,{...workContext,requests:db.prepare('SELECT id,request,created FROM owner_work ORDER BY rowid DESC LIMIT 100').all()});
 if(path==='/api/admin/my-work'&&req.method==='POST'){if(!rate('owner-work:'+user.id,20))fail(429,'Please wait before adding another request.');return json(res,200,{request:saveOwnerWork(C,user,JSON.parse(await body(req))),...workContext});}
 if(path==='/api/admin/owner-desk'&&req.method==='GET')return json(res,200,{products:C.catalogue(user,true),entries:db.prepare('SELECT payload FROM owner_entries ORDER BY created DESC LIMIT 100').all().map(r=>{const {request,...entry}=JSON.parse(r.payload);return entry;})});
