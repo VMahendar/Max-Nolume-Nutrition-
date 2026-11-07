@@ -1,80 +1,135 @@
-/* MVN grand opening visual preview. This is a client-side presentation gate, not API access control. */
+/* MAX VOLUME NUTRITION | launch identity
+   Graphite / soft-black / brushed neutral grey, with the original metallic logo as
+   the sole prominent warm metal accent. No blue UI, no pasted logo panel.
+   Presentation only: does NOT change launch date, checkout or authorization. */
 html.mvn-prelaunch-pending body{overflow:hidden!important}
 html.mvn-prelaunch-pending body > :not(#mvn-opening-countdown):not(script):not(style){
-  filter:blur(9px) brightness(.67);
-  pointer-events:none!important;
-  user-select:none!important;
+ filter:blur(11px) brightness(.38)!important;pointer-events:none!important;user-select:none!important;
 }
-.mvn-opening-countdown{color:#fff;font-family:Arial,Helvetica,sans-serif;box-sizing:border-box;
-  z-index:2147483640;text-align:center}
+.mvn-opening-countdown{
+ color:#f5f3ef;font-family:Inter,"Segoe UI",system-ui,Arial,sans-serif;
+ box-sizing:border-box;text-align:center;z-index:2147483640;
+}
 .mvn-opening-countdown *{box-sizing:border-box}
 .mvn-opening-countdown [hidden]{display:none!important}
 html.mvn-prelaunch-pending #mvn-opening-countdown{
-  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
-  overflow-x:hidden;overflow-y:auto;padding:26px 18px;
-  background:rgba(2,11,29,.53);backdrop-filter:blur(2px);
-  -webkit-backdrop-filter:blur(2px)
+ position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+ overflow-x:hidden;overflow-y:auto;padding:clamp(18px,4vh,38px) 18px;
+ background:radial-gradient(ellipse at 52% 14%,rgba(89,90,92,.17),transparent 50%),rgba(7,8,10,.91);
+ backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
 }
-.mvn-opening-countdown .mvn-clock-inner{width:min(100%,860px);padding:35px 42px 30px;display:flex;
-  align-items:center;flex-direction:column;gap:22px;position:relative;overflow:hidden;
-  border:1px solid rgba(142,186,255,.35);border-radius:18px;
-  background:linear-gradient(128deg,rgba(8,24,51,.97),rgba(12,40,88,.97) 70%,rgba(9,26,65,.97));
-  box-shadow:0 20px 88px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.14)}
-.mvn-opening-countdown .mvn-clock-inner::before{content:"";position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(circle at 50% -24%,rgba(74,132,244,.25),transparent 55%)}
-.mvn-clock-label{position:relative;display:flex;align-items:center;flex-direction:column;gap:11px;max-width:100%}
-.mvn-clock-logo{width:min(100%,360px);height:85px;object-fit:contain;display:block}
-.mvn-clock-eyebrow{font-size:10px;color:#b9d3ff;letter-spacing:.18em;font-weight:800}
-.mvn-clock-headline{font-size:clamp(23px,3.4vw,39px);font-weight:900;letter-spacing:-.025em;
-  line-height:1.13;margin:3px 0 0}
-.mvn-clock-date{font-size:12px;color:#e0ebff;font-weight:800;letter-spacing:.12em}
-.mvn-clock-description{font-size:14px;color:#bbcce9;margin:0;line-height:1.5}
-.mvn-clock-time{position:relative;display:flex;align-items:center;justify-content:center;gap:11px;
-  font-variant-numeric:tabular-nums;max-width:100%}
-.mvn-clock-time>span{min-width:113px;min-height:112px;display:flex;align-items:center;justify-content:center;
-  flex-direction:column;gap:9px;background:rgba(255,255,255,.085);
-  border:1px solid rgba(173,200,249,.23);border-radius:12px}
-.mvn-clock-time strong{font-size:clamp(32px,5.5vw,57px);font-weight:900;letter-spacing:.02em;line-height:1}
-.mvn-clock-time small{font-size:9px;color:#c6d8fa;font-weight:800;letter-spacing:.15em}
-.mvn-clock-time i{font-size:26px;color:#a7c4f5;font-style:normal;font-weight:800}
-.mvn-clock-footer{position:relative;display:flex;align-items:center;flex-direction:column;gap:12px}
-.mvn-clock-footer>span{font-size:11px;color:#d2e0fa;font-weight:800;letter-spacing:.11em}
-.mvn-clock-footer a{display:inline-flex;align-items:center;justify-content:center;text-decoration:none!important;
-  background:#fff;color:#102f68!important;border-radius:6px;padding:10px 19px;font-size:11px;font-weight:900;letter-spacing:.08em}
-
-/* Once the exact launch time arrives, restore the store and reduce the countdown to a compact banner. */
-.mvn-opening-countdown.mvn-clock-open{position:relative;inset:auto;z-index:5;display:block;overflow:visible;
-  border-bottom:2px solid #93b7fa;background:linear-gradient(100deg,#081a38,#13479a);
-  box-shadow:0 7px 25px rgba(7,30,78,.18);backdrop-filter:none;-webkit-backdrop-filter:none}
-.mvn-clock-open .mvn-clock-inner{max-width:1420px;width:100%;padding:13px 24px;display:grid;
-  grid-template-columns:1fr auto;gap:20px;background:transparent;box-shadow:none;border:0;border-radius:0}
+.mvn-opening-countdown .mvn-clock-inner{
+ width:min(100%,780px);position:relative;isolation:isolate;
+ padding:clamp(28px,4vw,45px) clamp(20px,5vw,50px) 34px;
+ display:flex;align-items:center;flex-direction:column;gap:25px;
+ border:1px solid rgba(176,175,172,.25);border-radius:14px;
+ background:linear-gradient(153deg,#222426 0%,#181a1c 48%,#111214 100%);
+ box-shadow:0 25px 85px rgba(0,0,0,.60),inset 0 1px 0 rgba(255,255,255,.065);
+}
+.mvn-opening-countdown .mvn-clock-inner::before{
+ content:"";position:absolute;inset:7px;border:1px solid rgba(218,217,212,.06);
+ border-radius:9px;pointer-events:none;
+}
+.mvn-clock-label{position:relative;display:flex;align-items:center;flex-direction:column;gap:15px;width:100%}
+.mvn-clock-logo{
+ display:block;width:min(100%,470px)!important;max-width:470px!important;
+ height:clamp(105px,17vw,155px)!important;max-height:155px!important;
+ object-fit:contain;object-position:center center;opacity:1;
+ mix-blend-mode:screen;filter:contrast(1.34) brightness(1.12);
+ /* Original artwork preserved; dark pixels merge into graphite instead of showing a square. */
+}
+.mvn-clock-eyebrow{
+ font-size:10px;color:#c4c4c3;font-weight:650;letter-spacing:.19em;
+ line-height:1.7;
+}
+.mvn-clock-eyebrow::before{
+ content:"";display:block;margin:0 auto 17px;width:44px;height:1px;background:#a6a4a0;
+}
+.mvn-clock-headline{
+ font-size:clamp(27px,3.7vw,43px);font-weight:780;letter-spacing:-.042em;
+ line-height:1.11;margin:2px 0 0;max-width:660px;color:#f8f6f2;
+ text-wrap:balance;
+}
+.mvn-clock-date{font-size:11px;color:#d1cfcb;font-weight:720;letter-spacing:.11em}
+.mvn-clock-description{
+ font-size:14px;color:#aeadab;margin:0;line-height:1.65;
+ max-width:460px;
+}
+.mvn-clock-time{
+ position:relative;width:100%;max-width:590px;display:flex;
+ align-items:center;justify-content:center;gap:10px;font-variant-numeric:tabular-nums;
+}
+.mvn-clock-time>span{
+ min-width:0;flex:1;min-height:104px;display:flex;
+ align-items:center;justify-content:center;flex-direction:column;gap:12px;
+ background:rgba(6,8,10,.40);border:1px solid #44474a;border-radius:8px;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+.mvn-clock-time strong{
+ color:#faf7f2;font-size:clamp(30px,5.7vw,53px);font-weight:700;
+ letter-spacing:-.03em;line-height:1;
+}
+.mvn-clock-time small{font-size:9px;color:#b4b2b0;font-weight:700;letter-spacing:.15em}
+.mvn-clock-time i{font-size:24px;color:#868686;font-style:normal;font-weight:500}
+.mvn-clock-footer{
+ position:relative;display:flex;align-items:center;flex-direction:column;gap:11px;
+}
+.mvn-clock-footer>span{font-size:10px;color:#c9c7c2;font-weight:720;letter-spacing:.105em}
+.mvn-clock-footer a{
+ display:inline-flex;align-items:center;justify-content:center;text-decoration:none!important;
+ background:#e8e4de;color:#191a1c!important;border:1px solid #eee9e2;border-radius:5px;
+ padding:11px 18px;font-size:10px;font-weight:820;letter-spacing:.09em;
+}
+.mvn-clock-footer a:hover{background:#fff!important}
+.mvn-opening-countdown.mvn-clock-open{
+ position:relative;inset:auto;z-index:5;display:block;overflow:visible;
+ border-bottom:1px solid #494a4c;background:linear-gradient(115deg,#1c1e20,#111214);
+ box-shadow:0 8px 22px rgba(0,0,0,.12);backdrop-filter:none;-webkit-backdrop-filter:none;
+}
+.mvn-clock-open .mvn-clock-inner{
+ max-width:1420px;width:100%;padding:13px 24px;display:grid;
+ grid-template-columns:1fr auto;gap:20px;background:transparent;
+ box-shadow:none;border:0;border-radius:0;
+}
 .mvn-clock-open .mvn-clock-inner::before{display:none}
 .mvn-clock-open .mvn-clock-label{align-items:flex-start;text-align:left;gap:4px}
-.mvn-clock-open .mvn-clock-logo{display:none}
+.mvn-clock-open .mvn-clock-logo{display:none!important}
 .mvn-clock-open .mvn-clock-eyebrow{font-size:8px}
+.mvn-clock-open .mvn-clock-eyebrow::before{display:none}
 .mvn-clock-open .mvn-clock-headline{font-size:18px;letter-spacing:.02em;margin:0}
 .mvn-clock-open .mvn-clock-date,.mvn-clock-open .mvn-clock-description{display:none}
 .mvn-clock-open .mvn-clock-footer{flex-direction:row;gap:12px}
 .mvn-clock-open .mvn-clock-footer>span{font-size:9px}
 .mvn-clock-open .mvn-clock-footer a{font-size:10px;padding:10px 14px}
-
 @media(max-width:650px){
-  html.mvn-prelaunch-pending #mvn-opening-countdown{padding:12px;align-items:center}
-  .mvn-opening-countdown .mvn-clock-inner{padding:25px 13px 24px;gap:20px;border-radius:13px}
-  .mvn-clock-logo{width:min(100%,275px);height:69px}
-  .mvn-clock-eyebrow{font-size:8px;letter-spacing:.1em}
-  .mvn-clock-headline{font-size:24px}
-  .mvn-clock-date{font-size:10px;letter-spacing:.06em}
-  .mvn-clock-description{font-size:12px;max-width:290px}
-  .mvn-clock-time{gap:4px;width:100%}
-  .mvn-clock-time>span{min-width:0;flex:1;max-width:75px;min-height:84px;gap:8px;padding:6px 2px}
-  .mvn-clock-time strong{font-size:clamp(25px,7.7vw,36px)}
-  .mvn-clock-time small{font-size:7px;letter-spacing:.04em}
-  .mvn-clock-time i{font-size:15px}
-  .mvn-clock-footer>span{font-size:9px;letter-spacing:.05em}
-  .mvn-clock-open .mvn-clock-inner{display:flex;flex-direction:column;align-items:stretch;gap:9px;padding:14px 15px}
-  .mvn-clock-open .mvn-clock-label{align-items:center;text-align:center}
-  .mvn-clock-open .mvn-clock-headline{font-size:16px}
-  .mvn-clock-open .mvn-clock-footer{justify-content:center;flex-wrap:wrap}
+ html.mvn-prelaunch-pending #mvn-opening-countdown{
+  align-items:flex-start;justify-content:center;padding:18px 11px;
+ }
+ .mvn-opening-countdown .mvn-clock-inner{
+  padding:25px 17px 25px;gap:22px;border-radius:10px;max-width:510px;margin:auto;
+ }
+ .mvn-clock-label{gap:14px}
+ .mvn-clock-logo{width:min(100%,350px)!important;height:clamp(105px,29vw,141px)!important;max-height:141px!important}
+ .mvn-clock-eyebrow{font-size:9px;letter-spacing:.115em}
+ .mvn-clock-eyebrow::before{margin-bottom:13px}
+ .mvn-clock-headline{font-size:clamp(25px,6.8vw,33px);line-height:1.15}
+ .mvn-clock-date{font-size:10px;letter-spacing:.06em}
+ .mvn-clock-description{font-size:12px;max-width:300px}
+ .mvn-clock-time{gap:5px}
+ .mvn-clock-time>span{min-height:78px;gap:9px;padding:9px 3px;border-radius:6px}
+ .mvn-clock-time strong{font-size:clamp(25px,7vw,35px)}
+ .mvn-clock-time small{font-size:8px;letter-spacing:.03em}
+ .mvn-clock-time i{font-size:15px}
+ .mvn-clock-footer>span{font-size:9px;letter-spacing:.04em}
+ .mvn-clock-open .mvn-clock-inner{display:flex;flex-direction:column;align-items:stretch;gap:9px;padding:14px 15px}
+ .mvn-clock-open .mvn-clock-label{align-items:center;text-align:center}
+ .mvn-clock-open .mvn-clock-headline{font-size:16px}
+ .mvn-clock-open .mvn-clock-footer{justify-content:center;flex-wrap:wrap}
+}
+@media(max-height:690px) and (max-width:650px){
+ html.mvn-prelaunch-pending #mvn-opening-countdown{align-items:flex-start;justify-content:flex-start}
+ .mvn-opening-countdown .mvn-clock-inner{margin:0 auto}
+ .mvn-clock-logo{height:95px!important}
+ .mvn-opening-countdown .mvn-clock-inner{padding-block:17px;gap:14px}
 }
 @media(prefers-reduced-motion:reduce){.mvn-opening-countdown *{transition:none!important;animation:none!important}}
