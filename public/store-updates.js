@@ -1,3 +1,4 @@
+import './scan-codes.js';
 import './launch-countdown.js';
 export const kindLabels={stock:'Fresh stock',launch:'Brand launch',deal:'Limited deal',news:'From MVN'};
 export function updateCard(post){
