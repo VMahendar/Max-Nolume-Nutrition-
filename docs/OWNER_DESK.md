@@ -1,6 +1,6 @@
 # MVN owner workspace
 
-Open `/admin.html`, sign in through Account with an existing administrator account, then use **Your daily desk**. Customer registrations never grant administrator access.
+Open `/admin.html`, sign in through Account with an existing administrator account, then use the sidebar to open **Overview**, **Sales**, **Purchases**, **Stock**, **Products** or **Store announcements**. One work area is visible at a time; the mobile menu opens the same navigation. The overview counts come from actual store records. Customer registrations never grant administrator access.
 
 ## Daily work
 
@@ -10,7 +10,7 @@ Open `/admin.html`, sign in through Account with an existing administrator accou
 - **Offers:** configure actual retail discount codes and their terms separately. Publishing an ad alone never changes prices or stock.
 - **Customers:** use existing opted-in customer follow-up controls.
 - **Dealers / distributors:** review existing business applications and their approval status. Purchase entries also retain the supplier name and bill reference.
-- **Products & prices:** existing complete product/pack editor. New product listings and pricing require product setup, separate from launch announcements.
+- **Products:** choose Add product, enter the name, brand, category, short description and full description, then add each pack size with customer price and confirmed MRP in rupees. Upload a product photo if available. Optional gym and wholesale prices are inside the pack’s private trade-price section. Product/pack references and backend data are generated or preserved automatically. After saving, use Stock to set the initial physical count. Priced products added here appear on both customer storefronts; announcements are separate from product listings.
 
 The private ledger shows the latest 100 manual entries; older entries remain in SQLite. A record contains a historical product name, pack and unit amount. It is not a complete accounting, profit calculation, tax or supplier-payables system. Starting physical stock must be counted and confirmed before receiving goods or recording sales. Conflicting stock edits fail; reloading gets the current quantity. Each save has a retry key; repeating the same request cannot apply stock twice. Duplicate product/bill/customer-or-supplier combinations are also rejected. Use Inventory with an explanatory reason to correct stock errors; the original manual record remains as an audit trail.
 
