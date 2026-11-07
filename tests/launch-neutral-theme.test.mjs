@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 
 test('countdown logic retains approved launch and automatic reveal',()=>{
  const js=readFileSync('public/launch-countdown.js','utf8');
- assert.match(js,/2026-11-08T17:30:00\.000Z/,'original 11pm IST launch date retained');
+ assert.match(js,/2026-11-08T05:30:00\.000Z/,'revised 11am IST launch date retained');
  assert.match(js,/window\.setInterval\(tick, 1000\)/,'timer updates every second');
  assert.match(js,/function finish\(\)/);
  assert.match(js,/mvn-clock-open/);

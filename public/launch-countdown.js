@@ -1,7 +1,7 @@
 // Existing MVN storefront: visually blurred pre-launch preview and automatic reveal.
 // The countdown is presentation-only. Server-side account, ordering, and payment gates stay unchanged.
-const OPENING_UTC = Date.parse('2026-11-08T17:30:00.000Z'); // 11:00 PM IST, 8 Nov 2026
-const LAUNCH_DATE_LABEL = 'SUNDAY · 8 NOVEMBER 2026 · 11:00 PM IST';
+const OPENING_UTC = Date.parse('2026-11-08T05:30:00.000Z'); // 11:00 AM IST, 8 Nov 2026
+const LAUNCH_DATE_LABEL = 'SUNDAY · 8 NOVEMBER 2026 · 11:00 AM IST';
 const supportedPreview = () => !document.body.hasAttribute('data-mvn-owner-preview') && (
   document.body.classList.contains('retail-home') ||
   document.body.classList.contains('app-store') ||
@@ -33,7 +33,7 @@ function installOpeningCountdown() {
         <span><strong data-clock="seconds">00</strong><small>SECONDS</small></span>
       </div>
       <div class="mvn-clock-footer">
-        <span id="mvn-clock-note">THE FULL STORE UNLOCKS AT 11:00 PM IST</span>
+        <span id="mvn-clock-note">THE FULL STORE UNLOCKS AT 11:00 AM IST</span>
         <a id="mvn-clock-link" href="#shop" hidden>EXPLORE THE COLLECTION →</a>
       </div>
     </div>`;

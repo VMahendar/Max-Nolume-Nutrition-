@@ -11,5 +11,5 @@ test('owner homepage preview requires the protected owner endpoint',()=>{
  assert.match(code,/if \(ownerPreviewGranted\) return;/,'timer cannot relock a granted owner preview');
  assert.match(code,/banner\.remove\(\)/,'owner sees actual underlying homepage');
  assert.doesNotMatch(code,/localStorage|sessionStorage/,'query or device storage cannot replace authorization');
- assert.match(code,/2026-11-08T17:30:00\.000Z/,'public timer deadline unchanged');
+ assert.match(code,/2026-11-08T05:30:00\.000Z/,'public timer deadline unchanged');
 });

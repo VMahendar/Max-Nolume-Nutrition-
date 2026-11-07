@@ -90,7 +90,7 @@ if(u.pathname==='/owner-preview'&&['GET','HEAD'].includes(req.method)){
   const allowed=new Set(['index.html','mobile-app.html','account.html','wholesale-account.html','dealer.html','support.html','admin.html']);
   if(!allowed.has(page))fail(404,'Preview page not found.');
   let html=readFileSync(resolve(root,page),'utf8');
-  html=html.replace(/<script>if\(Date\.now\(\)<Date\.parse\('2026-11-08T17:30:00\.000Z'\)\)document\.documentElement\.classList\.add\('mvn-prelaunch-pending'\)<\/script>/g,'')
+  html=html.replace(/<script>if\(Date\.now\(\)<Date\.parse\('2026-11-08T05:30:00\.000Z'\)\)document\.documentElement\.classList\.add\('mvn-prelaunch-pending'\)<\/script>/g,'')
     .replace(/<script src="\/launch-bootstrap\.js"><\/script>/g,'')
     .replace(/<script src="\/launch-countdown\.js" defer><\/script>/g,'')
     .replace(/<link rel="stylesheet" href="\/launch-countdown\.css">/g,'');
