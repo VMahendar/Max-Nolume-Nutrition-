@@ -20,12 +20,21 @@
 <link rel="apple-touch-icon" href="/icons/app-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <script src="/install-app.js" defer></script>
-<link rel="stylesheet" href="store-updates.css"><link rel="stylesheet" href="copper-home.css"><link rel="stylesheet" href="editorial-store.css"><script type="module" src="store-updates.js"></script></head>
+<link rel="stylesheet" href="store-updates.css"><link rel="stylesheet" href="copper-home.css"><link rel="stylesheet" href="editorial-store.css"><link rel="stylesheet" href="brand-system.css"><script type="module" src="store-updates.js"></script></head>
 <body class="retail-home">
 <!-- Keep original MVN artwork; remove only its dark rectangle at display time. -->
 <svg class="logo-filter-defs" xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true" focusable="false">
  <defs><filter id="mvnGoldKey" color-interpolation-filters="sRGB" x="-2%" y="-2%" width="104%" height="104%">
   <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  3 0 -3 0 -0.16"/>
+ </filter> <filter id="mvnCopperInk" color-interpolation-filters="sRGB" x="-10%" y="-18%" width="120%" height="136%">
+  <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  3 0 -3 0 -0.16" result="letterMask"/>
+  <feComponentTransfer in="letterMask" result="solidMask"><feFuncA type="discrete" tableValues="0 1"/></feComponentTransfer>
+  <feMorphology in="solidMask" operator="dilate" radius="1.25" result="outlineShape"/>
+  <feFlood flood-color="#171819" result="blackInk"/>
+  <feComposite in="blackInk" in2="outlineShape" operator="in" result="blackOutline"/>
+  <feFlood flood-color="#bb784f" result="copperInk"/>
+  <feComposite in="copperInk" in2="solidMask" operator="in" result="copperLetters"/>
+  <feMerge><feMergeNode in="blackOutline"/><feMergeNode in="copperLetters"/></feMerge>
  </filter></defs>
 </svg>
 <div class="announce">
