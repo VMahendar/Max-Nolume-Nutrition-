@@ -29,7 +29,7 @@ export function enqueueMarketing(C,now=Date.now()){
    const paid=db.prepare("SELECT MAX(created) AS last FROM orders WHERE user_id=? AND status='paid'").get(p.user_id)?.last;
    const anchor=Math.max(...[p.consented_at,p.last_reorder_contact_at,paid].filter(Boolean).map(Date.parse));
    const period=Math.floor((now-anchor)/(p.cadence_days*DAY));
-   const last=db.prepare("SELECT MAX(accepted) AS last FROM marketing_outbox WHERE user_id=? AND kind='reorder' AND status='accepted'").get(p.user_id)?.last;
+   const last=db.prepare("SELECT MAX(COALESCE(accepted,attempted)) AS last FROM marketing_outbox WHERE user_id=? AND kind='reorder' AND status IN ('accepted','sending','unknown')").get(p.user_id)?.last;
    if(period>=1&&(!last||now-Date.parse(last)>=p.cadence_days*DAY))jobs.push({id:'reorder:'+anchor+':'+period,kind:'reorder',title:'Your supplement routine',text:'Your '+p.cadence_days+'-day reminder from Max Volume Nutrition. Check your current supplies and browse our latest retail collection.',endsAt:new Date(now+DAY).toISOString()});
   }
   for(const event of jobs){
@@ -67,6 +67,12 @@ export async function deliverMarketing(C,{env=process.env,now=Date.now(),fetchIm
   if(job.kind==='announcement'){
    const current=(C.setting('marketingAutomation')?.announcements||[]).find(a=>a.enabled&&a.id+':'+a.startsAt===job.event_id&&Date.parse(a.startsAt)<=now&&now<Date.parse(a.endsAt));
    active=!!current;if(current)Object.assign(event,{title:current.title,text:current.text,endsAt:current.endsAt});
+  }
+  if(job.kind==='reorder'&&p?.cadence_days>0){
+   const paid=db.prepare("SELECT MAX(created) AS last FROM orders WHERE user_id=? AND status='paid'").get(job.user_id)?.last;
+   const previous=db.prepare("SELECT MAX(COALESCE(accepted,attempted)) AS last FROM marketing_outbox WHERE user_id=? AND kind='reorder' AND status IN ('accepted','sending','unknown')").get(job.user_id)?.last;
+   const anchor=Math.max(...[p.consented_at,p.last_reorder_contact_at,paid,previous].filter(Boolean).map(Date.parse));
+   active=now>=anchor+p.cadence_days*DAY;
   }
   const consent=p?.consented_at===job.consent&&p.whatsapp_opt_in&&/^\d{10,15}$/.test(p.phone)&&(job.kind==='reorder'?p.cadence_days>0:p.festival_opt_in);
   if(!consent||!active||Date.parse(event.endsAt)<=now){db.prepare("UPDATE marketing_outbox SET status='cancelled',error='Consent or event no longer valid' WHERE id=?").run(job.id);continue;}
