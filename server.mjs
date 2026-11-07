@@ -2,6 +2,8 @@ import {startLocalBackupScheduler} from './deploy/local-backups.mjs';
 import {startDriveBackupScheduler} from './deploy/drive-backup.mjs';
 import http from 'node:http';
 import {validateCampaign,activeCampaigns,campaignQuote} from './promotions.mjs';
+import {validateUpdate,activeUpdates,updateConfig,initializeUpdates,whatsappUpdateReadiness,validUpdateSignature,receiveWhatsappUpdates} from './store-updates.mjs';
+import {initializeOwnerDesk,recordOwnerEntry} from './owner-desk.mjs';
 import {initializeMarketing,marketingReadiness,enqueueMarketing,startMarketingScheduler,verifyUnsubscribe} from './marketing-automation.mjs';
 import {stagingGate} from './staging.mjs';
 const allowStaging=stagingGate();
@@ -20,6 +22,8 @@ if(C.setting('campaigns')===null&&existsSync(campaignSeed)){
  C.tx(()=>{C.set('campaigns',campaigns);C.audit('system','campaigns.initialize','campaigns',{count:campaigns.length});});
 }
 initializeMarketing(C);
+initializeUpdates(C);
+initializeOwnerDesk(C);
 const origin=process.env.PUBLIC_ORIGIN||'http://localhost:3000',production=process.env.NODE_ENV==='production';
 const previousStoreOrigin='https://max-volume-nutrition-preview.onrender.com';
 function canonicalStoreOrigin(){
@@ -37,7 +41,7 @@ const enabled=()=>{const s=C.setting('store');const key=process.env.RAZORPAY_KEY
 const ship=shiprocketClient();
 const json=(res,status,data)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(data));};
 const limits=new Map();function rate(key,max){const now=Date.now();if(limits.size>10000)for(const [k,v] of limits)if(v.until<now)limits.delete(k);let v=limits.get(key);if(!v||v.until<now){v={count:0,until:now+60000};limits.set(key,v);}return ++v.count<=max;}
-async function body(req){const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>65536)fail(413,'Request too large.');chunks.push(chunk);}return Buffer.concat(chunks).toString('utf8');}
+async function body(req,max=65536){const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>max)fail(413,'Request too large.');chunks.push(chunk);}return Buffer.concat(chunks).toString('utf8');}
 const cookie=(res,token)=>res.setHeader('Set-Cookie',`mvn_session=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${token?604800:0}${production||origin.startsWith('https:')?'; Secure':''}`);
 const requireUser=user=>user||fail(401,'Please sign in.');
 
@@ -64,8 +68,23 @@ function invoice(row,p){if(!p.tax?.enabled)return;const local=Object.fromEntries
 function fulfil(row,payment){return C.tx(()=>{row=db.prepare('SELECT * FROM orders WHERE id=?').get(row.id);const p=JSON.parse(row.payload);if(payment.order_id!==row.provider_id||payment.amount!==p.totalPaise||payment.currency!=='INR'||payment.status!=='captured'||!/^pay_[A-Za-z0-9]+$/.test(payment.id||''))fail(400,'Payment is not captured and verified. Contact support.');if(row.status==='paid'){if(row.payment_id!==payment.id)fail(409,'Payment reference conflict.');return C.publicOrder(row);}if(!['preparing','pending','provider_review'].includes(row.status))fail(409,'Payment requires administrator reconciliation.');for(const line of p.lines){const result=db.prepare('UPDATE inventory SET on_hand=on_hand-?,version=version+1 WHERE variant_id=? AND on_hand>=?').run(line.quantity,line.variantId,line.quantity);if(result.changes!==1)fail(409,'Inventory reconciliation required.');}db.prepare("UPDATE orders SET status='paid',payment_id=? WHERE id=?").run(payment.id,row.id);invoice(row,p);C.audit('provider','payment.captured',row.id);return C.publicOrder(db.prepare('SELECT * FROM orders WHERE id=?').get(row.id));});}
 function checkoutResponse(row){const p=JSON.parse(row.payload);if(row.status==='paid')fail(409,'This order is already paid. View your order history.');if(!row.provider_id)fail(409,'Payment creation needs reconciliation. Do not create another order.');if(row.status!=='pending')fail(409,'This checkout is no longer payable.');return {id:row.id,token:row.token,key:process.env.RAZORPAY_KEY_ID,providerOrderId:row.provider_id,amount:p.totalPaise,currency:'INR'};}
 const server=http.createServer(async(req,res)=>{res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','DENY');res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline'; img-src 'self' https://revakanya.com https://unicornproseries.com https://www.unicornproseries.com data: https://static.wixstatic.com; connect-src 'self' https://*.razorpay.com; frame-src https://*.razorpay.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'");if(production)res.setHeader('Strict-Transport-Security','max-age=31536000; includeSubDomains');
-try{if(!await allowStaging(req,res))return;const u=new URL(req.url,'http://localhost');if(u.pathname==='/healthz')return json(res,200,{ok:true});if(u.pathname.startsWith('/api/')){
-const forwarded=String(req.headers['x-forwarded-for']||'').split(',').at(-1).trim();const ip=process.env.TRUST_PROXY==='true'&&isIP(forwarded)?forwarded:req.socket.remoteAddress;if(!rate('general:'+ip,240))fail(429,'Please try again in a minute.');if(req.method==='POST'&&!['/api/webhook','/api/marketing/unsubscribe'].includes(u.pathname)&&req.headers.origin!==origin)fail(403,'Request origin not allowed.');const user=C.session(req),path=u.pathname;
+try{if(!await allowStaging(req,res))return;const u=new URL(req.url,'http://localhost');if(u.pathname==='/healthz')return json(res,200,{ok:true});
+if(/^\/assets\/updates\/[a-z0-9-]+\.jpg$/.test(u.pathname)&&['GET','HEAD'].includes(req.method)){
+ const image=db.prepare('SELECT content FROM store_update_images WHERE path=?').get(u.pathname.slice(1));if(!image)fail(404,'Image not found.');res.writeHead(200,{'Content-Type':'image/jpeg'});return res.end(req.method==='HEAD'?undefined:image.content);
+}
+if(u.pathname.startsWith('/api/')){
+const forwarded=String(req.headers['x-forwarded-for']||'').split(',').at(-1).trim();const ip=process.env.TRUST_PROXY==='true'&&isIP(forwarded)?forwarded:req.socket.remoteAddress;if(!rate('general:'+ip,240))fail(429,'Please try again in a minute.');if(req.method==='POST'&&!['/api/webhook','/api/marketing/unsubscribe','/api/whatsapp/store-updates'].includes(u.pathname)&&req.headers.origin!==origin)fail(403,'Request origin not allowed.');const user=C.session(req),path=u.pathname;
+if(path==='/api/store-updates'&&req.method==='GET')return json(res,200,{updates:activeUpdates(updateConfig(C).posts,u.searchParams.get('surface')||'web')});
+if(path==='/api/whatsapp/store-updates'){
+ if(!whatsappUpdateReadiness().ready)fail(503,'WhatsApp update intake is disconnected.');
+ if(req.method==='GET'){
+  if(u.searchParams.get('hub.mode')!=='subscribe'||u.searchParams.get('hub.verify_token')!==process.env.WHATSAPP_UPDATES_VERIFY_TOKEN||!/^\d{1,100}$/.test(u.searchParams.get('hub.challenge')||''))fail(403,'Invalid webhook verification.');
+  res.writeHead(200,{'Content-Type':'text/plain'});return res.end(u.searchParams.get('hub.challenge'));
+ }
+ if(req.method!=='POST')fail(405,'Method not allowed.');
+ const raw=await body(req);if(!validUpdateSignature(raw,req.headers['x-hub-signature-256'],process.env.WHATSAPP_APP_SECRET))fail(403,'Invalid webhook signature.');
+ receiveWhatsappUpdates(C,JSON.parse(raw));return json(res,200,{received:true});
+}
 if(path==='/api/catalog'&&req.method==='GET'){const s=C.setting('store');return json(res,200,{products:C.catalogue(user),store:{name:s.name,phone:s.phone,currency:s.currency,shippingPaise:s.shippingPaise,serviceStates:s.serviceStates},tier:C.pricingTier(user),paymentReady:!!enabled()});}
 if(path==='/api/marketing/unsubscribe'&&req.method==='GET'){res.writeHead(302,{Location:'/unsubscribe.html?token='+encodeURIComponent(u.searchParams.get('token')||'')});res.end();return;}
 if(path==='/api/marketing/unsubscribe'&&req.method==='POST'){
@@ -199,6 +218,22 @@ if(path==='/api/verify'&&req.method==='POST'){const b=JSON.parse(await body(req)
 if(path==='/api/webhook'&&req.method==='POST'){const raw=await body(req);if(!signatureMatches(raw,req.headers['x-razorpay-signature'],process.env.RAZORPAY_WEBHOOK_SECRET))fail(400,'Invalid signature.');const b=JSON.parse(raw),p=b.payload?.payment?.entity;if(['payment.captured','order.paid'].includes(b.event)&&p){const row=db.prepare('SELECT * FROM orders WHERE provider_id=?').get(p.order_id);if(!row)fail(503,'Payment order is awaiting reconciliation.');fulfil(row,p);}return json(res,200,{received:true});}
 if(path==='/api/order-status'&&req.method==='POST'){const b=JSON.parse(await body(req)),row=db.prepare('SELECT * FROM orders WHERE id=?').get(String(b.id));if(!accessible(row,user,b.token))fail(404,'Order not found.');return json(res,200,C.publicOrder(row));}
 if(path.startsWith('/api/admin/')){admin(user);
+if(path==='/api/admin/owner-desk'&&req.method==='GET')return json(res,200,{products:C.catalogue(user,true),entries:db.prepare('SELECT payload FROM owner_entries ORDER BY created DESC LIMIT 100').all().map(r=>{const {request,...entry}=JSON.parse(r.payload);return entry;})});
+if(path==='/api/admin/owner-desk'&&req.method==='POST')return json(res,200,{entry:recordOwnerEntry(C,user,JSON.parse(await body(req)))});
+if(path==='/api/admin/store-update-image'&&req.method==='POST'){
+ if(!rate('update-image:'+user.id,5))fail(429,'Please wait before uploading another photo.');
+ const b=JSON.parse(await body(req,2100000));if(typeof b.jpeg!=='string'||!/^data:image\/jpeg;base64,[A-Za-z0-9+/]+=*$/.test(b.jpeg))fail(400,'Upload a JPEG photo.');
+ const content=Buffer.from(b.jpeg.split(',')[1],'base64');if(content.length>1500000||content.length<20||content[0]!==255||content[1]!==216||content[2]!==255||content.at(-2)!==255||content.at(-1)!==217)fail(400,'Use a valid photo smaller than 1.5 MB.');
+ const path='assets/updates/'+randomUUID()+'.jpg';C.tx(()=>{db.prepare('INSERT INTO store_update_images VALUES(?,?)').run(path,content);C.audit(user.id,'store-update.image',path);});return json(res,200,{path});
+}
+if(path==='/api/admin/store-updates'&&req.method==='GET')return json(res,200,{...updateConfig(C),whatsapp:whatsappUpdateReadiness()});
+if(path==='/api/admin/store-updates'&&req.method==='POST'){
+ const b=JSON.parse(await body(req));
+ if(!Array.isArray(b.posts)||b.posts.length>40)fail(400,'Keep up to 40 updates; remove old drafts when full.');
+ let posts;try{posts=b.posts.map(validateUpdate);}catch(error){fail(400,error.message);}
+ if(new Set(posts.map(p=>p.id)).size!==posts.length)fail(400,'Update IDs must be unique.');
+ C.tx(()=>{const current=updateConfig(C);if(b.revision!==current.revision)fail(409,'Updates changed elsewhere. Reload updates before saving.');C.set('storeUpdates',{revision:current.revision+1,posts});C.audit(user.id,'store-updates.save','store-updates',{count:posts.length});});return json(res,200,{ok:true});
+}
 if(path==='/api/admin/marketing/automation'&&req.method==='GET')return json(res,200,{config:C.setting('marketingAutomation'),readiness:marketingReadiness(),counts:db.prepare('SELECT status,COUNT(*) count FROM marketing_outbox GROUP BY status').all(),recent:db.prepare('SELECT id,kind,status,created,accepted,error FROM marketing_outbox ORDER BY created DESC LIMIT 30').all()});
 if(path==='/api/admin/marketing/automation'&&req.method==='POST'){
  const b=JSON.parse(await body(req));if(!Array.isArray(b.announcements)||b.announcements.length>30)fail(400,'Provide up to 30 announcements.');

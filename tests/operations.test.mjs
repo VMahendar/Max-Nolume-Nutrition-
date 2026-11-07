@@ -2,7 +2,7 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';import {tmpdir} from 'node:os';import {resolve} from 'node:path';import {spawn} from 'node:child_process';import {DatabaseSync} from 'node:sqlite';import {createHmac,randomUUID} from 'node:crypto';
 const customer={name:'Test Customer',phone:'9876543210',email:'customer@example.com',address:'12 Test Street',city:'Chennai',pincode:'600001',state:'Tamil Nadu'};
 async function fixture(extraEnv={}){const dir=mkdtempSync(resolve(tmpdir(),'mvn-ops-'));mkdirSync(resolve(dir,'data'));mkdirSync(resolve(dir,'public'));writeFileSync(resolve(dir,'public/index.html'),'Store fixture');writeFileSync(resolve(dir,'data/products.json'),JSON.stringify([{id:'product',name:'Product',category:'Protein',subtitle:'Test pack',description:'Test description',hsn:'21069099',gstRateBps:1800,variants:[{id:'a',label:'Pack',pricePaise:10000,prices:{gym:9000,wholesale:8000},stock:10}]}]));writeFileSync(resolve(dir,'data/store.json'),JSON.stringify({address:'Business address',supportEmail:'store@example.com',serviceStates:['Tamil Nadu'],shippingPaise:500}));const port=35000+Math.floor(Math.random()*10000),origin='http://localhost:'+port;const child=spawn(process.execPath,['--import',resolve('tests/mock-provider.mjs'),resolve('server.mjs')],{cwd:dir,env:{...process.env,PORT:String(port),PUBLIC_ORIGIN:origin,PAYMENTS_ENABLED:'true',RAZORPAY_TESTED:'true',POLICIES_APPROVED:'true',RAZORPAY_KEY_ID:'rzp_test_fixture',RAZORPAY_KEY_SECRET:'fixture-secret',RAZORPAY_WEBHOOK_SECRET:'fixture-webhook',DATA_DIR:resolve(dir,'runtime'),...extraEnv},stdio:['ignore','pipe','pipe']});let stderr='';child.stderr.on('data',x=>stderr+=x);await new Promise((ok,no)=>{const timer=setTimeout(()=>no(Error('Startup timeout '+stderr)),5000);child.stdout.once('data',()=>{clearTimeout(timer);ok();});child.once('exit',()=>{clearTimeout(timer);no(Error('Server exited '+stderr));});});const db=new DatabaseSync(resolve(dir,'runtime/orders.sqlite'));
-const client=()=>{let cookie='';return async(path,body,headers={})=>{const r=await fetch(origin+path,{method:body===undefined?'GET':'POST',headers:{Origin:origin,'Content-Type':'application/json',Cookie:cookie,...headers},body:body===undefined?undefined:typeof body==='string'?body:JSON.stringify(body)});const set=r.headers.get('set-cookie');if(set)cookie=set.split(';')[0];return {status:r.status,body:await r.json(),headers:r.headers};};};return {dir,db,client,async close(){db.close();if(child.exitCode===null){const exited=new Promise(r=>child.once('exit',r));child.kill();await exited;}rmSync(dir,{recursive:true,force:true});}};}
+const client=()=>{let cookie='';return async(path,body,headers={})=>{const r=await fetch(origin+path,{method:body===undefined?'GET':'POST',headers:{Origin:origin,'Content-Type':'application/json',Cookie:cookie,...headers},body:body===undefined?undefined:typeof body==='string'?body:JSON.stringify(body)});const set=r.headers.get('set-cookie');if(set)cookie=set.split(';')[0];return {status:r.status,body:await r.json(),headers:r.headers};};};return {dir,db,client,origin,async close(){db.close();if(child.exitCode===null){const exited=new Promise(r=>child.once('exit',r));child.kill();await exited;}rmSync(dir,{recursive:true,force:true});}};}
 const password='correct-horse-test-password';
 test('accounts isolate orders; dealer approval controls pricing; admin endpoints reject customers',async()=>{const f=await fixture();try{const a=f.client(),b=f.client(),admin=f.client();assert.equal((await a('/api/me/orders')).status,401);assert.equal((await a('/api/register',{name:'Customer',email:customer.email,password,role:'admin'})).status,200);assert.equal((await a('/api/session')).body.user.role,'customer');assert.equal((await a('/api/admin/overview')).status,403);assert.equal((await a('/api/dealer',{kind:'gym',business:'Test Gym',gstin:''})).status,200);assert.equal((await a('/api/catalog')).body.tier,'retail');assert.equal((await a('/api/catalog')).body.products[0].variants[0].prices,undefined);
 await admin('/api/register',{name:'Admin',email:'admin@example.com',password});f.db.prepare("UPDATE users SET role='admin' WHERE email='admin@example.com'").run();const userId=(await a('/api/session')).body.user.id;assert.equal((await admin('/api/admin/dealer',{userId,status:'approved'})).status,200);assert.equal((await a('/api/catalog')).body.products[0].variants[0].pricePaise,9000);f.db.prepare("UPDATE users SET role='admin' WHERE id=?").run(userId);assert.equal((await a('/api/admin/overview')).body.products[0].variants[0].pricePaise,10000);f.db.prepare("UPDATE users SET role='customer' WHERE id=?").run(userId);
@@ -194,4 +194,53 @@ test('offer administration requires admin; app campaign quotes use server retail
 test('automation settings are protected and signed unsubscribe stops matching consent',async()=>{
  const secret='fixture-unsubscribe-secret-32-characters',f=await fixture({MARKETING_LINK_SECRET:secret});
  try{const c=f.client(),guest=f.client();assert.equal((await guest('/api/admin/marketing/automation')).status,401);await c('/api/register',{name:'Test Person',email:'automation@example.com',password});assert.equal((await c('/api/admin/marketing/automation',{enabled:true,announcements:[]})).status,403);await c('/api/me/marketing',{cadenceDays:15,festivalUpdates:true,emailOptIn:false,whatsappOptIn:true,phone:'9876543210',explicitConsent:true});const person=(await c('/api/session')).body.user,row=f.db.prepare('SELECT * FROM marketing_preferences WHERE user_id=?').get(person.id);const {unsubscribeToken}=await import('../marketing-automation.mjs');const token=unsubscribeToken(person.id,row.consented_at,secret);assert.equal((await guest('/api/marketing/unsubscribe?token='+encodeURIComponent(token),{})).status,200);assert.equal(f.db.prepare('SELECT whatsapp_opt_in FROM marketing_preferences WHERE user_id=?').get(person.id).whatsapp_opt_in,0);assert.equal((await guest('/api/marketing/unsubscribe?token=wrong',{})).status,400);f.db.prepare('UPDATE users SET role=? WHERE id=?').run('admin',person.id);assert.equal((await c('/api/admin/marketing/automation',{enabled:false,announcements:[]})).status,200);assert.equal((await c('/api/admin/marketing/automation')).body.readiness.ready,false);assert.equal((await c('/api/admin/marketing/preview',{})).body.sent,0);}finally{await f.close();}
+});
+
+test('owner desk keeps purchases private, updates stock once and rejects duplicates, stale edits and overselling',async()=>{
+ const f=await fixture();try{
+  const a=f.client(),guest=f.client();await a('/api/register',{name:'Owner',email:'owner@example.com',password});
+  assert.equal((await a('/api/admin/owner-desk')).status,403);f.db.prepare("UPDATE users SET role='admin' WHERE email='owner@example.com'").run();
+  const purchase={requestKey:randomUUID(),kind:'purchase',variantId:'a',quantity:3,unitPaise:5000,version:0,contact:'Private supplier',reference:'SUP-001',note:'Private purchase cost',confirmed:true};
+  assert.equal((await guest('/api/admin/owner-desk',purchase)).status,401);
+  assert.equal((await a('/api/admin/owner-desk',{...purchase,confirmed:false})).status,400);
+  const first=await a('/api/admin/owner-desk',purchase);assert.equal(first.status,200,JSON.stringify(first.body));assert.equal(first.body.entry.totalPaise,15000);
+  assert.equal((await a('/api/admin/owner-desk',purchase)).body.entry.id,first.body.entry.id);assert.equal(f.db.prepare("SELECT on_hand FROM inventory WHERE variant_id='a'").get().on_hand,13);
+  assert.equal((await a('/api/admin/owner-desk',{...purchase,requestKey:randomUUID(),version:1})).status,409);
+  assert.equal((await a('/api/admin/owner-desk',{...purchase,quantity:4})).status,409);
+  const sale={...purchase,requestKey:randomUUID(),kind:'sale',quantity:2,unitPaise:12000,reference:'WA-001',contact:'Customer',version:1};
+  assert.equal((await a('/api/admin/owner-desk',sale)).status,200);
+  assert.equal((await a('/api/admin/owner-desk',{...sale,requestKey:randomUUID(),reference:'WA-002'})).status,409);
+  assert.equal((await a('/api/admin/owner-desk',{...sale,requestKey:randomUUID(),reference:'WA-003',version:2,quantity:12})).status,409);
+  const reserved=await guest('/api/checkout',{items:[{variantId:'a',quantity:10}],customer,acceptedTerms:true});assert.equal(reserved.status,200,JSON.stringify(reserved.body));
+  assert.equal((await a('/api/admin/owner-desk',{...sale,requestKey:randomUUID(),reference:'WA-004',version:2,quantity:2})).status,409);
+  assert.equal(f.db.prepare('SELECT COUNT(*) n FROM owner_entries').get().n,2);assert.equal((await guest('/api/admin/owner-desk')).status,401);
+  assert.doesNotMatch(JSON.stringify((await guest('/api/retail/catalog')).body),/Private supplier|Private purchase cost|SUP-001/);
+ }finally{await f.close();}
+});
+
+test('store updates require admin, preserve concurrent drafts, filter public schedules and accept signed owner WhatsApp text only',async()=>{
+ const secret='fixture-meta-app-secret',token='fixture-webhook-verify-token-32-characters';
+ const f=await fixture({WHATSAPP_UPDATES_ENABLED:'true',WHATSAPP_APP_SECRET:secret,WHATSAPP_UPDATES_VERIFY_TOKEN:token,WHATSAPP_PHONE_NUMBER_ID:'1234567890',WHATSAPP_UPDATES_OWNER_PHONE:'919876543210'});try{
+  const a=f.client(),guest=f.client();await a('/api/register',{name:'Owner',email:'owner@example.com',password});f.db.prepare("UPDATE users SET role='admin' WHERE email='owner@example.com'").run();
+  const post={id:'new-stock',title:'Fresh stock',body:'Customer-facing message',kind:'stock',surface:'all',image:'',imageAlt:'',startsAt:new Date(Date.now()-60000).toISOString(),endsAt:new Date(Date.now()+3600000).toISOString(),enabled:true};
+  assert.equal((await guest('/api/admin/store-updates',{posts:[post],revision:0})).status,401);
+  assert.equal((await a('/api/admin/store-updates',{posts:[post,{...post,id:'private',enabled:false,title:'Private draft'}],revision:0})).status,200);
+  assert.equal((await a('/api/admin/store-updates',{posts:[],revision:0})).status,409);
+  assert.deepEqual((await guest('/api/store-updates')).body.updates.map(p=>p.id),['new-stock']);
+  assert.equal((await guest('/api/store-updates?surface=wholesale')).body.updates.length,0);
+  assert.equal((await a('/api/admin/store-updates',{posts:[{...post,image:'assets/../private.jpg',imageAlt:'bad'}],revision:1})).status,400);
+  const event=(from='919876543210',phone='1234567890',id='fixture-message')=>({object:'whatsapp_business_account',entry:[{changes:[{field:'messages',value:{metadata:{phone_number_id:phone},messages:[{id,from,type:'text',text:{body:'MVN UPDATE\nNew launch\nOwner supplied launch announcement'}}]}}]}]});
+  const send=async(payload,sig)=>{const raw=JSON.stringify(payload);return guest('/api/whatsapp/store-updates',raw,{'x-hub-signature-256':sig||'sha256='+createHmac('sha256',secret).update(raw).digest('hex'),Origin:'https://external.example'});};
+  assert.equal((await send(event(),'sha256='+'0'.repeat(64))).status,403);
+  assert.equal((await send(event('911111111111'))).status,200);assert.equal((await send(event(undefined,'9999999999'))).status,200);
+  assert.equal((await a('/api/admin/store-updates')).body.posts.length,2);
+  for(let i=0;i<2;i++)assert.equal((await send(event())).status,200);
+  const config=(await a('/api/admin/store-updates')).body;assert.equal(config.posts.length,3);assert.equal(config.revision,2);assert.equal(config.posts[0].enabled,false);
+  assert.doesNotMatch(JSON.stringify((await guest('/api/store-updates')).body),/New launch|Private draft|fixture/);
+  assert.equal((await a('/api/admin/store-updates',{posts:[],revision:1})).status,409);
+  const verifyUrl=f.origin+'/api/whatsapp/store-updates?hub.mode=subscribe&hub.challenge=12345&hub.verify_token=';
+  assert.equal((await fetch(verifyUrl+'wrong')).status,403);
+  const verified=await fetch(verifyUrl+token);assert.equal(verified.status,200);assert.equal(await verified.text(),'12345');
+  const badImage=await a('/api/admin/store-update-image',{jpeg:'data:image/jpeg;base64,'+Buffer.from('<svg>unsafe</svg>').toString('base64')});assert.equal(badImage.status,400);
+ }finally{await f.close();}
 });
