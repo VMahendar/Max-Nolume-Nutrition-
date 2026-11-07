@@ -5,7 +5,7 @@ const screens={
  'daily-desk':['Overview','Your store at a glance.'],
  sales:['Sales','Record completed shop and WhatsApp sales.'],purchases:['Purchases','Receive goods and keep your supplier bill records together.'],
  inventory:['Stock','Check quantities, reservations and available packs.'],orders:['Online orders','Review checkouts, payment status and delivery.'],products:['Products','Add products, pack photos and clear customer prices.'],
- marketing:['Customers','Follow up with customers who asked to hear from you.'],dealers:['Dealers & distributors','Review business applications and access to trade prices.'],
+ marketing:['Customers','Follow up with customers who asked to hear from you.'],dealers:['Dealers & enquiries','Review dealer applications, all website enquiries and the next follow-up.'],
  'store-updates':['Store announcements','Create a launch, stock update or ad for your website and app.'],campaigns:['Offers','Set retail discount codes, dates and savings limits.'],reviews:['Reviews','Review customer feedback before publishing it.'],automation:['WhatsApp automation','Check your connection and message schedule.'],settings:['Store settings','Manage delivery details and tax configuration.'],activity:['Activity log','See changes made to your store.']
 };
 function menu(open){document.body.classList.toggle('admin-menu-open',open);$('adminSidebarShade').hidden=!open;$('adminMenuToggle').setAttribute('aria-expanded',String(open));}
