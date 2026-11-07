@@ -232,6 +232,12 @@ if(path==='/api/enquiries'&&req.method==='POST'){
  return json(res,201,lead);
 }
 if(path.startsWith('/api/admin/')){admin(user);
+if(path==='/api/admin/shipping-setup'&&req.method==='GET'){
+ const productionMode=process.env.STAGING_MODE!=='true'&&process.env.NODE_ENV==='production';
+ const apiCredentialsPresent=!!process.env.SHIPROCKET_EMAIL&&!!process.env.SHIPROCKET_PASSWORD;
+ const pickupNamePresent=!!process.env.SHIPROCKET_PICKUP;
+ return json(res,200,{provider:'Shiprocket',productionMode,apiCredentialsPresent,pickupNamePresent,pickupApiVerified:process.env.SHIPROCKET_TESTED==='true'&&productionMode,bookingEnabled:!!shippingReady(),pickupScheduledByOwner:true,note:'Only configuration status is shown; this endpoint never makes a courier booking or exposes keys, addresses or credentials.'});
+}
 if(path==='/api/admin/launch-readiness'&&req.method==='GET'){
  const products=C.catalogue(user,true),store=C.setting('store'),tax=C.setting('tax');
  const report=evaluateLaunch({env:process.env,products,store,tax,databaseExists:true});
