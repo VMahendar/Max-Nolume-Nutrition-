@@ -29,10 +29,9 @@
             text-align: center;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
-        /* 🟢 Logo Fix: Strips the box containment and sets fluid container scale */
         .logo-container {
             width: 100%;
-            max-width: 320px;
+            max-width: 340px;
             margin: 0 auto 25px auto;
         }
         .logo-container img {
@@ -98,38 +97,24 @@
 <body>
 
     <div class="countdown-card">
-        <!-- 🟢 Fixed Logo Rendering Window -->
         <div class="logo-container">
-            <img src="logo.png" alt="Max Volume Nutrition">
+            <img src="max-volume-logo-wide.png" alt="Max Volume Nutrition">
         </div>
         
         <div class="subtitle">Chennai · Retail · Wholesale & Distribution</div>
         <h1>Something Powerful<br>Is Coming.</h1>
         
         <div class="timer-grid">
-            <div class="time-box">
-                <span class="time-val" id="days">00</span>
-                <span class="time-lbl">Days</span>
-            </div>
-            <div class="time-box">
-                <span class="time-val" id="hours">20</span>
-                <span class="time-lbl">Hours</span>
-            </div>
-            <div class="time-box">
-                <span class="time-val" id="minutes">54</span>
-                <span class="time-lbl">Mins</span>
-            </div>
-            <div class="time-box">
-                <span class="time-val" id="seconds">47</span>
-                <span class="time-lbl">Secs</span>
-            </div>
+            <div class="time-box"><span class="time-val" id="days">00</span><span class="time-lbl">Days</span></div>
+            <div class="time-box"><span class="time-val" id="hours">00</span><span class="time-lbl">Hours</span></div>
+            <div class="time-box"><span class="time-val" id="minutes">00</span><span class="time-lbl">Mins</span></div>
+            <div class="time-box"><span class="time-val" id="seconds">00</span><span class="time-lbl">Secs</span></div>
         </div>
         
         <div class="footer-note">The Full Store Unlocks At 11:00 PM IST</div>
     </div>
 
     <script>
-        // Target Date: Sunday, 8 November 2026 23:00:00 IST
         const launchDate = new Date("Nov 8, 2026 23:00:00").getTime();
 
         const timerInterval = setInterval(function() {
