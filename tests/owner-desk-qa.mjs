@@ -1,3 +1,4 @@
+import {commerceBrowser} from './unlocked-storefront.mjs';
 import {chromium} from 'playwright';
 import {spawn} from 'node:child_process';
 import {mkdtempSync,rmSync,mkdirSync} from 'node:fs';
@@ -12,6 +13,7 @@ try{
  await new Promise((ok,no)=>{const timer=setTimeout(()=>no(Error('Startup timed out')),5000);server.stdout.once('data',()=>{clearTimeout(timer);ok();});server.once('exit',()=>{clearTimeout(timer);no(Error('Server exited'));});});
  db=new DatabaseSync(resolve(dir,'orders.sqlite'));db.prepare('UPDATE inventory SET on_hand=10').run();
  browser=await chromium.launch({...(process.env.CHROMIUM_EXECUTABLE_PATH?{executablePath:process.env.CHROMIUM_EXECUTABLE_PATH}:{}),args:['--no-sandbox']});
+ commerceBrowser(browser);
  const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'}),page=await context.newPage(),errors=[];
  page.on('pageerror',error=>errors.push(error.message));
  const registration=await context.request.post(base+'/api/register',{headers:{Origin:base},data:{name:'Fixture Owner',email:'owner-browser@example.com',password:'owner-browser-fixture-password'}});assert.equal(registration.status(),200);

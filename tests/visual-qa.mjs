@@ -1,3 +1,4 @@
+import {commerceBrowser} from './unlocked-storefront.mjs';
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
 import {mkdirSync,writeFileSync} from 'node:fs';
@@ -24,6 +25,7 @@ try {
   }
   assert.ok(ready,'Local application did not become healthy: '+appError);
   browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+ commerceBrowser(browser);
   for(const preset of [{name:'desktop',viewport:{width:1440,height:900},isMobile:false},{name:'mobile',viewport:{width:390,height:844},isMobile:true}]){
     const page=await browser.newPage({viewport:preset.viewport,isMobile:preset.isMobile,deviceScaleFactor:1});
     const errors=[];page.on('pageerror',e=>errors.push(e.message));

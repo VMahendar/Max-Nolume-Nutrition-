@@ -1,3 +1,4 @@
+import {commerceBrowser} from './unlocked-storefront.mjs';
 import {chromium} from 'playwright';
 import {spawn} from 'node:child_process';
 import assert from 'node:assert/strict';
@@ -14,6 +15,7 @@ let browser;
 try{
  await new Promise((ok,no)=>{const timer=setTimeout(()=>no(Error('server startup timed out')),5000);child.stdout.once('data',()=>{clearTimeout(timer);ok()});child.once('exit',()=>{clearTimeout(timer);no(Error('server exited'))});child.once('error',no)});
  browser=await chromium.launch({...(process.env.CHROMIUM_EXECUTABLE_PATH?{executablePath:process.env.CHROMIUM_EXECUTABLE_PATH}:{}),args:['--no-sandbox']});
+ commerceBrowser(browser);
  for(const width of [1440,390,320]){
  const page=await browser.newPage({viewport:{width,height:950}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(base+'/');
