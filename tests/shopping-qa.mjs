@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {resolve} from 'node:path';
 import {mkdtempSync,mkdirSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
+import {DatabaseSync} from 'node:sqlite';
 const dataDir=mkdtempSync(resolve(tmpdir(),'mvn-shopping-'));
 const reportDir='reports/visual-qa/shopping';
 mkdirSync(reportDir,{recursive:true});
@@ -94,5 +95,33 @@ try{
  for(const expected of ['Potency Whey','Coffee','× 2','10,446','App Customer','9876543210'])assert.ok(text.includes(expected),expected);
  console.log('PASS product-first app, live retail prices, failed-price protection, price change review and WhatsApp order contents');
  await app.close();
+
+ // Activate a test-only app campaign in this isolated browser-test database.
+ const db=new DatabaseSync(resolve(dataDir,'orders.sqlite'));
+ const campaign={id:'browser-app',code:'TESTAPP',title:'Test app festival',description:'Browser fixture only',occasion:'Diwali',surface:'app',type:'fixed',amount:10000,minimumPaise:100000,capPaise:10000,startsAt:new Date(Date.now()-60000).toISOString(),endsAt:new Date(Date.now()+3600000).toISOString(),terms:'Test fixture only',enabled:true};
+ db.prepare('INSERT INTO settings VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value').run('campaigns',JSON.stringify([campaign]));db.close();
+ const promo=await browser.newPage({viewport:{width:390,height:844}});
+ let offerUrl='';let offerRequested;const offerSent=new Promise(done=>offerRequested=done);
+ await promo.route('https://wa.me/**',async route=>{offerUrl=route.request().url();offerRequested();await route.abort()});
+ await promo.goto(base+'/mobile-app.html');
+ assert.equal(await promo.locator('#brands').isVisible(),true);
+ assert.equal(await promo.locator('#certificate').isVisible(),true);
+ assert.match(await promo.locator('#brands').textContent(),/AUTHORIZED EXCLUSIVE DISTRIBUTOR/);
+ assert.equal(await promo.locator('.app-bottom-nav').isVisible(),true);
+ assert.equal((await (await promo.request.get(base+'/api/promotions?surface=web')).json()).campaigns.length,0);
+ await promo.getByRole('button',{name:'Use TESTAPP',exact:true}).waitFor();
+ await promo.waitForFunction(()=>document.querySelector('#price-whey .retail-offer-price')?.textContent.includes('4,899'));
+ await promo.locator('#brands').scrollIntoViewIfNeeded();await promo.screenshot({path:reportDir+'/app-launch.png'});
+ assert.equal(await promo.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'app marketing overflow');
+ await promo.locator('.add[data-id="whey"]').click();
+ await promo.locator('#offerCode').fill('TESTAPP');await promo.locator('#applyOffer').click();
+ await promo.waitForFunction(()=>document.querySelector('#offerMessage').textContent.includes('Applied TESTAPP'));
+ assert.match(await promo.locator('#cart-totals').textContent(),/4,899/);
+ await promo.locator('#customerName').fill('Festival Customer');await promo.locator('#customerPhone').fill('9876543210');
+ await Promise.all([offerSent,promo.locator('#send').click()]);
+ const offerText=new URL(offerUrl).searchParams.get('text');
+ assert.match(offerText,/Offer code: TESTAPP/);assert.match(offerText,/Offer savings: ₹100/);assert.match(offerText,/Products total after offer: ₹4,899/);
+ console.log('PASS app distributor/certificate visibility, app campaign audience, server discount and WhatsApp offer breakdown');
+ await promo.close();
 
 }finally{await browser?.close();if(child.exitCode===null){const stopped=new Promise(done=>child.once('exit',done));child.kill();await stopped;}rmSync(dataDir,{recursive:true,force:true});}

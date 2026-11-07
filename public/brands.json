@@ -9,6 +9,14 @@
     "certificateImage": "assets/IMG-20261102-WA0019.jpg"
   },
   {
+    "id": "glob-tech",
+    "name": "Glob Tech",
+    "initials": "GT",
+    "status": "coming-soon",
+    "tamilNaduDistributor": true,
+    "description": "Next to launch at Max Volume Nutrition. Authorized exclusive distributor for Tamil Nadu and Puducherry."
+  },
+  {
     "id": "more-brands",
     "name": "Multi-brand store",
     "initials": "+",

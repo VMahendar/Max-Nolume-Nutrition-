@@ -1,0 +1,34 @@
+[
+  {
+    "id": "mvn-opening-2026",
+    "title": "Opening edit · 5% off",
+    "description": "Welcome to Max Volume Nutrition. Save 5% on retail carts of ₹1,500 or more, up to ₹300.",
+    "occasion": "OPENING OFFER",
+    "code": "MVNOPEN5",
+    "surface": "all",
+    "type": "percent",
+    "amount": 5,
+    "minimumPaise": 150000,
+    "capPaise": 30000,
+    "startsAt": "2026-11-07T00:00:00+05:30",
+    "endsAt": "2026-11-10T00:00:00+05:30",
+    "terms": "Retail customers only. Minimum products subtotal ₹1,500. One code per cart; cannot be combined with another offer. Not valid on wholesale or gym quotations. Trade free-gift schemes do not apply. Delivery charges are separate; stock and order acceptance are confirmed on WhatsApp. Valid 7–9 November 2026, India Standard Time. Maximum savings ₹300.",
+    "enabled": true
+  },
+  {
+    "id": "mvn-diwali-2026",
+    "title": "Light up your routine · 8% off",
+    "description": "Three days. A little more for your next training chapter. Save 8% on retail carts of ₹1,500 or more, up to ₹400.",
+    "occasion": "DIWALI · 7–9 NOVEMBER",
+    "code": "DIWALI8",
+    "surface": "all",
+    "type": "percent",
+    "amount": 8,
+    "minimumPaise": 150000,
+    "capPaise": 40000,
+    "startsAt": "2026-11-07T00:00:00+05:30",
+    "endsAt": "2026-11-10T00:00:00+05:30",
+    "terms": "Retail customers only. Minimum products subtotal ₹1,500. One code per cart; cannot be combined with another offer. Not valid on wholesale or gym quotations. Trade free-gift schemes do not apply. Delivery charges are separate; stock and order acceptance are confirmed on WhatsApp. Valid 7–9 November 2026, India Standard Time. Maximum savings ₹400.",
+    "enabled": true
+  }
+]
