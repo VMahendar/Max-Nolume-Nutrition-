@@ -6,6 +6,7 @@ import {validateUpdate,activeUpdates,updateConfig,initializeUpdates,whatsappUpda
 import {initializeOwnerDesk,recordOwnerEntry} from './owner-desk.mjs';
 import {initializeOwnerWork,saveOwnerWork,workContext} from './owner-work.mjs';
 import {initializeLeadInbox,saveLead,listLeads,updateLead} from './lead-inbox.mjs';
+import {evaluateLaunch} from './deploy/launch-readiness.mjs';
 import {initializeMarketing,marketingReadiness,enqueueMarketing,startMarketingScheduler,verifyUnsubscribe} from './marketing-automation.mjs';
 import {stagingGate} from './staging.mjs';
 const allowStaging=stagingGate();
@@ -230,6 +231,11 @@ if(path==='/api/enquiries'&&req.method==='POST'){
  return json(res,201,lead);
 }
 if(path.startsWith('/api/admin/')){admin(user);
+if(path==='/api/admin/launch-readiness'&&req.method==='GET'){
+ const products=C.catalogue(user,true),store=C.setting('store'),tax=C.setting('tax');
+ const report=evaluateLaunch({env:process.env,products,store,tax,databaseExists:true});
+ return json(res,200,{...report,mode:process.env.STAGING_MODE==='true'?'staging':'production',paymentsCurrentlyEnabled:!!enabled(),shippingCurrentlyEnabled:!!shippingReady(),note:'Read-only. Does not activate billing, payments, shipping, messaging, advertising or production.'});
+}
 if(path==='/api/admin/leads'&&req.method==='GET')return json(res,200,listLeads(C));
 if(path==='/api/admin/leads'&&req.method==='POST'){
  if(!rate('lead-review:'+user.id,30))fail(429,'Please wait before saving another change.');
