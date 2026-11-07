@@ -165,3 +165,28 @@ test('wishlists are account-owned and genuine reviews require authenticated subm
   const product=(await guest('/api/catalog')).body.products[0];assert.equal(product.variants[0].pricePaise,10000);assert.equal(product.variants[0].stock,10);
  }finally{await f.close();}
 });
+
+test('offer administration requires admin; app campaign quotes use server retail prices and persist settings',async()=>{
+ const f=await fixture();try{const guest=f.client(),admin=f.client();
+ assert.equal((await guest('/api/admin/promotions')).status,401);
+ assert.equal((await guest('/api/admin/promotions',{campaigns:[]})).status,401);
+ await admin('/api/register',{name:'Campaign Admin',email:'campaign-admin@example.com',password});
+ assert.equal((await admin('/api/admin/promotions',{campaigns:[]})).status,403);
+ f.db.prepare("UPDATE users SET role='admin' WHERE email='campaign-admin@example.com'").run();
+ const c={id:'test-diwali',title:'Test campaign',code:'TESTAPP',surface:'app',type:'percent',amount:10,minimumPaise:0,capPaise:0,startsAt:new Date(Date.now()-60000).toISOString(),endsAt:new Date(Date.now()+60000).toISOString(),terms:'Fixture only',enabled:false};
+ assert.equal((await admin('/api/admin/promotions',{campaigns:[c]})).status,200);
+ assert.equal((await guest('/api/promotions?surface=app')).body.campaigns.length,0);
+ assert.equal((await admin('/api/admin/promotions',{campaigns:[{...c,enabled:true,amount:101}]})).status,400);
+ assert.equal((await admin('/api/admin/promotions',{campaigns:[{...c,enabled:true}]})).status,200);
+ assert.equal((await admin('/api/admin/promotions')).body.campaigns[0].code,'TESTAPP');
+ assert.equal((await guest('/api/promotions?surface=web')).body.campaigns.length,0);
+ assert.equal((await guest('/api/promotions?surface=app')).body.campaigns.length,1);
+ const request={code:'TESTAPP',surface:'app',items:[{variantId:'a',quantity:2,pricePaise:1}]};
+ const q=await guest('/api/promotion-quote',request);assert.equal(q.status,200);assert.equal(q.body.subtotalPaise,20000);assert.equal(q.body.discountPaise,2000);assert.equal(q.body.totalPaise,18000);
+ assert.equal((await guest('/api/promotion-quote',{...request,surface:'web'})).status,400);
+ assert.equal((await guest('/api/promotion-quote',request,{Origin:'https://wrong.example'})).status,403);
+ await admin('/api/dealer',{kind:'gym',business:'Fixture Gym',gstin:''});const adminId=(await admin('/api/session')).body.user.id;f.db.prepare("UPDATE dealers SET status='approved' WHERE user_id=?").run(adminId);assert.equal((await admin('/api/promotion-quote',request)).status,403);
+ assert.equal((await admin('/api/admin/promotions',{campaigns:[{...c,enabled:true,endsAt:new Date(Date.now()-1).toISOString()}]})).status,200);
+ assert.equal((await guest('/api/promotion-quote',request)).status,400);
+ }finally{await f.close();}
+});

@@ -63,3 +63,11 @@ Consult [docs/PRODUCTION.md](docs/PRODUCTION.md), [docs/STAGING.md](docs/STAGING
 The browser-installable store at `/mobile-app.html` opens directly to products, pack choices, prices and the same WhatsApp cart as the website. Both views refresh retail prices from the backend and verify them again before preparing a WhatsApp order; changed totals require review. It uses the original MVN logo and a network-only service worker: customer accounts, stock, prices and orders are never cached. Internet access is required. Installation does not enable online payments.
 
 Android and iPhone development preview projects and release requirements are in [mobile/README.md](mobile/README.md). These are not signed store releases.
+
+## Retail festival campaigns and distribution news
+
+The website and installed app show separate Unicorn Pro Series certificate and Glob Tech launch sections. App tabs link directly to shopping, offers, launches, the certificate and the account. Instagram story links are references; the source footage was not retrievable and is not embedded as a video.
+
+Retail launch campaigns are initialized once from `data/retail-campaigns.json`, preserving later administrator edits and deactivations. `MVNOPEN5` gives 5% off, capped at ₹300; `DIWALI8` gives 8% off, capped at ₹400. Both require a ₹1,500 products subtotal, run 7–9 November 2026 IST, and expire at midnight starting 10 November. They appear on both platforms. Only one code applies. These are separate from trade pricing and trade free-gift schemes; approved wholesale/gym accounts cannot use retail promotion quotes. No wholesale source prices are included in the retail campaign configuration.
+
+Administrators can manage draft/active campaigns, audiences, dates, minimums, caps and terms in Offers. Discounts are priced server-side and revalidated before the WhatsApp message. They are quotations, with stock, delivery and acceptance confirmed by the store; no automatic payment or redemption record is created. Future campaigns need explicit new dates and amounts. Existing consent preferences handle opt-in festival/launch announcements; automatic push/email/WhatsApp sending is not configured.

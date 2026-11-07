@@ -1,16 +1,23 @@
 import {startLocalBackupScheduler} from './deploy/local-backups.mjs';
 import {startDriveBackupScheduler} from './deploy/drive-backup.mjs';
 import http from 'node:http';
+import {validateCampaign,activeCampaigns,campaignQuote} from './promotions.mjs';
 import {stagingGate} from './staging.mjs';
 const allowStaging=stagingGate();
 import {isIP} from 'node:net';
-import {readFileSync,realpathSync} from 'node:fs';
+import {readFileSync,realpathSync,existsSync} from 'node:fs';
 import {resolve,extname,sep} from 'node:path';
 import {randomUUID,randomBytes} from 'node:crypto';
 import {signatureMatches,quote,customerValid} from './lib.mjs';
 import {openCommerce,Problem,fail,hash,clean,integer,email,passwordHash,passwordMatches,taxQuote,stateCode} from './commerce.mjs';
 import {razor,shippingReady,shiprocketClient,shipmentPayload} from './integrations.mjs';
 const root=realpathSync(resolve('public')),C=openCommerce(resolve(process.env.DATA_DIR||'runtime')),db=C.db;
+// First-run retail campaign configuration; later admin edits and deactivations win.
+const campaignSeed=resolve('data/retail-campaigns.json');
+if(C.setting('campaigns')===null&&existsSync(campaignSeed)){
+ const campaigns=JSON.parse(readFileSync(campaignSeed,'utf8')).map(validateCampaign);
+ C.tx(()=>{C.set('campaigns',campaigns);C.audit('system','campaigns.initialize','campaigns',{count:campaigns.length});});
+}
 const origin=process.env.PUBLIC_ORIGIN||'http://localhost:3000',production=process.env.NODE_ENV==='production';
 const previousStoreOrigin='https://max-volume-nutrition-preview.onrender.com';
 function canonicalStoreOrigin(){
@@ -58,6 +65,11 @@ const server=http.createServer(async(req,res)=>{res.setHeader('Cache-Control','n
 try{if(!await allowStaging(req,res))return;const u=new URL(req.url,'http://localhost');if(u.pathname==='/healthz')return json(res,200,{ok:true});if(u.pathname.startsWith('/api/')){
 const forwarded=String(req.headers['x-forwarded-for']||'').split(',').at(-1).trim();const ip=process.env.TRUST_PROXY==='true'&&isIP(forwarded)?forwarded:req.socket.remoteAddress;if(!rate('general:'+ip,240))fail(429,'Please try again in a minute.');if(req.method==='POST'&&u.pathname!=='/api/webhook'&&req.headers.origin!==origin)fail(403,'Request origin not allowed.');const user=C.session(req),path=u.pathname;
 if(path==='/api/catalog'&&req.method==='GET'){const s=C.setting('store');return json(res,200,{products:C.catalogue(user),store:{name:s.name,phone:s.phone,currency:s.currency,shippingPaise:s.shippingPaise,serviceStates:s.serviceStates},tier:C.pricingTier(user),paymentReady:!!enabled()});}
+if(path==='/api/promotions'&&req.method==='GET')return json(res,200,{campaigns:activeCampaigns(C.setting('campaigns'),u.searchParams.get('surface')||'web')});
+if(path==='/api/promotion-quote'&&req.method==='POST'){
+ if(C.pricingTier(user)!=='retail')fail(403,'These offers are for retail customers. Wholesale and gym quotations have separate prices and trade schemes.');
+ const b=JSON.parse(await body(req));try{return json(res,200,campaignQuote({campaigns:C.setting('campaigns'),products:C.catalogue(null),items:b.items,code:b.code,surface:b.surface}));}catch(error){fail(400,error.message);}
+}
 if(path==='/api/retail/catalog'&&req.method==='GET')return json(res,200,{products:C.catalogue(null),tier:'retail',paymentReady:!!enabled()});
 if(path==='/api/dealer/catalog'&&req.method==='GET'){requireUser(user);if(C.pricingTier(user)==='retail')fail(403,'Dealer approval is required.');return json(res,200,{products:C.catalogue(user),tier:C.pricingTier(user)});}
 if(path==='/api/session'&&req.method==='GET')return json(res,200,{user:C.safeUser(user)});
@@ -208,8 +220,15 @@ if(path==='/api/admin/marketing/mark'&&req.method==='POST'){
  });
  return json(res,200,{ok:true});
 }
+if(path==='/api/admin/promotions'&&req.method==='GET')return json(res,200,{campaigns:C.setting('campaigns')||[]});
 if(path==='/api/admin/overview'&&req.method==='GET')return json(res,200,{products:C.catalogue(user,true),dealers:db.prepare('SELECT d.*,u.email,u.name,dp.phone,dp.city,dp.address,dp.pincode FROM dealers d JOIN users u ON u.id=d.user_id LEFT JOIN dealer_profiles dp ON dp.user_id=d.user_id ORDER BY d.created DESC LIMIT 100').all(),orders:db.prepare('SELECT * FROM orders ORDER BY created DESC LIMIT 100').all().map(C.publicOrder),store:C.setting('store'),tax:C.setting('tax'),shippingReady:!!shippingReady(),paymentReady:!!enabled(),reviews:db.prepare('SELECT r.*,u.name FROM product_reviews r JOIN users u ON u.id=r.user_id ORDER BY r.updated DESC LIMIT 100').all(),audit:db.prepare('SELECT * FROM audit ORDER BY id DESC LIMIT 100').all()});
 if(req.method!=='POST')fail(405,'Method not allowed.');const b=JSON.parse(await body(req));
+if(path==='/api/admin/promotions'){
+ if(!Array.isArray(b.campaigns)||b.campaigns.length>30)fail(400,'Provide up to 30 campaigns.');
+ let campaigns;try{campaigns=b.campaigns.map(validateCampaign);}catch(error){fail(400,error.message);}
+ if(new Set(campaigns.map(c=>c.id)).size!==campaigns.length||new Set(campaigns.map(c=>c.code)).size!==campaigns.length)fail(400,'Campaign IDs and codes must be unique.');
+ C.tx(()=>{C.set('campaigns',campaigns);C.audit(user.id,'campaigns.save','campaigns',{count:campaigns.length});});return json(res,200,{ok:true});
+}
 if(path==='/api/admin/review'){
  if(!['approved','rejected'].includes(b.status))fail(400,'Choose an approved review status.');
  const row=db.prepare('SELECT id FROM product_reviews WHERE id=?').get(String(b.id));if(!row)fail(404,'Review not found.');

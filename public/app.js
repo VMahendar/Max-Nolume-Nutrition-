@@ -21,7 +21,9 @@ async function refreshRetailPrices(){
 const $=id=>document.getElementById(id);
 const money=n=>"₹"+Number(n).toLocaleString("en-IN");
 let cat="all",q="",cart={},mode="retail";
-let priceRange="all",recent=[];
+let priceRange="all",recent=[],appliedOffer=null,availableOffers=[];
+const offerSurface=document.body.classList.contains("app-store")?"app":"web";
+const cartSignature=()=>JSON.stringify(Object.entries(cart).sort().map(([key,qty])=>[key,qty,getItem(key)?.v.price]));
 const categoryNames={all:"ALL PRODUCTS",whey:"WHEY PROTEIN",mass:"MASS GAINERS",pre:"PRE-WORKOUT",creatine:"CREATINE",vitamins:"VITAMINS"};
 const priceLabels={all:"All prices",under1000:"Under ₹1,000","1000to3000":"₹1,000 – ₹3,000",over3000:"Over ₹3,000"};
 function matchesPrice(v){return priceRange==="all"||(priceRange==="under1000"&&v.price<1000)||(priceRange==="1000to3000"&&v.price>=1000&&v.price<=3000)||(priceRange==="over3000"&&v.price>3000)}
@@ -54,13 +56,18 @@ function swapPhoto(host,src,name){
  img.onload=()=>{img.hidden=false;placeholder.hidden=true};
  img.hidden=false;placeholder.hidden=true;img.src=src;
 }
+function retailOfferMarkup(v){
+ const subtotal=Math.round(v.price*100);let best=null;
+ for(const campaign of availableOffers){if(Date.parse(campaign.endsAt)<=Date.now()||subtotal<campaign.minimumPaise||!/^[A-Z0-9-]{3,30}$/.test(campaign.code))continue;let discount=campaign.type==='percent'?Math.floor(subtotal*campaign.amount/100):campaign.amount;if(campaign.capPaise>0)discount=Math.min(discount,campaign.capPaise);discount=Math.min(discount,subtotal);if(!best||discount>best.discount)best={campaign,discount};}
+ return best?'<div class="retail-offer-price"><strong>'+money((subtotal-best.discount)/100)+'</strong><span>With '+best.campaign.code+' · apply code in cart</span></div>':'';
+}
 function priceMarkup(v){
  const hasMrp=Number.isSafeInteger(v.mrp)&&v.mrp>v.price;
  const percent=hasMrp?Math.round((v.mrp-v.price)*100/v.mrp):0;
  return '<div class="price-main"><b class="selling-price">'+money(v.price)+'</b>'+
  (hasMrp?'<del class="mrp-value" aria-label="MRP '+money(v.mrp)+'">MRP '+money(v.mrp)+'</del>':'')+
  '</div>'+(hasMrp?'<span class="discount-value">'+percent+'% OFF · SAVE '+money(v.mrp-v.price)+'</span>':'')+
- '<small class="selling-caption">Selling price</small>';
+ '<small class="selling-caption">Selling price</small>'+retailOfferMarkup(v);
 }
 function card(p){
 const featured=displayVariant(p);const cover=coverImage(p,featured);const pic=cover?'<img loading="lazy" src="'+cover+'" alt="'+p.name+'"><div class="placeholder" hidden><b>'+p.name+'</b>Photo coming soon</div>':'<div class="placeholder"><b>'+p.name+'</b>Correct pack photo being verified</div>';
@@ -84,13 +91,13 @@ document.querySelectorAll(".details-link").forEach(b=>b.addEventListener("click"
 document.querySelectorAll(".add").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.id+"|"+$("v-"+b.dataset.id).value;cart[k]=Math.min(999,(cart[k]||0)+1);persist();openBag()}));
 }
 function setCat(c){if(!Object.hasOwn(categoryNames,c))return;cat=c;document.querySelectorAll(".cats [data-cat]").forEach(b=>b.classList.toggle("active",b.dataset.cat===c));render();$("shop").scrollIntoView({behavior:"smooth"})}
-function totals(){let n=0,subtotal=0;for(const [k,qty] of Object.entries(cart)){const item=getItem(k);if(!item)continue;const quantity=Math.min(999,Math.max(0,Number(qty)||0));n+=quantity;subtotal+=item.v.price*quantity;}return{n,subtotal}}
+function totals(){let n=0,subtotal=0;for(const [k,qty] of Object.entries(cart)){const item=getItem(k);if(!item)continue;const quantity=Math.min(999,Math.max(0,Number(qty)||0));n+=quantity;subtotal+=item.v.price*quantity;}const discount=appliedOffer?.signature===cartSignature()&&appliedOffer.campaign.code===$("offerCode").value.trim().toUpperCase()&&Date.parse(appliedOffer.campaign.endsAt)>Date.now()?appliedOffer.discountPaise/100:0;return{n,subtotal,discount,total:subtotal-discount}}
 function drawCart(){
-const {n,subtotal}=totals();$("count").textContent=n;if($("floatingCount"))$("floatingCount").textContent=n;
+const {n,subtotal,discount,total}=totals();$("count").textContent=n;if($("floatingCount"))$("floatingCount").textContent=n;
 let html=n?"":'<p class="empty-cart">Your cart is empty. Choose your supplements to get started.</p>';
 for(const [k,qty] of Object.entries(cart)){const item=getItem(k);if(!item)continue;html+='<div class="row"><b>'+item.p.name+'</b><small>'+item.v.label+' · '+money(item.v.price)+'</small><div class="qty"><button data-minus="'+k+'" aria-label="Decrease quantity">−</button><span>'+qty+'</span><button data-plus="'+k+'" aria-label="Increase quantity">+</button><strong>'+money(item.v.price*qty)+'</strong></div></div>'}
 $("items").innerHTML=html;
-$("cart-totals").innerHTML=n?'<div><span>Subtotal</span><b>'+money(subtotal)+'</b></div>':"";
+$("cart-totals").innerHTML=n?'<div><span>Subtotal</span><b>'+money(subtotal)+'</b></div>'+(discount?'<div><span>Offer savings</span><b>−'+money(discount)+'</b></div><div><span>Products total</span><b>'+money(total)+'</b></div>':''):"";
 $("send").disabled=!n;
 document.querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>{const k=b.dataset.minus;cart[k]-=1;if(cart[k]<=0)delete cart[k];persist()});
 document.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>{const k=b.dataset.plus;cart[k]=Math.min(999,cart[k]+1);persist()});
@@ -102,16 +109,39 @@ async function retailEnquiry(){
 let entries=Object.entries(cart).filter(([k])=>getItem(k));if(!entries.length)return;
 const name=$("customerName").value.trim(),phone=$("customerPhone").value.trim();
 if(!name||!/^[0-9]{10}$/.test(phone)){$("checkoutFields").reportValidity();return}
-const message=$("priceMessage");const previous=totals().subtotal;$("send").disabled=true;message.textContent="Checking current prices…";
-try{await refreshRetailPrices();drawCart();renderRecent();document.querySelectorAll('.variant').forEach(select=>{const p=P.find(item=>item.id===select.id.slice(2));$("price-"+p.id).innerHTML=priceMarkup(p.variants[Number(select.value)])});}catch(error){message.textContent=error.message;$("send").disabled=false;return;}
-if(totals().subtotal!==previous){message.textContent="Prices have been updated. Please review your cart total and confirm again.";return;}
+const message=$("priceMessage");const previous=totals().total;$("send").disabled=true;message.textContent="Checking current prices…";
+try{await refreshRetailPrices();if($("offerCode").value.trim())await quoteOffer();drawCart();renderRecent();document.querySelectorAll('.variant').forEach(select=>{const p=P.find(item=>item.id===select.id.slice(2));$("price-"+p.id).innerHTML=priceMarkup(p.variants[Number(select.value)])});}catch(error){message.textContent=error.message;$("send").disabled=false;return;}
+if(totals().total!==previous){message.textContent="Prices have been updated. Please review your cart total and confirm again.";return;}
 message.textContent="";
 entries=Object.entries(cart).filter(([k])=>getItem(k));if(!entries.length)return;
 const lines=entries.map(([k,n])=>{const {p,v}=getItem(k);return p.name+" — "+v.label+" × "+n+" = "+money(n*v.price)});
-const {subtotal}=totals();
-const msg="Hello Max Volume Nutrition, I would like to confirm my order request via WhatsApp:\n\nSelected products:\n"+lines.join("\n")+"\n\nProducts total: "+money(subtotal)+"\n\nCustomer name: "+name+"\nMobile number: "+phone+"\n\nOnline payment is temporarily unavailable. Please confirm stock, delivery charges, payment method and order acceptance with me on WhatsApp.";
+const {subtotal,discount,total}=totals();
+const offerText=discount?"\nOffer code: "+appliedOffer.campaign.code+"\nOffer savings: "+money(discount)+"\nProducts total after offer: "+money(total):"";
+const msg="Hello Max Volume Nutrition, I would like to confirm my order request via WhatsApp:\n\nSelected products:\n"+lines.join("\n")+"\n\nProducts total: "+money(subtotal)+offerText+"\n\nCustomer name: "+name+"\nMobile number: "+phone+"\n\nOnline payment is temporarily unavailable. Please confirm stock, delivery charges, payment method and order acceptance with me on WhatsApp.";
 window.location.assign("https://wa.me/"+PHONE+"?text="+encodeURIComponent(msg));
 }
+async function quoteOffer(){
+ const code=$("offerCode").value.trim();
+ const requestItems=Object.entries(cart).filter(([key])=>getItem(key)).map(([key,quantity])=>{const [id,index]=key.split('|');return {variantId:retailVariantIds[id][Number(index)],quantity}});
+ const signature=cartSignature();
+ const response=await fetch('/api/promotion-quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,items:requestItems,surface:offerSurface}),signal:AbortSignal.timeout(8000)});
+ const data=await response.json();
+ if(!response.ok){appliedOffer=null;drawCart();throw Error(data.error||'This offer is unavailable.');}
+ if(signature!==cartSignature())throw Error('Your cart changed. Apply the code again.');
+ if(!Number.isSafeInteger(data.discountPaise)||data.discountPaise<0||data.discountPaise>Math.round(totals().subtotal*100))throw Error('Offer could not be verified.');
+ appliedOffer={...data,signature};$("offerMessage").textContent='Applied '+data.campaign.code+' · Save '+money(data.discountPaise/100);$("removeOffer").hidden=false;
+}
+$("offerCode").oninput=()=>{appliedOffer=null;$("offerMessage").textContent="";$("removeOffer").hidden=true;drawCart()};
+$("applyOffer").onclick=async()=>{const button=$("applyOffer");button.disabled=true;try{await refreshRetailPrices();await quoteOffer();drawCart()}catch(error){$("offerMessage").textContent=error.message}finally{button.disabled=false}};
+$("removeOffer").onclick=()=>{appliedOffer=null;$("offerCode").value='';$("offerMessage").textContent='';$("removeOffer").hidden=true;drawCart()};
+async function loadOffers(){
+ try{const response=await fetch('/api/promotions?surface='+offerSurface,{cache:'no-store'});if(!response.ok)return;const {campaigns}=await response.json();if(!campaigns?.length)return;availableOffers=campaigns;document.querySelectorAll('.variant').forEach(select=>{const p=P.find(item=>item.id===select.id.slice(2));$("price-"+p.id).innerHTML=priceMarkup(p.variants[Number(select.value)])});
+ $("offerCards").replaceChildren(...campaigns.map(c=>{const card=document.createElement('article');card.className='offer-card';
+ for(const [tag,text] of [['span',c.occasion||'MVN SPECIAL'],['h3',c.title],['p',c.description],['small','Retail customers only · Ends '+new Date(Date.parse(c.endsAt)-1).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'})+' IST']]){const el=document.createElement(tag);el.textContent=text;card.append(el)}
+ const terms=document.createElement('details'),summary=document.createElement('summary'),copy=document.createElement('p');summary.textContent='Offer terms';copy.textContent=c.terms;terms.append(summary,copy);card.append(terms);
+ const button=document.createElement('button');button.type='button';button.textContent='Use '+c.code;button.onclick=()=>{openBag();appliedOffer=null;$("offerCode").value=c.code;drawCart();$("offerMessage").textContent='Add your products, then apply this code.';$("offerCode").focus()};card.append(button);return card;}));
+ }catch{} }
+loadOffers();
 $("bag").onclick=openBag;if($("floatingCart"))$("floatingCart").onclick=openBag;$("close").onclick=closeBag;$("shade").onclick=closeBag;
 document.querySelectorAll("[data-cat]").forEach(x=>x.onclick=e=>{e.preventDefault();setCat(x.dataset.cat)});
 $("sort").onchange=render;
