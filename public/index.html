@@ -12,6 +12,11 @@
 <meta property="og:image" content="https://max-volume-nutrition-preview.onrender.com/max-volume-logo-wide.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Store","name":"Max Volume Nutrition","url":"https://max-volume-nutrition-preview.onrender.com/","logo":"https://max-volume-nutrition-preview.onrender.com/max-volume-logo-wide.png","description":"Sports supplements online store and wholesale distribution in Chennai, Tamil Nadu. Orders are confirmed via WhatsApp.","telephone":"+91 77088 30513","email":"mahendar0605@gmail.com","areaServed":{"@type":"AdministrativeArea","name":"Tamil Nadu"}}</script>
 <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="premium.css"><link rel="stylesheet" href="flagship.css">
+<link rel="stylesheet" href="shopping.css">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/app-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script src="/install-app.js" defer></script>
 </head>
 <body class="retail-home">
 <!-- Keep original MVN artwork; remove only its dark rectangle at display time. -->
@@ -40,7 +45,7 @@
   </div>
 </header>
 <nav class="nav" aria-label="Shop categories">
-  <a class="nav-featured" href="#shop">Shop all</a>
+  <a class="nav-featured" href="#shop" data-cat="all">Shop all</a>
   <a href="#shop" data-cat="whey">Whey protein</a>
   <a href="#shop" data-cat="mass">Mass gainers</a>
   <a href="#shop" data-cat="creatine">Creatine</a>
@@ -78,16 +83,29 @@
 </section>
 <main id="shop">
   <div class="section-title"><div><span class="eyebrow dark">SPORTS NUTRITION · CURATED FOR YOU</span><h2>SHOP THE <strong>COLLECTION.</strong></h2></div><p>Explore verified pack variants and customer selling prices. Order requests are confirmed directly with our team.</p></div>
-  <div class="productbar"><div><span class="eyebrow dark">AVAILABLE TO ORDER</span><h3>ALL PRODUCTS</h3><span id="resultText">Current collection</span></div><label class="sort-label">SORT BY <select id="sort"><option value="default">Featured</option><option value="name">Name A–Z</option><option value="low">Price: low to high</option></select></label></div>
+  <div class="productbar"><div><span class="eyebrow dark">AVAILABLE TO ORDER</span><h3 id="collectionTitle">ALL PRODUCTS</h3><span id="resultText" role="status" aria-live="polite">Current collection</span></div><label class="sort-label">SORT BY <select id="sort"><option value="default">Featured</option><option value="name">Name A–Z</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option></select></label></div>
   <div class="cats"><button class="active" data-cat="all" type="button">ALL PRODUCTS</button><button data-cat="whey" type="button">WHEY</button><button data-cat="mass" type="button">MASS GAINER</button><button data-cat="creatine" type="button">CREATINE</button><button data-cat="pre" type="button">PRE-WORKOUT</button><button data-cat="vitamins" type="button">VITAMINS</button></div>
+  <div class="shopping-layout">
+  <aside class="collection-filters" aria-label="Collection filters">
+    <div class="filter-heading"><h3>Refine your selection</h3><button type="button" id="resetFilters">Reset</button></div>
+    <label for="priceRange">PRICE PER PACK</label>
+    <select id="priceRange"><option value="all">All prices</option><option value="under1000">Under ₹1,000</option><option value="1000to3000">₹1,000 – ₹3,000</option><option value="over3000">Over ₹3,000</option></select>
+    <p class="filter-hint">Products match when at least one pack is in your price range.</p>
+    <div class="filter-brand"><span>FEATURED BRAND</span><b>UNICORN<br>PRO SERIES</b><a href="#certificate">View distributor certificate ↗</a></div>
+    <div class="shopping-assistance"><h4>Need a closer look?</h4><p>Ask our team for current pack labels, flavour availability and delivery details.</p><a href="support.html">Talk to our team →</a></div>
+  </aside>
+  <div class="collection-results"><div id="activeFilters" class="active-filters" hidden></div>
   <!-- Immediate visible catalogue: enhanced to interactive cart cards by app.js. -->
   <div id="grid" class="grid"><article class="card"><div class="photo"><img src="assets/potency-whey-coffee-5lb.webp" alt="Potency Whey 5 lb · Coffee current pack" loading="lazy"></div><div class="info"><small>UNICORN PRO SERIES</small><h3>Potency Whey</h3><p>5 lb · Coffee</p><div class="price"><div class="price-main"><b class="selling-price">₹4,999</b><del class="mrp-value">MRP ₹8,599</del><span class="discount-value">42% OFF · SAVE ₹3,600</span></div><small class="selling-caption">Selling price</small></div><a class="add" href="https://wa.me/917708830513?text=Hello%20Max%20Volume%20Nutrition%2C%20I%20would%20like%20to%20enquire%20about%20Potency%20Whey%205%20lb%20%C2%B7%20Coffee" rel="noopener noreferrer" target="_blank">ENQUIRE VIA WHATSAPP ↗</a></div></article>
 <article class="card"><div class="photo"><img src="assets/Screenshot_2026_1103_003852.jpg" alt="Nitro Mass 5 kg · Bucket current pack" loading="lazy"></div><div class="info"><small>UNICORN PRO SERIES</small><h3>Nitro Mass</h3><p>5 kg · Bucket</p><div class="price"><div class="price-main"><b class="selling-price">₹3,499</b></div><small class="selling-caption">Selling price</small></div><a class="add" href="https://wa.me/917708830513?text=Hello%20Max%20Volume%20Nutrition%2C%20I%20would%20like%20to%20enquire%20about%20Nitro%20Mass%205%20kg%20%C2%B7%20Bucket" rel="noopener noreferrer" target="_blank">ENQUIRE VIA WHATSAPP ↗</a></div></article>
 <article class="card"><div class="photo"><div class="placeholder"><b>Sturdy Pre-Workout</b>Watermelon 250 g photograph being verified</div></div><div class="info"><small>UNICORN PRO SERIES</small><h3>Sturdy Pre-Workout</h3><p>250 g</p><div class="price"><div class="price-main"><b class="selling-price">₹1,399</b></div><small class="selling-caption">Selling price</small></div><a class="add" href="https://wa.me/917708830513?text=Hello%20Max%20Volume%20Nutrition%2C%20I%20would%20like%20to%20enquire%20about%20Sturdy%20Pre-Workout%20250%20g" rel="noopener noreferrer" target="_blank">ENQUIRE VIA WHATSAPP ↗</a></div></article>
 <article class="card"><div class="photo"><div class="placeholder"><b>Pro Creatine</b>Cranberry 100 g photograph being verified</div></div><div class="info"><small>UNICORN PRO SERIES</small><h3>Pro Creatine</h3><p>100 g · Cranberry</p><div class="price"><div class="price-main"><b class="selling-price">₹899</b><del class="mrp-value">MRP ₹1,499</del><span class="discount-value">40% OFF · SAVE ₹600</span></div><small class="selling-caption">Selling price</small></div><a class="add" href="https://wa.me/917708830513?text=Hello%20Max%20Volume%20Nutrition%2C%20I%20would%20like%20to%20enquire%20about%20Pro%20Creatine%20100%20g%20%C2%B7%20Cranberry" rel="noopener noreferrer" target="_blank">ENQUIRE VIA WHATSAPP ↗</a></div></article>
 <article class="card"><div class="photo"><div class="placeholder"><b>Musclevite Multivitamin</b>Verified pack photo coming soon</div></div><div class="info"><small>UNICORN PRO SERIES</small><h3>Musclevite Multivitamin</h3><p>Pack details to confirm</p><div class="price"><div class="price-main"><b class="selling-price">₹699</b></div><small class="selling-caption">Selling price</small></div><a class="add" href="https://wa.me/917708830513?text=Hello%20Max%20Volume%20Nutrition%2C%20I%20would%20like%20to%20enquire%20about%20Musclevite%20Multivitamin%20Pack%20details%20to%20confirm" rel="noopener noreferrer" target="_blank">ENQUIRE VIA WHATSAPP ↗</a></div></article></div>
+  </div></div>
   <p class="catalog-note"><b>Product photographs:</b> Only matching pack images are shown. If a flavour or size photograph is being verified, request its current front/back label before ordering.</p>
 </main>
+<section class="recent-section" id="recentSection" hidden aria-labelledby="recentTitle"><div class="recent-heading"><div><span class="eyebrow dark">PICK UP WHERE YOU LEFT OFF</span><h2 id="recentTitle">Recently viewed</h2></div><button type="button" id="clearRecent">Clear history</button></div><p class="recent-note">Saved only in this browser.</p><div id="recentProducts" class="recent-products"></div></section>
+<section class="store-service-strip" aria-label="Shopping with MVN"><article><span>01</span><h3>Know your pack</h3><p>Choose the exact flavour and size. Request the current label before ordering.</p></article><article><span>02</span><h3>Clear retail prices</h3><p>See your products total in the cart. Our team confirms delivery charges separately.</p></article><article><span>03</span><h3>Personal order support</h3><p>Send your cart through WhatsApp for stock, payment and delivery confirmation.</p></article></section>
 <section class="certificate-feature" id="certificate" aria-labelledby="certificateTitle">
   <div class="certificate-copy">
     <span class="cert-kicker">VERIFIED BUSINESS CREDENTIALS</span>
@@ -128,9 +146,9 @@
   <div><b>BUSINESS</b><a href="dealer.html">Wholesale enquiries</a><a href="wholesale-account.html">Wholesale account</a><a href="account.html">Retail account</a><a href="#certificate">Distributor certificate</a></div>
   <div><b>CONTACT</b><a href="tel:+917708830513">+91 77088 30513</a><a href="support.html">Help &amp; Support</a><a href="https://wa.me/917708830513">WhatsApp our team</a><span>Chennai · Tamil Nadu</span></div>
   <p class="fine">© 2026 Max Volume Nutrition. All rights reserved. Retail prices are shown. Availability and product packaging may change. See Help Center for order details.</p>
-</footer>
+<p><a href="/mobile-app.html">Get the mobile app</a></p></footer>
 <dialog id="productDialog" class="product-dialog" aria-label="Product information"><button type="button" id="detailClose" class="detail-close" aria-label="Close product details">×</button><div id="productDetail"></div></dialog>
-<div id="shade" hidden></div><aside id="drawer" aria-hidden="true" aria-label="Shopping bag"><div class="dhead"><div><small>MAX VOLUME NUTRITION</small><h2>YOUR CART</h2></div><button id="close" aria-label="Close bag">×</button></div><div id="items"></div><div class="drawerfoot"><div id="cart-totals"></div><form id="checkoutFields"><h3 class="checkout-heading">CHECKOUT DETAILS</h3><label>Full name<input id="customerName" required maxlength="100" autocomplete="name" placeholder="Enter your name"></label><label>Mobile number<input id="customerPhone" required type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" autocomplete="tel-national" title="Enter a 10-digit mobile number" placeholder="10-digit mobile number"></label><p class="checkout-message"><strong>Online payment is temporarily unavailable.</strong> We are confirming orders through WhatsApp. Your selected products, quantities, total, name and phone number will be included in the WhatsApp message.</p><small>Sending the message requests confirmation. Our team will confirm stock, delivery and payment arrangements before your order is accepted. No online payment is taken.</small><button class="primary send" id="send" type="submit">CONFIRM VIA WHATSAPP ↗</button></form></div></aside>
+<div id="shade" hidden></div><aside id="drawer" role="dialog" aria-modal="true" tabindex="-1" aria-hidden="true" aria-label="Shopping bag"><div class="dhead"><div><small>MAX VOLUME NUTRITION</small><h2>YOUR CART</h2></div><button id="close" aria-label="Close bag">×</button></div><div id="items"></div><div class="drawerfoot"><div id="cart-totals"></div><form id="checkoutFields"><h3 class="checkout-heading">CHECKOUT DETAILS</h3><label>Full name<input id="customerName" required maxlength="100" autocomplete="name" placeholder="Enter your name"></label><label>Mobile number<input id="customerPhone" required type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" autocomplete="tel-national" title="Enter a 10-digit mobile number" placeholder="10-digit mobile number"></label><p class="checkout-message"><strong>Online payment is temporarily unavailable.</strong> We are confirming orders through WhatsApp. Your selected products, quantities, total, name and phone number will be included in the WhatsApp message.</p><small>Sending the message requests confirmation. Our team will confirm stock, delivery and payment arrangements before your order is accepted. No online payment is taken.</small><button class="primary send" id="send" type="submit">CONFIRM VIA WHATSAPP ↗</button></form></div></aside>
 <button id="floatingCart" class="floating-cart" type="button" aria-label="View shopping cart"><span>🛒 VIEW CART</span><strong id="floatingCount" aria-live="polite">0</strong></button>
 <script src="app.js" defer></script>
 </body></html>

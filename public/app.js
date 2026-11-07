@@ -11,6 +11,24 @@ const P=[
 const $=id=>document.getElementById(id);
 const money=n=>"₹"+Number(n).toLocaleString("en-IN");
 let cat="all",q="",cart={},mode="retail";
+let priceRange="all",recent=[];
+const categoryNames={all:"ALL PRODUCTS",whey:"WHEY PROTEIN",mass:"MASS GAINERS",pre:"PRE-WORKOUT",creatine:"CREATINE",vitamins:"VITAMINS"};
+const priceLabels={all:"All prices",under1000:"Under ₹1,000","1000to3000":"₹1,000 – ₹3,000",over3000:"Over ₹3,000"};
+function matchesPrice(v){return priceRange==="all"||(priceRange==="under1000"&&v.price<1000)||(priceRange==="1000to3000"&&v.price>=1000&&v.price<=3000)||(priceRange==="over3000"&&v.price>3000)}
+function displayVariant(p){const featured=p.featuredIndex||0;return matchesPrice(p.variants[featured])?featured:Math.max(0,p.variants.findIndex(matchesPrice))}
+try{const saved=JSON.parse(localStorage.getItem("mvn-recent-v1")||"[]");if(Array.isArray(saved))recent=[...new Set(saved.filter(id=>P.some(p=>p.id===id)))].slice(0,4)}catch{}
+function renderRecent(){
+ const section=$("recentSection");if(!section)return;section.hidden=!recent.length;
+ $("recentProducts").replaceChildren(...recent.map(id=>{
+  const p=P.find(item=>item.id===id),v=p.variants[p.featuredIndex||0],button=document.createElement("button");
+  button.type="button";button.className="recent-product";
+  const image=coverImage(p,p.featuredIndex||0);
+  if(image){const img=document.createElement("img");img.src=image;img.alt="";img.loading="lazy";img.onerror=()=>img.hidden=true;button.append(img)}
+  const name=document.createElement("strong");name.textContent=p.name;
+  const price=document.createElement("span");price.textContent=v.label+" · "+money(v.price);
+  button.append(name,price);button.onclick=()=>showDetail(id);return button;
+ }));
+}
 try{const v=JSON.parse(localStorage.getItem("mvn-cart-v2")||"{}");if(v&&typeof v==="object")cart=v}catch(e){}
 function getItem(k){if(!/^(whey|mass|pre|creatine|vitamins)\|[0-9]+$/.test(k))return null;const [id,i]=k.split("|");const p=P.find(x=>x.id===id),v=p&&p.variants[Number(i)];return p&&v?{p,v}:null}
 cart=Object.fromEntries(Object.entries(cart).filter(([k,v])=>getItem(k)&&Number.isSafeInteger(v)&&v>0&&v<=999));
@@ -35,22 +53,27 @@ function priceMarkup(v){
  '<small class="selling-caption">Selling price</small>';
 }
 function card(p){
-const featured=p.featuredIndex||0;const cover=coverImage(p,featured);const pic=cover?'<img loading="lazy" src="'+cover+'" alt="'+p.name+'"><div class="placeholder" hidden><b>'+p.name+'</b>Photo coming soon</div>':'<div class="placeholder"><b>'+p.name+'</b>Correct pack photo being verified</div>';
+const featured=displayVariant(p);const cover=coverImage(p,featured);const pic=cover?'<img loading="lazy" src="'+cover+'" alt="'+p.name+'"><div class="placeholder" hidden><b>'+p.name+'</b>Photo coming soon</div>':'<div class="placeholder"><b>'+p.name+'</b>Correct pack photo being verified</div>';
 return '<article class="card"><div class="photo">'+pic+'</div><div class="info"><small>UNICORN PRO SERIES</small><h3>'+p.name+'</h3><p>'+p.desc+'</p><label class="variant-label" for="v-'+p.id+'">FLAVOUR / PACK SIZE</label><select id="v-'+p.id+'" class="variant">'+p.variants.map((v,i)=>'<option value="'+i+'"'+(i===featured?' selected':'')+'>'+v.label+'</option>').join("")+'</select><div class="price" id="price-'+p.id+'">'+priceMarkup(p.variants[featured])+'</div><button class="details-link" type="button" data-detail="'+p.id+'">VIEW PRODUCT DETAILS →</button><button class="add" data-id="'+p.id+'">ADD TO CART +</button></div></article>';
 }
 function render(){
-const items=P.filter(p=>(cat==="all"||p.cat===cat)&&((p.name+" "+p.variants.map(v=>v.label).join(" ")).toLowerCase().includes(q.toLowerCase())));
+const items=P.filter(p=>(cat==="all"||p.cat===cat)&&p.variants.some(matchesPrice)&&((p.name+" "+p.variants.map(v=>v.label).join(" ")).toLowerCase().includes(q.toLowerCase())));
 if($("sort").value==="default")items.sort((a,b)=>Number(Boolean(coverImage(b,b.featuredIndex||0)))-Number(Boolean(coverImage(a,a.featuredIndex||0))));
 if($("sort").value==="name")items.sort((a,b)=>a.name.localeCompare(b.name));
-if($("sort").value==="low")items.sort((a,b)=>a.variants[0].price-b.variants[0].price);
-$("grid").innerHTML=items.map(card).join("");
+if($("sort").value==="low")items.sort((a,b)=>a.variants[displayVariant(a)].price-b.variants[displayVariant(b)].price);
+if($("sort").value==="high")items.sort((a,b)=>b.variants[displayVariant(b)].price-a.variants[displayVariant(a)].price);
+$("grid").innerHTML=items.length?items.map(card).join(""):'<div class="no-products"><span aria-hidden="true">⌕</span><h3>No matching products</h3><p>Try another name or price range, or browse the full collection.</p><button type="button" id="emptyReset">View all products</button></div>';
+if($("emptyReset"))$("emptyReset").onclick=resetFilters;
+if($("collectionTitle"))$("collectionTitle").textContent=categoryNames[cat];
+document.querySelectorAll("[data-cat]").forEach(button=>{const active=button.dataset.cat===cat;button.classList.toggle("active",active);if(button.tagName==="BUTTON")button.setAttribute("aria-pressed",String(active));});
+const filters=$("activeFilters");if(filters){filters.replaceChildren();for(const [label,clear] of [[q?"Search: "+q:"",()=>{q="";$("q").value="";}],[priceRange!=="all"?priceLabels[priceRange]:"",()=>{priceRange="all";$("priceRange").value="all";}]]){if(!label)continue;const button=document.createElement("button");button.type="button";button.textContent=label+" ×";button.setAttribute("aria-label","Clear "+label);button.onclick=()=>{clear();render()};filters.append(button)}filters.hidden=!filters.childElementCount;}
  document.querySelectorAll(".photo img").forEach(img=>img.addEventListener("error",()=>{img.hidden=true;if(img.nextElementSibling)img.nextElementSibling.hidden=false}));
 $("resultText").textContent=items.length+" product"+(items.length===1?"":"s")+" available";
 document.querySelectorAll(".variant").forEach(s=>s.addEventListener("change",()=>{const p=P.find(x=>x.id===s.id.slice(2));$("price-"+p.id).innerHTML=priceMarkup(p.variants[Number(s.value)]);swapPhoto(s.closest(".card").querySelector(".photo"),coverImage(p,s.value),p.name)}));
 document.querySelectorAll(".details-link").forEach(b=>b.addEventListener("click",()=>showDetail(b.dataset.detail)));
 document.querySelectorAll(".add").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.id+"|"+$("v-"+b.dataset.id).value;cart[k]=Math.min(999,(cart[k]||0)+1);persist();openBag()}));
 }
-function setCat(c){cat=c;document.querySelectorAll(".cats [data-cat]").forEach(b=>b.classList.toggle("active",b.dataset.cat===c));render();$("shop").scrollIntoView({behavior:"smooth"})}
+function setCat(c){if(!Object.hasOwn(categoryNames,c))return;cat=c;document.querySelectorAll(".cats [data-cat]").forEach(b=>b.classList.toggle("active",b.dataset.cat===c));render();$("shop").scrollIntoView({behavior:"smooth"})}
 function totals(){let n=0,subtotal=0;for(const [k,qty] of Object.entries(cart)){const item=getItem(k);if(!item)continue;const quantity=Math.min(999,Math.max(0,Number(qty)||0));n+=quantity;subtotal+=item.v.price*quantity;}return{n,subtotal}}
 function drawCart(){
 const {n,subtotal}=totals();$("count").textContent=n;if($("floatingCount"))$("floatingCount").textContent=n;
@@ -62,8 +85,9 @@ $("send").disabled=!n;
 document.querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>{const k=b.dataset.minus;cart[k]-=1;if(cart[k]<=0)delete cart[k];persist()});
 document.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>{const k=b.dataset.plus;cart[k]=Math.min(999,cart[k]+1);persist()});
 }
-function openBag(){$("shade").hidden=false;$("drawer").classList.add("open");$("drawer").setAttribute("aria-hidden","false");document.body.classList.add("cart-open")}
-function closeBag(){$("shade").hidden=true;$("drawer").classList.remove("open");$("drawer").setAttribute("aria-hidden","true");document.body.classList.remove("cart-open")}
+let bagOpener=null;
+function openBag(){bagOpener=document.activeElement;for(const el of document.body.children){if(!["drawer","shade"].includes(el.id)&&!['SCRIPT','SVG'].includes(el.tagName)){el.dataset.bagInert=String(el.inert);el.inert=true;}}$("shade").hidden=false;$("drawer").classList.add("open");$("drawer").setAttribute("aria-hidden","false");document.body.classList.add("cart-open");$("close").focus()}
+function closeBag(){$("shade").hidden=true;$("drawer").classList.remove("open");$("drawer").setAttribute("aria-hidden","true");document.body.classList.remove("cart-open");document.querySelectorAll("[data-bag-inert]").forEach(el=>{el.inert=el.dataset.bagInert==="true";delete el.dataset.bagInert});(bagOpener?.isConnected?bagOpener:$("bag")).focus()}
 function retailEnquiry(){
 const entries=Object.entries(cart).filter(([k])=>getItem(k));if(!entries.length)return;
 const name=$("customerName").value.trim(),phone=$("customerPhone").value.trim();
@@ -79,10 +103,20 @@ $("sort").onchange=render;
 $("search").onsubmit=e=>{e.preventDefault();q=$("q").value;cat="all";render();$("shop").scrollIntoView({behavior:"smooth"})};
 $("q").oninput=e=>{q=e.target.value;render()};
 $("checkoutFields").onsubmit=e=>{e.preventDefault();retailEnquiry()};
-render();drawCart();
+function resetFilters(){cat="all";q="";priceRange="all";$("q").value="";if($("priceRange"))$("priceRange").value="all";$("sort").value="default";render()}
+if($("priceRange"))$("priceRange").onchange=e=>{priceRange=e.target.value;render()};
+if($("resetFilters"))$("resetFilters").onclick=resetFilters;
+if($("clearRecent"))$("clearRecent").onclick=()=>{recent=[];try{localStorage.removeItem("mvn-recent-v1")}catch{}renderRecent()};
+document.addEventListener("keydown",e=>{
+ if(!$("drawer").classList.contains("open"))return;
+ if(e.key==="Escape"){e.preventDefault();closeBag()}
+ if(e.key==="Tab"){const controls=[...$("drawer").querySelectorAll('button:not(:disabled),input,a[href],select')].filter(el=>el.getClientRects().length);const first=controls[0],last=controls.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}
+});
+render();drawCart();renderRecent();
 
 function showDetail(id){
  const p=P.find(x=>x.id===id);if(!p)return;
+ recent=[id,...recent.filter(value=>value!==id)].slice(0,4);try{localStorage.setItem("mvn-recent-v1",JSON.stringify(recent))}catch{}renderRecent();
  const dlg=$("productDialog"),root=$("productDetail");
  const initialIndex=Number($("v-"+id)?.value ?? p.featuredIndex ?? 0);
  const cover=coverImage(p,initialIndex);const photo=cover?'<img src="'+cover+'" alt="'+p.name+'" loading="lazy"><div class="placeholder" hidden>Verified product image pending</div>':'<div class="placeholder"><b>'+p.name+'</b>Verified product image pending</div>';

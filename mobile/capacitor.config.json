@@ -1,0 +1,9 @@
+{
+  "appId": "com.maxvolumenutrition.store.preview",
+  "appName": "MVN Store Preview",
+  "webDir": "www",
+  "server": {
+    "url": "https://max-volume-nutrition-preview.onrender.com",
+    "cleartext": false
+  }
+}
