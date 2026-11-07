@@ -305,3 +305,10 @@
 .owner-admin .pickup-next{border-top:1px solid var(--line);margin-top:24px;padding-top:18px;max-width:950px}
 .owner-admin .pickup-next a{color:#1f568d;text-decoration:underline}
 @media(max-width:640px){.owner-admin .pickup-setup-head{flex-direction:column}.owner-admin .pickup-primary-link{width:100%}}
+
+/* Private Shiprocket collection-point draft; never shown in public storefront. */
+.owner-admin .pickup-draft-card{margin:16px 0 22px;padding:18px;border:1px solid #ccd6e3;border-radius:10px;background:#f6f9fc}
+.owner-admin .pickup-draft-card h3{margin:0 0 8px;font-size:18px}
+.owner-admin .pickup-draft-card p{color:var(--muted);font-size:12px}
+.owner-admin .pickup-draft-address{white-space:pre-line;font-style:normal;font-size:14px;line-height:1.7;padding:12px 0}
+.owner-admin #pickupDraftCopy{background:#172e57;color:#fff;border:0;border-radius:8px;padding:10px 16px;cursor:pointer;font-weight:700}
