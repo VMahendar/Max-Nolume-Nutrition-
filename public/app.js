@@ -116,6 +116,7 @@ document.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>{const k=b.dat
 let bagOpener=null;
 function openBag(){bagOpener=document.activeElement;for(const el of document.body.children){if(!["drawer","shade"].includes(el.id)&&!['SCRIPT','SVG'].includes(el.tagName)){el.dataset.bagInert=String(el.inert);el.inert=true;}}$("shade").hidden=false;$("drawer").classList.add("open");$("drawer").setAttribute("aria-hidden","false");document.body.classList.add("cart-open");$("close").focus()}
 function closeBag(){$("shade").hidden=true;$("drawer").classList.remove("open");$("drawer").setAttribute("aria-hidden","true");document.body.classList.remove("cart-open");document.querySelectorAll("[data-bag-inert]").forEach(el=>{el.inert=el.dataset.bagInert==="true";delete el.dataset.bagInert});(bagOpener?.isConnected?bagOpener:$("bag")).focus()}
+let retailLeadKey=crypto.randomUUID();
 async function retailEnquiry(){
 let entries=Object.entries(cart).filter(([k])=>getItem(k));if(!entries.length)return;
 const name=$("customerName").value.trim(),phone=$("customerPhone").value.trim();
@@ -124,14 +125,25 @@ for(const id of ['customerName','customerAddress','customerCity','customerState'
 if(!$("checkoutFields").reportValidity()||!name||!/^[0-9]{10}$/.test(phone)||!address||!city||!state||!/^[1-9][0-9]{5}$/.test(pincode))return;
 const message=$("priceMessage");const previous=totals().total;$("send").disabled=true;message.textContent="Checking current prices…";
 try{await refreshRetailPrices();if($("offerCode").value.trim())await quoteOffer();drawCart();renderRecent();document.querySelectorAll('.variant').forEach(select=>{const p=P.find(item=>item.id===select.id.slice(2));$("price-"+p.id).innerHTML=priceMarkup(p.variants[Number(select.value)])});}catch(error){message.textContent=error.message;$("send").disabled=false;return;}
-if(totals().total!==previous){message.textContent="Prices have been updated. Please review your cart total and confirm again.";return;}
+if(totals().total!==previous){message.textContent="Prices have been updated. Please review your cart total and confirm again.";$("send").disabled=false;return;}
 message.textContent="";
 entries=Object.entries(cart).filter(([k])=>getItem(k));if(!entries.length)return;
 const lines=entries.map(([k,n])=>{const {p,v}=getItem(k);return p.name+" — "+v.label+" × "+n+" = "+money(n*v.price)});
 const {subtotal,discount,total}=totals();
 const offerText=discount?"\nOffer code: "+appliedOffer.campaign.code+"\nOffer savings: "+money(discount)+"\nProducts total after offer: "+money(total):"";
 const msg="Hello Max Volume Nutrition, I would like to confirm my order request via WhatsApp:\n\nSelected products:\n"+lines.join("\n")+"\n\nProducts total: "+money(subtotal)+offerText+"\n\nCustomer name: "+name+"\nMobile number: "+phone+"\n\nDelivery address: "+address+"\nCity: "+city+"\nState: "+state+"\nPIN code: "+pincode+"\nPayment preference: "+payment+"\n\nPlease confirm stock, delivery availability, shipping charges and final payable total. Share the payment instructions or payment link on WhatsApp. This message is an order request; payment and shipment are confirmed separately by your team.";
-window.location.assign("https://wa.me/"+PHONE+"?text="+encodeURIComponent(msg));
+let whatsappMessage=msg;
+ try{
+  const items=entries.map(([k,quantity])=>{const [id,index]=k.split('|');return {variantId:retailVariantIds[id][Number(index)],quantity};});
+  const response=await fetch('/api/enquiries',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requestKey:retailLeadKey,kind:'retail',name,phone,address,city,state,pincode,paymentPreference:payment,items,offerCode:$("offerCode").value.trim(),acknowledgeStorage:$("leadConsent").checked}),signal:AbortSignal.timeout(10000)});
+  const result=await response.json();if(!response.ok||!result.recorded)throw Error(result.error||'Enquiry not saved');
+  whatsappMessage+='\\n\\nEnquiry reference: '+result.id;
+  message.textContent='Your enquiry was recorded as '+result.id+'. WhatsApp will now open. Press Send to contact our team.';
+ }catch(error){
+  message.textContent='Your enquiry was NOT saved on the website. Please press Send in WhatsApp to contact us directly.';
+ }
+ $("send").disabled=false;
+ window.location.assign("https://wa.me/"+PHONE+"?text="+encodeURIComponent(whatsappMessage));
 }
 async function quoteOffer(){
  const code=$("offerCode").value.trim();
@@ -165,6 +177,7 @@ $("sort").onchange=render;
 $("search").onsubmit=e=>{e.preventDefault();q=$("q").value;cat="all";render();$("shop").scrollIntoView({behavior:"smooth"})};
 $("q").oninput=e=>{q=e.target.value;render()};
 for(const id of ['customerName','customerAddress','customerCity','customerState'])$(id).addEventListener('input',()=>$(id).setCustomValidity(''));
+$("checkoutFields").addEventListener("input",()=>{retailLeadKey=crypto.randomUUID()});
 $("checkoutFields").onsubmit=e=>{e.preventDefault();retailEnquiry()};
 function resetFilters(){cat="all";q="";priceRange="all";$("q").value="";if($("priceRange"))$("priceRange").value="all";$("sort").value="default";render()}
 if($("priceRange"))$("priceRange").onchange=e=>{priceRange=e.target.value;render()};
