@@ -2,6 +2,7 @@ const previewBadge=document.querySelector('.owner-preview-status');if(previewBad
 const $=id=>document.getElementById(id);
 const screens={
  'my-work':['My Work','Your store change requests, all in one place.'],
+ launch:['Launch checklist','Check what is ready for the real payment and delivery launch.'],
  'daily-desk':['Overview','Your store at a glance.'],
  sales:['Sales','Record completed shop and WhatsApp sales.'],purchases:['Purchases','Receive goods and keep your supplier bill records together.'],
  inventory:['Stock','Check quantities, reservations and available packs.'],orders:['Online orders','Review checkouts, payment status and delivery.'],products:['Products','Add products, pack photos and clear customer prices.'],
