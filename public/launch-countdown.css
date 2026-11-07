@@ -42,7 +42,7 @@ html.mvn-prelaunch-pending #mvn-opening-countdown{
   text-transform:uppercase;line-height:1.6;
 }
 .mvn-clock-headline{
-  color:#111214;font-size:clamp(59px,6.8vw,110px);line-height:.87;letter-spacing:-.07em;
+  color:#111214;font-size:clamp(44px,4.6vw,72px);line-height:.87;letter-spacing:-.07em;
   font-weight:950;margin:0;text-transform:uppercase;text-wrap:balance;
 }
 .mvn-clock-headline>span{color:#945b3b}
@@ -126,7 +126,7 @@ html.mvn-prelaunch-pending #mvn-opening-countdown{
 @media(max-width:950px){
   .mvn-launch-layout{grid-template-columns:1fr 1fr}
   .mvn-clock-label{padding:40px 27px;gap:19px}
-  .mvn-clock-headline{font-size:clamp(50px,7.3vw,74px)}
+  .mvn-clock-headline{font-size:clamp(32px,5vw,48px)}
   .mvn-launch-visual{padding:20px 16px}
 }
 @media(max-width:680px){
@@ -135,7 +135,7 @@ html.mvn-prelaunch-pending #mvn-opening-countdown{
   .mvn-clock-logo{width:240px;height:82px}
   .mvn-launch-layout{grid-template-columns:1fr;min-height:0}
   .mvn-clock-label{padding:36px 24px 28px;gap:18px}
-  .mvn-clock-headline{font-size:clamp(48px,11.8vw,78px);line-height:.9}
+  .mvn-clock-headline{font-size:clamp(30px,8.9vw,60px);line-height:.9}
   .mvn-clock-eyebrow{font-size:9px;letter-spacing:.16em}
   .mvn-clock-description{font-size:12px;line-height:1.65;max-width:400px}
   .mvn-clock-date{font-size:10px}
@@ -154,7 +154,7 @@ html.mvn-prelaunch-pending #mvn-opening-countdown{
 @media(max-height:710px) and (max-width:680px){
   .mvn-clock-logo{height:65px}
   .mvn-clock-label{padding:22px 24px 20px;gap:12px}
-  .mvn-clock-headline{font-size:46px}
+  .mvn-clock-headline{font-size:clamp(30px,8.9vw,46px)}
   .mvn-launch-product-stage{min-height:185px;padding:5px 0}
   .mvn-launch-product-main{height:170px}
   .mvn-launch-product-secondary{height:145px}

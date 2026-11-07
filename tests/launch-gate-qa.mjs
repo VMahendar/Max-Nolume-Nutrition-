@@ -14,6 +14,14 @@ try{
   await page.addInitScript(()=>{const match=window.matchMedia.bind(window);window.matchMedia=q=>q==='(display-mode: standalone)'?{...match(q),matches:true,addListener(){},removeListener(){},addEventListener(){},removeEventListener(){}}:match(q);});
   await page.clock.install({time:new Date('2026-11-08T17:29:50Z')});await page.goto(base+path);
   await page.locator('#mvn-opening-countdown').waitFor();assert.equal(await page.evaluate(()=>document.documentElement.classList.contains('mvn-prelaunch-pending')),true);assert.equal(await page.locator('#shop').evaluate(el=>el.inert),true);
+  for(const width of [1440,390,320]){
+   await page.setViewportSize({width,height:900});
+   const title=await page.locator('.mvn-clock-headline').evaluate(el=>{
+    const parent=el.parentElement,style=getComputedStyle(parent);
+    return {width:el.scrollWidth,available:parent.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight)};
+   });
+   assert.ok(title.width<=title.available+1,`Launch headline clips at ${width}px on ${path}: ${JSON.stringify(title)}`);
+  }
   await page.clock.runFor(11000);assert.equal(await page.evaluate(()=>document.documentElement.classList.contains('mvn-prelaunch-pending')),false);assert.equal(await page.locator('#shop').evaluate(el=>el.inert),false);
   await page.close();
  }
