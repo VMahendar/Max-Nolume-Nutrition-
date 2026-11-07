@@ -4,7 +4,24 @@ import {randomBytes} from 'node:crypto';
 import {openCommerce,passwordHash} from '../commerce.mjs';
 if(process.env.STAGING_MODE!=='true'||!process.env.DATA_DIR)throw Error('Explicit STAGING_MODE and isolated DATA_DIR are required.');
 const dir=resolve(process.env.DATA_DIR),marker=resolve(dir,'staging-only.json');
-if(existsSync(marker)){const value=JSON.parse(readFileSync(marker,'utf8'));if(value.purpose!=='mvn-staging-test-data'||value.version!==1)throw Error('Unrecognized data directory.');console.log('Existing isolated staging data retained.');process.exit(0);}
+if(existsSync(marker)){
+ const value=JSON.parse(readFileSync(marker,'utf8'));
+ if(value.purpose!=='mvn-staging-test-data'||value.version!==1)throw Error('Unrecognized data directory.');
+ if(process.env.STAGING_OWNER_RESET_PASSWORD==='true'){
+  const password=process.env.STAGING_ADMIN_PASSWORD;
+  if(typeof password!=='string'||password.length<16)throw Error('Staging admin password must have at least 16 characters.');
+  const db=openCommerce(dir);
+  try{
+   const hash=await passwordHash(password);
+   const result=db.db.prepare("UPDATE users SET password=? WHERE id='staging-admin' AND role='admin' AND email='staging-admin@example.test'").run(hash);
+   if(result.changes!==1)throw Error('Staging admin account was not found. No other accounts were changed.');
+   db.db.prepare('DELETE FROM sessions WHERE user_id=?').run('staging-admin');
+   db.audit('staging-init','admin.preview-password.reset','staging-admin',{stagingOnly:true});
+   console.log('Staging-only administrator login refreshed.');
+  }finally{db.db.close();}
+ }
+ console.log('Existing isolated staging data retained.');process.exit(0);
+}
 if(existsSync(resolve(dir,'orders.sqlite')))throw Error('Refusing to seed an existing unmarked database. Production data must never be imported into staging.');
 for(const key of ['STAGING_ADMIN_PASSWORD','STAGING_CUSTOMER_PASSWORD'])if(typeof process.env[key]!=='string'||process.env[key].length<16)throw Error(key+' must contain at least 16 characters.');
 const adminHash=await passwordHash(process.env.STAGING_ADMIN_PASSWORD),customerHash=await passwordHash(process.env.STAGING_CUSTOMER_PASSWORD);
