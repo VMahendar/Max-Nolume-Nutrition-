@@ -13,7 +13,7 @@ const allowStaging=stagingGate();
 import {isIP} from 'node:net';
 import {readFileSync,realpathSync,existsSync} from 'node:fs';
 import {resolve,extname,sep} from 'node:path';
-import {randomUUID,randomBytes} from 'node:crypto';
+import {randomUUID,randomBytes,timingSafeEqual} from 'node:crypto';
 import {signatureMatches,quote,customerValid} from './lib.mjs';
 import {openCommerce,Problem,fail,hash,clean,integer,email,passwordHash,passwordMatches,taxQuote,stateCode} from './commerce.mjs';
 import {razor,shippingReady,shiprocketClient,shipmentPayload} from './integrations.mjs';
@@ -76,11 +76,15 @@ function checkoutResponse(row){const p=JSON.parse(row.payload);if(row.status==='
 const server=http.createServer(async(req,res)=>{res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','DENY');res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline'; img-src 'self' https://revakanya.com https://unicornproseries.com https://www.unicornproseries.com data: https://static.wixstatic.com; connect-src 'self' https://*.razorpay.com; frame-src https://*.razorpay.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'");if(production)res.setHeader('Strict-Transport-Security','max-age=31536000; includeSubDomains');
 try{if(!await allowStaging(req,res))return;const u=new URL(req.url,'http://localhost');if(u.pathname==='/healthz')return json(res,200,{ok:true});
 if(u.pathname==='/owner-preview'&&['GET','HEAD'].includes(req.method)){
+  // Private, no-login owner viewing uses a 256-bit environment-only bearer link.
+  // The public site and its launch countdown are not changed.
   const previewUser=C.session(req);
-  if(!previewUser||previewUser.role!=='admin'){
-    res.writeHead(302,{'Location':'/admin.html#ownerAccess','Cache-Control':'no-store','X-Robots-Tag':'noindex, nofollow'});
-    return res.end();
-  }
+  const supplied=u.searchParams.get('key')||'';
+  const configured=process.env.OWNER_REVIEW_TOKEN||'';
+  const validToken=/^[a-f0-9]{64}$/.test(supplied)&&/^[a-f0-9]{64}$/.test(configured)&&
+    timingSafeEqual(Buffer.from(supplied,'hex'),Buffer.from(configured,'hex'));
+  if(!validToken&&previewUser?.role!=='admin')fail(403,'Private review link required.');
+  const reviewSuffix=validToken?'&key='+encodeURIComponent(supplied):'';
   const view=u.searchParams.get('view')==='app'?'app':u.searchParams.get('view')==='mobile'?'mobile':'desktop';
   const page=u.searchParams.get('page')|| (view==='app'?'mobile-app.html':'index.html');
   const allowed=new Set(['index.html','mobile-app.html','account.html','wholesale-account.html','dealer.html','support.html','admin.html']);
@@ -92,7 +96,7 @@ if(u.pathname==='/owner-preview'&&['GET','HEAD'].includes(req.method)){
     .replace(/<link rel="stylesheet" href="\/launch-countdown\.css">/g,'');
   const previewStyles='<base href="/"><meta name="robots" content="noindex,nofollow"><style>html.mvn-prelaunch-pending body{overflow:auto!important}body>.mvn-opening-countdown{display:none!important}.mvn-owner-preview-nav{position:sticky;top:0;z-index:2147483630;display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center;padding:12px;background:#141414;color:#fff;font:600 13px system-ui;box-shadow:0 2px 12px #0005}.mvn-owner-preview-nav a{color:#fff;text-decoration:none;border:1px solid #777;padding:7px 11px;border-radius:5px}.mvn-owner-preview-nav a[aria-current]{background:#fff;color:#111}.app-store .app-install-gate{display:none!important}body.app-store .native-app-header,body.app-store .native-app-search,body.app-store .app-welcome,body.app-store main,body.app-store .app-bottom-nav{display:revert}</style>';
   html=html.replace('</head>',previewStyles+'</head>');
-  const nav='<nav class="mvn-owner-preview-nav" aria-label="Private owner review"><span>OWNER REVIEW · NOT PUBLIC</span><a href="/owner-preview?view=desktop">Desktop site</a><a href="/owner-preview?view=mobile">Mobile site</a><a href="/owner-preview?view=app">Mobile app</a><a href="/admin.html">Admin</a></nav>';
+  const nav=`<nav class="mvn-owner-preview-nav" aria-label="Private owner review"><span>OWNER REVIEW · NOT PUBLIC</span><a href="/owner-preview?view=desktop${reviewSuffix}">Desktop site</a><a href="/owner-preview?view=mobile${reviewSuffix}">Mobile site</a><a href="/owner-preview?view=app${reviewSuffix}">Mobile app</a><a href="/admin.html">Admin</a></nav>`;
   html=html.replace(/<body([^>]*)>/i,(tag)=>tag+nav);
   html=html.replace('</body>','<script src="/owner-preview.js" defer></script></body>');
   res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'private, no-store','X-Robots-Tag':'noindex, nofollow'});

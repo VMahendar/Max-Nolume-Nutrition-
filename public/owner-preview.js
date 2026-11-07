@@ -1,5 +1,5 @@
 /* Private owner page navigation: no countdown bypass for public visitors.
- * Access to /owner-preview requires a valid administrator session server-side. */
+ * Access to /owner-preview requires an unguessable, server-verified link or an administrator session. */
 (() => {
   const allowed = new Set(['index.html','mobile-app.html','account.html','wholesale-account.html','dealer.html','support.html','admin.html']);
   const here = new URL(location.href);
@@ -16,6 +16,8 @@
     if (page === 'admin.html') return;
     const review = new URL('/owner-preview', location.origin);
     review.searchParams.set('view', view);
+    const key = here.searchParams.get('key');
+    if (key) review.searchParams.set('key', key);
     review.searchParams.set('page', page);
     if (url.hash) review.hash = url.hash;
     a.href = review.pathname + review.search + review.hash;

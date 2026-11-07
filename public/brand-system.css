@@ -1,0 +1,139 @@
+/* Max Volume Nutrition | coherent retail brand system
+   Brand rule: COPPER LETTERS + THIN BLACK OUTLINE; NO COLOURED LOGO PANEL.
+   Copper belongs to the logo and small identity details, NOT the page background.
+   This layer comes last after the legacy themes. Functional shopping remains unchanged. */
+:root{--mvn-paper:#f7f8f7;--mvn-white:#fff;--mvn-ink:#1b2228;--mvn-muted:#646c73;--mvn-rule:#e5e9e9;--mvn-copper:#bb784f;--mvn-black:#171819}
+html{scroll-padding-top:112px}
+body.retail-home{background:var(--mvn-white)!important;color:var(--mvn-ink)!important;font-family:Inter,"Segoe UI",Arial,sans-serif!important;line-height:1.55}
+body.retail-home *{box-sizing:border-box}
+body.retail-home :is(a,button,input,select,textarea,summary):focus-visible{outline:2px solid #1c252c!important;outline-offset:3px!important}
+body.retail-home:not(.app-store) .announce{background:#252b30!important;color:#f5f6f6!important;border:0!important;min-height:34px!important}
+body.retail-home:not(.app-store) .announce a{color:#fff!important;border-color:#b9c0c3!important}
+body.retail-home:not(.app-store) .storehead{
+ background:#fff!important;color:#1d252b!important;box-shadow:none!important;
+ border:0!important;border-bottom:1px solid var(--mvn-rule)!important;
+ grid-template-columns:minmax(250px,305px) minmax(220px,1fr) auto!important;
+ gap:clamp(15px,2.4vw,42px)!important;min-height:104px!important;
+ padding:14px max(24px,calc((100% - 1360px)/2))!important
+}
+body.retail-home:not(.app-store) .brand-identity{
+ width:100%!important;max-width:305px!important;min-width:0!important;
+ height:74px!important;min-height:74px!important;max-height:none!important;
+ overflow:visible!important;border:none!important;border-radius:0!important;
+ background:none!important;background-image:none!important;box-shadow:none!important;
+ mix-blend-mode:normal!important;padding:2px 0!important;
+ display:flex!important;align-items:center!important;justify-content:flex-start!important
+}
+body.retail-home:not(.app-store) .brand-identity .original-brand-logo{
+ display:block!important;opacity:1!important;visibility:visible!important;
+ width:100%!important;max-width:305px!important;height:70px!important;max-height:none!important;
+ object-fit:contain!important;object-position:left center!important;
+ background:none!important;mix-blend-mode:normal!important;
+ filter:url("#mvnCopperInk")!important;transform:none!important
+}
+body.retail-home:not(.app-store) .header-search{max-width:620px!important;gap:6px!important}
+body.retail-home:not(.app-store) .header-descriptor{color:#616b72!important;font-size:10px!important;letter-spacing:.065em!important}
+body.retail-home:not(.app-store) #search{height:48px!important;border:1px solid #d8dfe2!important;background:#f5f7f8!important;border-radius:5px!important}
+body.retail-home:not(.app-store) #search input{background:transparent!important;color:#252d33!important;font-size:13px!important}
+body.retail-home:not(.app-store) #search button{background:#20282e!important;color:#fff!important;border-radius:0!important}
+body.retail-home:not(.app-store) #bag{height:46px!important;background:#20282e!important;color:#fff!important;border-color:#20282e!important;border-radius:5px!important}
+body.retail-home:not(.app-store) .head-actions :is(.wa,.account-link){color:#252c31!important}
+body.retail-home:not(.app-store) .nav{background:#fff!important;border-bottom:1px solid #e4e7e9!important;min-height:48px!important}
+body.retail-home:not(.app-store) .nav a{color:#252d34!important;font-size:11px!important;font-weight:750!important;letter-spacing:.015em!important;min-height:48px!important}
+body.retail-home:not(.app-store) .nav :is(a:hover,.nav-featured){border-bottom-color:#222a2f!important}
+body.retail-home:not(.app-store) .hero{
+ background:#f2f4f4!important;color:#182127!important;
+ border-bottom:1px solid #e3e7e9!important;grid-template-columns:minmax(0,.98fr) minmax(0,1.02fr)!important;
+ min-height:560px!important
+}
+body.retail-home:not(.app-store) .hero-copy{padding-top:clamp(60px,6vw,96px)!important;padding-bottom:clamp(55px,6vw,96px)!important}
+body.retail-home:not(.app-store) .hero-kicker{color:#5b656c!important;letter-spacing:.12em!important}
+body.retail-home:not(.app-store) .kicker-line{background:#656e75!important}
+body.retail-home:not(.app-store) .hero h1{color:#20282e!important;letter-spacing:-.06em!important;font-size:clamp(44px,4.5vw,73px)!important;line-height:1.02!important;max-width:690px!important}
+body.retail-home:not(.app-store) .hero h1 strong{color:#20282e!important}
+body.retail-home:not(.app-store) .hero p{color:#525e65!important;font-size:15px!important;line-height:1.72!important}
+body.retail-home:not(.app-store) .hero :is(.primary,.secondary){border-radius:5px!important;font-size:11px!important}
+body.retail-home:not(.app-store) .hero .primary{background:#252d34!important;color:#fff!important;border-color:#252d34!important}
+body.retail-home:not(.app-store) .hero .secondary{color:#252d34!important;border:1px solid #9aa3a8!important;background:transparent!important}
+body.retail-home:not(.app-store) .hero-visual{background:#e9eeee!important;border-left:1px solid #dee3e6!important}
+body.retail-home:not(.app-store) :is(.hero-spotlight,.hero-mini){background:#fff!important;border:1px solid #dee3e5!important;border-radius:8px!important}
+body.retail-home:not(.app-store) .hero-visual :is(img,.hero-product){object-fit:contain!important}
+body.retail-home:not(.app-store) .trust{border-top-color:#d5dcdf!important}
+body.retail-home:not(.app-store) .trust span{color:#68727a!important}
+body.retail-home:not(.app-store) .benefits{background:#fff!important;border-color:#e5e9eb!important}
+body.retail-home:not(.app-store) #shop{background:#fff!important}
+body.retail-home:not(.app-store) #shop .section-title h2{letter-spacing:-.05em!important;color:#212b33!important}
+body.retail-home:not(.app-store) .collection-filters{border-top-color:#313b42!important}
+body.retail-home:not(.app-store) .collection-results .grid{gap:clamp(12px,1.6vw,24px)!important}
+body.retail-home:not(.app-store) .collection-results .card{
+ background:#fff!important;border:1px solid #e2e7ea!important;border-radius:9px!important;
+ box-shadow:none!important;overflow:hidden!important;transition:box-shadow .2s ease,border-color .2s ease!important
+}
+body.retail-home:not(.app-store) .collection-results .card:hover{box-shadow:0 10px 32px #1b273016!important;border-color:#bfc8cd!important;transform:none!important}
+body.retail-home:not(.app-store) .collection-results .photo{background:#f6f8f8!important;min-height:220px!important}
+body.retail-home:not(.app-store) .collection-results .photo img{object-fit:contain!important;padding:12px!important}
+body.retail-home:not(.app-store) .collection-results .info{padding:19px!important}
+body.retail-home:not(.app-store) .collection-results .info h3{font-size:18px!important;letter-spacing:-.025em!important;color:#202a31!important}
+body.retail-home:not(.app-store) .collection-results .selling-price{color:#1c252b!important}
+body.retail-home:not(.app-store) .collection-results :is(.add,.primary){background:#252e34!important;color:#fff!important;border-radius:5px!important}
+body.retail-home:not(.app-store) .store-service-strip{background:#f7f8f8!important;border:1px solid #e5e8ea!important}
+body.retail-home:not(.app-store) .site-footer{background:#252b30!important;color:#f6f7f7!important}
+body.retail-home:not(.app-store) .site-footer :is(a,p,span){color:#e5e9eb!important}
+body.retail-home:not(.app-store) .footer-logo-frame{background:none!important;border:0!important;box-shadow:none!important;overflow:visible!important}
+body.retail-home:not(.app-store) .original-footer-logo{filter:url("#mvnCopperInk")!important;mix-blend-mode:normal!important;transform:none!important;object-fit:contain!important}
+
+/* App and mobile: same brand treatment, without inheriting the website's desktop-only hero. */
+body.retail-home.app-store{background:#f7f8f9!important;color:#202930!important}
+body.retail-home.app-store .native-app-header{background:#fff!important;border-bottom:1px solid #e1e7ea!important;box-shadow:none!important}
+body.retail-home.app-store .app-brand{min-width:0!important;display:flex!important;align-items:center!important;gap:9px!important}
+body.retail-home.app-store .app-brand img{background:none!important;filter:url("#mvnCopperInk")!important;mix-blend-mode:normal!important;object-fit:contain!important;transform:none!important}
+body.retail-home.app-store .app-brand span{color:#243039!important}
+body.retail-home.app-store .native-app-search{background:#fff!important;border-bottom:1px solid #e2e7e9!important}
+body.retail-home.app-store .app-welcome{background:#eaf0f2!important;color:#1f2931!important;border-bottom:1px solid #d8e0e4!important}
+body.retail-home.app-store .app-welcome h1{color:#1e2930!important;letter-spacing:-.045em!important}
+body.retail-home.app-store .app-bottom-nav{background:#fff!important;border-top:1px solid #dbe2e6!important;box-shadow:0 -5px 18px #1f2b330c!important}
+body.retail-home.app-store .app-bottom-nav a{color:#303b43!important}
+body.retail-home.app-store .grid .card{background:#fff!important;border:1px solid #e0e6e9!important;border-radius:9px!important;overflow:hidden!important;box-shadow:none!important}
+body.retail-home.app-store .grid .photo{background:#f4f6f7!important}
+body.retail-home.app-store .grid .photo img{object-fit:contain!important}
+body.retail-home.app-store :is(.add,.primary,#bag){background:#263039!important;color:#fff!important;border-radius:5px!important}
+body.retail-home.app-store .app-install-gate>img{filter:url("#mvnCopperInk")!important;background:none!important}
+
+@media(max-width:1050px){
+ body.retail-home:not(.app-store) .storehead{grid-template-columns:minmax(185px,240px) minmax(0,1fr) auto!important;padding-inline:20px!important;gap:14px!important}
+ body.retail-home:not(.app-store) .brand-identity{height:70px!important;min-height:70px!important}
+ body.retail-home:not(.app-store) .brand-identity .original-brand-logo{height:66px!important}
+}
+@media(max-width:900px){
+ body.retail-home:not(.app-store) .storehead{grid-template-columns:minmax(0,1fr) auto!important;gap:10px 14px!important;padding:13px 20px!important}
+ body.retail-home:not(.app-store) .brand-identity{grid-column:1!important;grid-row:1!important;max-width:260px!important;width:min(260px,100%)!important;height:66px!important;min-height:66px!important}
+ body.retail-home:not(.app-store) .brand-identity .original-brand-logo{height:62px!important}
+ body.retail-home:not(.app-store) .head-actions{grid-column:2!important;grid-row:1!important}
+ body.retail-home:not(.app-store) .header-search{grid-column:1/-1!important;grid-row:2!important;max-width:none!important}
+ body.retail-home:not(.app-store) .hero{grid-template-columns:1fr!important;min-height:0!important}
+ body.retail-home:not(.app-store) .hero-visual{border-left:0!important;border-top:1px solid #d9e0e4!important}
+}
+@media(max-width:620px){
+ body.retail-home:not(.app-store) .storehead{padding:10px 14px 13px!important;gap:8px!important}
+ body.retail-home:not(.app-store) .brand-identity{width:min(210px,100%)!important;max-width:210px!important;height:61px!important;min-height:61px!important;max-height:61px!important;padding:0!important;overflow:visible!important}
+ body.retail-home:not(.app-store) .brand-identity .original-brand-logo{width:100%!important;height:58px!important;max-height:58px!important;transform:none!important;object-position:left center!important}
+ body.retail-home:not(.app-store) #bag{min-height:42px!important;height:42px!important}
+ body.retail-home:not(.app-store) .nav{justify-content:flex-start!important}
+ body.retail-home:not(.app-store) .hero-copy{padding:49px 20px 38px!important}
+ body.retail-home:not(.app-store) .hero h1{font-size:clamp(42px,10.5vw,60px)!important;line-height:1.02!important}
+ body.retail-home:not(.app-store) .hero p{font-size:13px!important;line-height:1.7!important}
+ body.retail-home:not(.app-store) .hero-visual{padding:20px 13px 25px!important}
+ body.retail-home:not(.app-store) .collection-results .grid{gap:12px!important}
+ body.retail-home:not(.app-store) .collection-results .info{padding:13px!important}
+ body.retail-home:not(.app-store) .collection-results .photo{min-height:166px!important}
+ body.retail-home:not(.app-store) .collection-results .info h3{font-size:16px!important}
+ body.retail-home:not(.app-store) .benefits{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ body.retail-home.app-store .native-app-header{padding:10px 14px!important}
+ body.retail-home.app-store .app-brand img{max-height:47px!important;width:auto!important}
+}
+@media(max-width:380px){
+ body.retail-home:not(.app-store) .brand-identity{max-width:174px!important;width:min(174px,100%)!important}
+ body.retail-home:not(.app-store) .brand-identity .original-brand-logo{height:52px!important}
+ body.retail-home:not(.app-store) .head-actions{gap:6px!important}
+}
+@media(prefers-reduced-motion:reduce){body.retail-home:not(.app-store) .collection-results .card{transition:none!important}}
