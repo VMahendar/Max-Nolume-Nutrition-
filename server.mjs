@@ -75,6 +75,25 @@ function fulfil(row,payment){return C.tx(()=>{row=db.prepare('SELECT * FROM orde
 function checkoutResponse(row){const p=JSON.parse(row.payload);if(row.status==='paid')fail(409,'This order is already paid. View your order history.');if(!row.provider_id)fail(409,'Payment creation needs reconciliation. Do not create another order.');if(row.status!=='pending')fail(409,'This checkout is no longer payable.');return {id:row.id,token:row.token,key:process.env.RAZORPAY_KEY_ID,providerOrderId:row.provider_id,amount:p.totalPaise,currency:'INR'};}
 const server=http.createServer(async(req,res)=>{res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','DENY');res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline'; img-src 'self' https://revakanya.com https://unicornproseries.com https://www.unicornproseries.com data: https://static.wixstatic.com; connect-src 'self' https://*.razorpay.com; frame-src https://*.razorpay.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'");if(production)res.setHeader('Strict-Transport-Security','max-age=31536000; includeSubDomains');
 try{if(!await allowStaging(req,res))return;const u=new URL(req.url,'http://localhost');if(u.pathname==='/healthz')return json(res,200,{ok:true});
+if(u.pathname==='/owner-preview'&&['GET','HEAD'].includes(req.method)){
+  admin(C.session(req));
+  const view=u.searchParams.get('view')==='app'?'app':u.searchParams.get('view')==='mobile'?'mobile':'desktop';
+  const page=u.searchParams.get('page')|| (view==='app'?'mobile-app.html':'index.html');
+  const allowed=new Set(['index.html','mobile-app.html','account.html','wholesale-account.html','dealer.html','support.html','admin.html']);
+  if(!allowed.has(page))fail(404,'Preview page not found.');
+  let html=readFileSync(resolve(root,page),'utf8');
+  html=html.replace(/<script>if\(Date\.now\(\)<Date\.parse\('2026-11-08T17:30:00\.000Z'\)\)document\.documentElement\.classList\.add\('mvn-prelaunch-pending'\)<\/script>/g,'')
+    .replace(/<script src="\/launch-bootstrap\.js"><\/script>/g,'')
+    .replace(/<script src="\/launch-countdown\.js" defer><\/script>/g,'')
+    .replace(/<link rel="stylesheet" href="\/launch-countdown\.css">/g,'');
+  const previewStyles='<base href="/"><meta name="robots" content="noindex,nofollow"><style>html.mvn-prelaunch-pending body{overflow:auto!important}body>.mvn-opening-countdown{display:none!important}.mvn-owner-preview-nav{position:sticky;top:0;z-index:2147483630;display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center;padding:12px;background:#141414;color:#fff;font:600 13px system-ui;box-shadow:0 2px 12px #0005}.mvn-owner-preview-nav a{color:#fff;text-decoration:none;border:1px solid #777;padding:7px 11px;border-radius:5px}.mvn-owner-preview-nav a[aria-current]{background:#fff;color:#111}.app-store .app-install-gate{display:none!important}body.app-store .native-app-header,body.app-store .native-app-search,body.app-store .app-welcome,body.app-store main,body.app-store .app-bottom-nav{display:revert}</style>';
+  html=html.replace('</head>',previewStyles+'</head>');
+  const nav='<nav class="mvn-owner-preview-nav" aria-label="Private owner review"><span>OWNER REVIEW · NOT PUBLIC</span><a href="/owner-preview?view=desktop">Desktop site</a><a href="/owner-preview?view=mobile">Mobile site</a><a href="/owner-preview?view=app">Mobile app</a><a href="/admin.html">Admin</a></nav>';
+  html=html.replace(/<body([^>]*)>/i,(tag)=>tag+nav);
+  html=html.replace('</body>','<script src="/owner-preview.js" defer></script></body>');
+  res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'private, no-store','X-Robots-Tag':'noindex, nofollow'});
+  return res.end(req.method==='HEAD'?undefined:html);
+}
 if(/^\/assets\/updates\/[a-z0-9-]+\.jpg$/.test(u.pathname)&&['GET','HEAD'].includes(req.method)){
  const image=db.prepare('SELECT content FROM store_update_images WHERE path=?').get(u.pathname.slice(1));if(!image)fail(404,'Image not found.');res.writeHead(200,{'Content-Type':'image/jpeg'});return res.end(req.method==='HEAD'?undefined:image.content);
 }
