@@ -251,3 +251,21 @@
   .owner-access h1 {font-size:26px}
 }
 @media(prefers-reduced-motion:reduce) {.admin-sidebar {transition:none}}
+
+/* One-person business lead tracker, visible only in the authenticated owner workspace. */
+.owner-admin .lead-inbox{margin-top:28px;border-top:1px solid var(--line);padding-top:24px}
+.owner-admin .lead-inbox-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.owner-admin .lead-inbox-head h3{font-size:20px;margin:0 0 5px}
+.owner-admin .lead-inbox-head p{margin:0 0 18px;color:var(--muted);font-size:13px}
+.owner-admin .lead-inbox-head button,.owner-admin .lead-buttons button{border:none;background:#172e57;color:#fff;padding:10px 14px;border-radius:7px;font-weight:700;cursor:pointer}
+.owner-admin .lead-buttons button:disabled{opacity:.55}
+.owner-admin #leadInboxRows{overflow-x:auto}
+.owner-admin #leadInboxRows table{width:100%;border-collapse:collapse;min-width:780px}
+.owner-admin #leadInboxRows th{text-align:left;background:#f5f7fa;padding:12px;font-size:12px}
+.owner-admin #leadInboxRows td{vertical-align:top;padding:12px;border-bottom:1px solid var(--line);font-size:12px;max-width:340px;overflow-wrap:anywhere}
+.owner-admin #leadInboxRows td strong{font-size:13px}
+.owner-admin .lead-controls{display:flex;flex-direction:column;gap:8px;min-width:170px}
+.owner-admin .lead-controls select,.owner-admin .lead-controls input,.owner-admin .lead-controls textarea{width:100%;border:1px solid #cfd8e3;padding:8px;border-radius:5px;background:#fff}
+.owner-admin .lead-buttons{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.owner-admin .lead-buttons a{display:inline-block;background:#eaf7f0;color:#17683d;padding:9px 12px;border-radius:6px;font-weight:700}
+.owner-admin .lead-privacy-note{font-size:12px;color:var(--muted);margin-top:12px}
