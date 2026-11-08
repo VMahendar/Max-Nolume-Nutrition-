@@ -33,7 +33,7 @@ initializeLeadInbox(C);
 const origin=process.env.PUBLIC_ORIGIN||'http://localhost:3000',production=process.env.NODE_ENV==='production';
 const previousStoreOrigin='https://max-volume-nutrition-preview.onrender.com';
 const publicLaunchAt=Date.parse('2026-11-08T11:00:00+05:30');
-const publicLaunchService=[origin,process.env.RENDER_EXTERNAL_URL].includes(previousStoreOrigin);
+const publicLaunchHost=new URL(previousStoreOrigin).host;
 const launchStorePages=new Set(['/','/index.html','/mobile-app.html','/account.html','/wholesale-account.html','/dealer.html']);
 function canonicalStoreOrigin(){
   const configured=process.env.STORE_PUBLIC_URL;
@@ -105,7 +105,9 @@ if(u.pathname==='/owner-preview'&&['GET','HEAD'].includes(req.method)){
   res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'private, no-store','X-Robots-Tag':'noindex, nofollow'});
   return res.end(req.method==='HEAD'?undefined:html);
 }
-const launchRemaining=publicLaunchService?publicLaunchAt-Date.now():0;
+const onPublicLaunchService=origin===previousStoreOrigin||
+  (process.env.RENDER_EXTERNAL_URL===previousStoreOrigin&&req.headers.host===publicLaunchHost);
+const launchRemaining=onPublicLaunchService?publicLaunchAt-Date.now():0;
 if(launchRemaining>0){
   const launchPath=posix.normalize(decodeURIComponent(u.pathname));
   if(['GET','HEAD'].includes(req.method)&&launchStorePages.has(launchPath)){
