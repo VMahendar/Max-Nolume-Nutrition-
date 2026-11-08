@@ -1,6 +1,8 @@
 const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
-document.body.classList.toggle('standalone-app',!!standalone);
-const gate=document.getElementById('appInstallGate');if(gate)gate.hidden=!!standalone;
+// The app route is a browsable mobile preview as well as an installed PWA.
+// Do not replace its shop with an install-only screen in a normal browser.
+document.body.classList.add('standalone-app');
+const gate=document.getElementById('appInstallGate');if(gate)gate.hidden=true;
 const screens=['shop','offers','brands','certificate'];
 function showAppScreen(){
  const requested=location.hash.slice(1),active=screens.includes(requested)?requested:'shop';
@@ -10,4 +12,5 @@ function showAppScreen(){
  document.querySelectorAll('.app-bottom-nav a').forEach(link=>{const selected=link.hash==='#'+active;link.classList.toggle('selected',selected);if(selected)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');});
  scrollTo({top:0,behavior:'instant'});
 }
-if(standalone){addEventListener('hashchange',showAppScreen);showAppScreen();}
+addEventListener('hashchange',showAppScreen);
+showAppScreen();
