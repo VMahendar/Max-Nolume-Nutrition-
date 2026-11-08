@@ -37,7 +37,7 @@ test('homepage excludes demonstrably incorrect product photos and retains verifi
   assert.equal(source.find(p=>p.id==='sturdy-pre').image,null);
   assert.equal(source.find(p=>p.id==='pro-creatine').variants.find(v=>v.id==='creatine-cranberry').image,null);
  }
- assert.match(app,/3 kg · Box photo pending.*?img:null/,'3kg pack must not use 5kg photo');
+ assert.match(app,/3 kg · (?:Box|Pack) photo pending",price:2599,img:null/,'3kg pack must not use 5kg photo');
  assert.match(app,/Chocolate · 5 lbs.*?img:null/,'Chocolate must not use Coffee photo');
  assert.match(app,/Blueberry · 100 g.*?img:null/,'Blueberry must not use Cranberry photo');
 });
