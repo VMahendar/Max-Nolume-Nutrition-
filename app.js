@@ -8,6 +8,17 @@ const P=[
 {id:"creatine",name:"Pro Creatine",cat:"creatine",featuredIndex:1,variants:[{label:"Blueberry · 100 g",price:899,mrp:1499,img:null},{label:"Cranberry · 100 g",price:899,mrp:1499,img:null}],desc:"Creatine supplement in two flavour options.",img:""},
 {id:"vitamins",name:"Multivitamin",cat:"vitamins",variants:[{label:"1 pack",price:699}],desc:"Daily multivitamin supplement.",img:""}
 ];
+
+/* Product names corroborated with the official Unicorn Pro Series catalogue.
+   These are supplier-range enquiries, NEVER priced/stocked cart items. */
+const supplierDiscovery=[
+ {id:"zippy-gainer",name:"Zippy Mass Gainer",cat:"mass",note:"Mass gainer · packaging, pack size and price to confirm",img:"https://revakanya.com/assets/imgs/Zippy%20Mass%20Gainer.png"},
+ {id:"unicorn-pro-mass",name:"Unicorn Pro Mass",cat:"mass",note:"Mass-gainer range · packaging, pack size and price to confirm",img:""},
+ {id:"pro-isolate",name:"Pro Isolate",cat:"isolate",note:"Whey isolate · confirm the available pack and flavour",img:""},
+ {id:"speedy-bcaa",name:"Speedy BCAA",cat:"bcaa",note:"300 g · confirm the current flavour and label",img:"https://revakanya.com/assets/imgs/Speedy%20BCAA.png"},
+ {id:"creatine-black",name:"Creatine Black",cat:"creatine",note:"Creatine range · verify the current pack",img:""},
+ {id:"sturdy-pineapple",name:"Sturdy Pre-Workout Pineapple",cat:"pre",note:"Pineapple flavour · verify the current pack",img:""}
+];
 const retailVariantIds={whey:['whey-chocolate','whey-coffee'],mass:['mass-3kg','mass-5kg'],pre:['pre-watermelon'],creatine:['creatine-blueberry','creatine-cranberry'],vitamins:['musclevite-pack']};
 async function refreshRetailPrices(){
  const response=await fetch('/api/retail/catalog',{cache:'no-store',signal:AbortSignal.timeout(8000)});
@@ -35,7 +46,7 @@ let cat="all",q="",cart={},mode="retail";
 let priceRange="all",recent=[],appliedOffer=null,availableOffers=[];
 const offerSurface=document.body.classList.contains("app-store")?"app":"web";
 const cartSignature=()=>JSON.stringify(Object.entries(cart).sort().map(([key,qty])=>[key,qty,getItem(key)?.v.price]));
-const categoryNames={all:"ALL PRODUCTS",whey:"WHEY PROTEIN",mass:"MASS GAINERS",pre:"PRE-WORKOUT",creatine:"CREATINE",vitamins:"VITAMINS"};
+const categoryNames={all:"ALL PRODUCTS",whey:"WHEY PROTEIN",isolate:"ISOLATE",mass:"MASS GAINERS",pre:"PRE-WORKOUT",creatine:"CREATINE",bcaa:"BCAA & AMINOS",vitamins:"VITAMINS"};
 const priceLabels={all:"All prices",under1000:"Under ₹1,000","1000to3000":"₹1,000 – ₹3,000",over3000:"Over ₹3,000"};
 function matchesPrice(v){return priceRange==="all"||(priceRange==="under1000"&&v.price<1000)||(priceRange==="1000to3000"&&v.price>=1000&&v.price<=3000)||(priceRange==="over3000"&&v.price>3000)}
 function displayVariant(p){const featured=p.featuredIndex||0;return matchesPrice(p.variants[featured])?featured:Math.max(0,p.variants.findIndex(matchesPrice))}
@@ -84,19 +95,39 @@ function card(p){
 const featured=displayVariant(p);const cover=coverImage(p,featured);const pic=cover?'<img loading="lazy" src="'+safe(cover)+'" alt="'+safe(p.name)+'"><div class="placeholder" hidden><b>'+safe(p.name)+'</b>Photo coming soon</div>':'<div class="placeholder"><b>'+safe(p.name)+'</b>Correct pack photo being verified</div>';
 return '<article class="card"><div class="photo">'+pic+'</div><div class="info"><small>'+safe(p.brand||'Unicorn Pro Series')+'</small><h3>'+safe(p.name)+'</h3><p>'+safe(p.desc)+'</p><label class="variant-label" for="v-'+p.id+'">FLAVOUR / PACK SIZE</label><select id="v-'+p.id+'" class="variant">'+p.variants.map((v,i)=>'<option value="'+i+'"'+(i===featured?' selected':'')+'>'+safe(v.label)+'</option>').join("")+'</select><div class="price" id="price-'+p.id+'">'+priceMarkup(p.variants[featured])+'</div><button class="details-link" type="button" data-detail="'+p.id+'">VIEW PRODUCT DETAILS →</button><button class="add" data-id="'+p.id+'">ADD TO CART +</button></div></article>';
 }
+
+function supplierCard(p){
+ const photo=p.img
+ ?'<img loading="lazy" src="'+safe(p.img)+'" alt="'+safe(p.name)+' manufacturer reference pack"><div class="placeholder" hidden><b>'+safe(p.name)+'</b>Manufacturer photo unavailable</div>'
+ :'<div class="mvn-supplier-art"><span>UNICORN PRO SERIES</span><strong>'+safe(p.name)+'</strong><small>Packaging photo being confirmed</small></div>';
+ const message='Hello Max Volume Nutrition, please confirm stock, current pack photo, size, and retail price for Unicorn Pro Series '+p.name+'.';
+ return '<article class="card mvn-supplier-card"><div class="photo">'+photo+'</div><div class="info"><small>UNICORN PRO SERIES · EXTENDED RANGE</small><h3>'+safe(p.name)+'</h3><p>'+safe(p.note)+'</p><div class="mvn-inquiry-status">Price &amp; MVN stock awaiting confirmation</div><a class="mvn-inquiry-action" href="https://wa.me/'+PHONE+'?text='+encodeURIComponent(message)+'" target="_blank" rel="noopener noreferrer">CHECK AVAILABILITY ↗</a><a class="mvn-source-link" href="https://unicornproseries.com/shop/" target="_blank" rel="noopener noreferrer">Manufacturer listing ↗</a></div></article>';
+}
+function installCategoryShortcuts(){
+ if(document.getElementById('mvn-quick-categories'))return;
+ const shop=$('shop');if(!shop)return;
+ const nav=document.createElement('nav');nav.className='mvn-quick-categories';nav.id='mvn-quick-categories';
+ nav.setAttribute('aria-label','Browse by supplement category');
+ nav.innerHTML='<div class="mvn-quick-caption"><strong>SHOP BY CATEGORY</strong><span>Find your supplements fast</span></div><div class="mvn-quick-track">'+[
+ ['all','All'],['whey','Whey'],['isolate','Isolate'],['mass','Mass Gainers'],['creatine','Creatine'],['pre','Pre-workout'],['bcaa','BCAA & Aminos'],['vitamins','Vitamins']
+ ].map(([id,label])=>'<button type="button" data-cat="'+id+'">'+label+'</button>').join('')+'</div>';
+ shop.before(nav);
+ nav.querySelectorAll('[data-cat]').forEach(button=>button.onclick=()=>setCat(button.dataset.cat));
+}
 function render(){
 const items=P.filter(p=>(cat==="all"||p.cat===cat)&&p.variants.some(matchesPrice)&&((p.name+" "+(p.brand||"Unicorn Pro Series")+" "+p.variants.map(v=>v.label).join(" ")).toLowerCase().includes(q.toLowerCase())));
+ const supplierItems=priceRange==="all"?supplierDiscovery.filter(p=>(cat==="all"||p.cat===cat)&&(p.name+" "+p.note).toLowerCase().includes(q.toLowerCase())):[];
 if($("sort").value==="default")items.sort((a,b)=>Number(Boolean(coverImage(b,b.featuredIndex||0)))-Number(Boolean(coverImage(a,a.featuredIndex||0))));
 if($("sort").value==="name")items.sort((a,b)=>a.name.localeCompare(b.name));
 if($("sort").value==="low")items.sort((a,b)=>a.variants[displayVariant(a)].price-b.variants[displayVariant(b)].price);
 if($("sort").value==="high")items.sort((a,b)=>b.variants[displayVariant(b)].price-a.variants[displayVariant(a)].price);
-$("grid").innerHTML=items.length?items.map(card).join(""):'<div class="no-products"><span aria-hidden="true">⌕</span><h3>No matching products</h3><p>Try another name or price range, or browse the full collection.</p><button type="button" id="emptyReset">View all products</button></div>';
+$("grid").innerHTML=(items.length||supplierItems.length)?items.map(card).join("")+supplierItems.map(supplierCard).join(""):'<div class="no-products"><span aria-hidden="true">⌕</span><h3>No matching products</h3><p>Try another name or price range, or browse the full collection.</p><button type="button" id="emptyReset">View all products</button></div>';
 if($("emptyReset"))$("emptyReset").onclick=resetFilters;
 if($("collectionTitle"))$("collectionTitle").textContent=categoryNames[cat];
 document.querySelectorAll("[data-cat]").forEach(button=>{const active=button.dataset.cat===cat;button.classList.toggle("active",active);if(button.tagName==="BUTTON")button.setAttribute("aria-pressed",String(active));});
 const filters=$("activeFilters");if(filters){filters.replaceChildren();for(const [label,clear] of [[q?"Search: "+q:"",()=>{q="";$("q").value="";}],[priceRange!=="all"?priceLabels[priceRange]:"",()=>{priceRange="all";$("priceRange").value="all";}]]){if(!label)continue;const button=document.createElement("button");button.type="button";button.textContent=label+" ×";button.setAttribute("aria-label","Clear "+label);button.onclick=()=>{clear();render()};filters.append(button)}filters.hidden=!filters.childElementCount;}
  document.querySelectorAll(".photo img").forEach(img=>img.addEventListener("error",()=>{img.hidden=true;if(img.nextElementSibling)img.nextElementSibling.hidden=false}));
-$("resultText").textContent=items.length+" product"+(items.length===1?"":"s")+" available";
+$("resultText").textContent=items.length+" priced product"+(items.length===1?"":"s")+" · "+supplierItems.length+" enquiry-only manufacturer product"+(supplierItems.length===1?"":"s");
 document.querySelectorAll(".variant").forEach(s=>s.addEventListener("change",()=>{const p=P.find(x=>x.id===s.id.slice(2));$("price-"+p.id).innerHTML=priceMarkup(p.variants[Number(s.value)]);swapPhoto(s.closest(".card").querySelector(".photo"),coverImage(p,s.value),p.name)}));
 document.querySelectorAll(".details-link").forEach(b=>b.addEventListener("click",()=>showDetail(b.dataset.detail)));
 document.querySelectorAll(".add").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.id+"|"+$("v-"+b.dataset.id).value;cart[k]=Math.min(999,(cart[k]||0)+1);persist();openBag()}));
@@ -188,7 +219,7 @@ document.addEventListener("keydown",e=>{
  if(e.key==="Escape"){e.preventDefault();closeBag()}
  if(e.key==="Tab"){const controls=[...$("drawer").querySelectorAll('button:not(:disabled),input,a[href],select')].filter(el=>el.getClientRects().length);const first=controls[0],last=controls.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}
 });
-render();drawCart();renderRecent();
+installCategoryShortcuts();render();drawCart();renderRecent();
 refreshRetailPrices().then(()=>{render();drawCart();renderRecent()}).catch(error=>{if($("priceMessage"))$("priceMessage").textContent=error.message});
 
 function showDetail(id){
