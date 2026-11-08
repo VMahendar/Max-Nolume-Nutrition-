@@ -17,11 +17,15 @@ function installOpeningCountdown() {
   banner.innerHTML = `
     <div class="mvn-clock-inner">
       <div class="mvn-clock-label">
-        <img class="mvn-clock-logo" src="/max-volume-logo-wide.png" alt="Max Volume Nutrition" width="390" height="88">
-        <span class="mvn-clock-eyebrow">CHENNAI · RETAIL · WHOLESALE & DISTRIBUTION</span>
-        <strong class="mvn-clock-headline" id="mvn-clock-title">SOMETHING POWERFUL IS COMING.</strong>
+        <img class="mvn-clock-logo" src="/max-volume-logo-wide.png" alt="Max Volume Nutrition — original gold logo" width="390" height="110">
+        <span class="mvn-clock-eyebrow">MAX VOLUME NUTRITION · OFFICIAL ONLINE STORE</span>
+        <strong class="mvn-clock-headline" id="mvn-clock-title">STORE OPERATIONS OPEN AT <span>11:00 AM IST</span></strong>
+        <p class="mvn-clock-description">Retail · Gym Supply · Wholesale Distribution<br>Serving Tamil Nadu &amp; Puducherry</p>
+        <div class="mvn-clock-brands" aria-label="Brand availability">
+          <div class="mvn-clock-brand"><small>AVAILABLE NOW</small><strong>UNICORN PRO SERIES</strong></div>
+          <div class="mvn-clock-brand mvn-clock-brand-soon"><small>COMING SOON</small><strong>GLOB TECH</strong></div>
+        </div>
         <span class="mvn-clock-date">${LAUNCH_DATE_LABEL}</span>
-        <p class="mvn-clock-description">Our new online store opens soon. The collection is coming into focus.</p>
       </div>
       <div class="mvn-clock-time" id="mvn-clock-time" role="timer" aria-label="Time remaining until store launch">
         <span><strong data-clock="days">00</strong><small>DAYS</small></span>
@@ -33,7 +37,7 @@ function installOpeningCountdown() {
         <span><strong data-clock="seconds">00</strong><small>SECONDS</small></span>
       </div>
       <div class="mvn-clock-footer">
-        <span id="mvn-clock-note">THE FULL STORE UNLOCKS AT 11:00 AM IST</span>
+        <span id="mvn-clock-note">THE COUNTDOWN ENDS AT 11:00 AM IST</span>
         <a id="mvn-clock-link" href="#shop" hidden>EXPLORE THE COLLECTION →</a>
       </div>
     </div>`;
