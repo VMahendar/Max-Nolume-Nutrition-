@@ -89,16 +89,16 @@
     "name": "Pro Creatine",
     "category": "Creatine",
     "subtitle": "Make every session count",
-    "description": "Unicorn Pro Series creatine supplement in 100 g packs. Choose Blueberry or Cranberry. Read the pack label for ingredients and directions.",
+    "description": "Unicorn Pro Series Pro Creatine in 250 g packs. Choose Blueberry or Cranberry. Read the pack label for ingredients and directions.",
     "image": null,
     "variants": [
       {
         "id": "creatine-blueberry",
-        "label": "100 g · Blueberry",
+        "label": "250 g · Blueberry",
         "pricePaise": 89900,
         "stock": null,
         "mrpPaise": 149900,
-        "image": null,
+        "image": "https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png",
         "prices": {
           "wholesale": 65000,
           "gym": 75000
@@ -106,11 +106,11 @@
       },
       {
         "id": "creatine-cranberry",
-        "label": "100 g · Cranberry",
+        "label": "250 g · Cranberry",
         "pricePaise": 89900,
         "stock": null,
         "mrpPaise": 149900,
-        "image": null,
+        "image": "assets/pro-creatine.png",
         "prices": {
           "wholesale": 65000,
           "gym": 75000
