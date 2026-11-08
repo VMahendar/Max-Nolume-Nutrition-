@@ -24,7 +24,7 @@ try {
     await delay(250);
   }
   assert.ok(ready,'Local application did not become healthy: '+appError);
-  browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+  browser=await chromium.launch({...(process.env.CHROMIUM_EXECUTABLE_PATH?{executablePath:process.env.CHROMIUM_EXECUTABLE_PATH}:{}),headless:true,args:['--no-sandbox']});
  commerceBrowser(browser);
   for(const preset of [{name:'desktop',viewport:{width:1440,height:900},isMobile:false},{name:'mobile',viewport:{width:390,height:844},isMobile:true}]){
     const page=await browser.newPage({viewport:preset.viewport,isMobile:preset.isMobile,deviceScaleFactor:1});
@@ -32,7 +32,7 @@ try {
     const response=await page.goto(origin+'/',{waitUntil:'domcontentloaded',timeout:25000});
     assert.equal(response.status(),200,preset.name+' homepage HTTP status');
     await page.locator('#grid article.card').first().waitFor({timeout:10000});
-    assert.equal(await page.locator('#grid article.card').count(),5,preset.name+' product family count');
+    assert.equal(await page.locator('#grid article.card').count(),3,preset.name+' product family count');
     assert.ok(await page.locator('.hero h1').isVisible(),preset.name+' hero visible');
     assert.match(await page.locator('.hero h1').innerText(),/FUEL EVERY\s+REP/i,preset.name+' product-first hero headline');
     assert.match(await page.locator('.hero-declaration').innerText(),/AUTHORIZED UNICORN PRO SERIES DISTRIBUTOR/i,preset.name+' distribution identity');
@@ -84,8 +84,8 @@ try {
     const featuredImage=await page.locator('#grid article.card').first().locator('.photo img').evaluate(img=>({src:img.src,loaded:img.complete&&img.naturalWidth>0,hidden:img.hidden}));
     assert.ok(featuredImage.loaded&&!featuredImage.hidden,preset.name+' first merchandise card shows a real product photo: '+JSON.stringify(featuredImage));
     if(preset.name==='mobile'){
-      assert.ok(await page.locator('#floatingCart').isVisible(),'mobile persistent shopping cart must be visible');
-      assert.match(await page.locator('#floatingCart').innerText(),/VIEW CART/,'mobile cart has an obvious label');
+      assert.equal(await page.locator('#floatingCart').isVisible(),false,'empty floating cart must not cover product controls');
+      assert.ok(await page.locator('#bag').isVisible(),'header retains access to the empty cart');
     }
     await page.locator('.add[data-id="whey"]').click();
     assert.equal(await page.locator('#count').innerText(),'1',preset.name+' add-to-cart count');
@@ -114,12 +114,10 @@ try {
     });
     assert.ok(bucket.naturalWidth>0&&!bucket.hidden,preset.name+' 5kg bucket photo must load');
     await page.locator('#v-mass').selectOption('0');
-    const missingBox=await page.locator('.add[data-id="mass"]').evaluate(btn=>{
-      const photo=btn.closest('.card').querySelector('.photo');
-      return {imgHidden:photo.querySelector('img')?.hidden,placeholderVisible:!photo.querySelector('.placeholder').hidden};
-    });
-    assert.ok(missingBox.imgHidden&&missingBox.placeholderVisible,preset.name+' 3kg box must not show 5kg bucket');
-    console.log('NITRO_IMAGES',preset.name,JSON.stringify({bucket,missingBox}));
+    await page.waitForFunction(()=>{const img=document.querySelector('.add[data-id="mass"]').closest('.card').querySelector('.photo img');return img&&img.complete&&img.naturalWidth>0;});
+    const jar=await page.locator('.add[data-id="mass"]').evaluate(btn=>{const img=btn.closest('.card').querySelector('.photo img');return {src:img.src,loaded:img.naturalWidth>0,hidden:img.hidden};});
+    assert.ok(jar.loaded&&!jar.hidden&&jar.src!==bucket.src,preset.name+' confirmed 3kg jar uses its own image, not the 5kg bucket');
+    console.log('NITRO_IMAGES',preset.name,JSON.stringify({bucket,jar}));
     await page.locator('button[data-detail="mass"]').click();
     assert.ok(await page.locator('#productDialog').isVisible(),preset.name+' product details dialog');
     assert.equal(await page.locator('#detail-variant').inputValue(),'0',preset.name+' product details preserve selected 3kg pack');
