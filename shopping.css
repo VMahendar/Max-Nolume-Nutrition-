@@ -181,3 +181,26 @@
  .retail-home .mvn-hd-placeholder small{font-size:10px}
 }
 @media(max-width:360px){.retail-home .mvn-purchased-grid{grid-template-columns:1fr}.retail-home .mvn-purchased-photo{height:320px}}
+
+
+/* Mobile/PWA product-first correction: products must be visible immediately. */
+@media(max-width:700px){
+ .retail-home.app-store .app-intro{padding:12px 13px 6px!important}
+ .retail-home.app-store .app-intro p,.retail-home.app-store .app-install-help{display:none!important}
+ .retail-home.app-store #shop{padding:8px 13px 82px!important}
+ .retail-home.app-store .productbar{margin:0 0 8px!important;padding:0!important}
+ .retail-home.app-store .productbar>div>span,.retail-home.app-store .productbar .sort-label{display:none!important}
+ .retail-home.app-store .productbar h3{font-size:20px!important;margin:0!important}
+ .retail-home.app-store .cats{display:flex!important;overflow-x:auto!important;flex-wrap:nowrap!important;gap:7px!important;margin:8px 0 10px!important;padding-bottom:3px!important}
+ .retail-home.app-store .cats button{flex:0 0 auto!important;white-space:nowrap!important}
+ .retail-home.app-store .shopping-layout{display:block!important}
+ .retail-home.app-store .collection-filters{display:none!important}
+ .retail-home.app-store .collection-results{display:block!important;width:100%!important}
+ .retail-home.app-store .collection-results .grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+ .retail-home.app-store .collection-results .card{display:flex!important;flex-direction:column!important;min-width:0!important}
+ .retail-home.app-store .collection-results .photo{display:flex!important;height:205px!important}
+ .retail-home.app-store .collection-results .info{display:block!important}
+}
+@media(max-width:360px){
+ .retail-home.app-store .collection-results .grid{grid-template-columns:1fr!important}
+}
