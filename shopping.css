@@ -204,3 +204,15 @@
 @media(max-width:360px){
  .retail-home.app-store .collection-results .grid{grid-template-columns:1fr!important}
 }
+
+/* Owner requirement: mobile app opens product-first. */
+@media(max-width:700px){
+ body.retail-home.app-store .app-intro{display:none!important}
+ body.retail-home.app-store .mvn-quick-categories{display:none!important}
+ body.retail-home.app-store #shop{padding-top:8px!important;margin-top:0!important}
+ body.retail-home.app-store #shop>.section-title{display:none!important}
+ body.retail-home.app-store .productbar{display:none!important}
+ body.retail-home.app-store .shopping-layout{margin-top:0!important;padding-top:0!important}
+ body.retail-home.app-store .collection-results{margin-top:0!important;padding-top:0!important}
+ body.retail-home.app-store .collection-results .grid{margin-top:0!important;padding-top:0!important}
+}
