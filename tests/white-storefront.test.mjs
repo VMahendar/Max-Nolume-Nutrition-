@@ -30,16 +30,16 @@ test('homepage excludes demonstrably incorrect product photos and retains verifi
   assert.ok(existsSync(new URL('../public/assets/'+name,import.meta.url)),name+' exists');
   assert.ok(both.includes('assets/'+name),name+' used');
  }
- for(const wrong of ['assets/sturdy-pre-workout.png','assets/pro-creatine.png']){
+ for(const wrong of ['assets/sturdy-pre-workout.png']){
   assert.ok(!both.includes(wrong),'incorrect-size/flavour photograph must never show on storefront: '+wrong);
  }
  for(const source of [seed,pub]){
   assert.equal(source.find(p=>p.id==='sturdy-pre').image,null);
-  assert.equal(source.find(p=>p.id==='pro-creatine').variants.find(v=>v.id==='creatine-cranberry').image,null);
+  assert.equal(source.find(p=>p.id==='pro-creatine').variants.find(v=>v.id==='creatine-cranberry').image,'assets/pro-creatine.png');
  }
  assert.match(app,/3 kg · (?:Box|Pack) photo pending",price:2599,img:null/,'3kg pack must not use 5kg photo');
  assert.match(app,/Chocolate · 5 lbs.*?img:null/,'Chocolate must not use Coffee photo');
- assert.match(app,/Blueberry · 100 g.*?img:null/,'Blueberry must not use Cranberry photo');
+ assert.match(app,/Blueberry · 250 g.*?img:\"https:\/\/unicornproseries.com\/wp-content\/uploads\/2026\/05\/Pro-Creatine-Blueberry-1.png\"/,'Blueberry must use the official Blueberry photo');
 });
 
 test('public retail offers use verified MRP and keep confidential wholesale pricing private',()=>{
