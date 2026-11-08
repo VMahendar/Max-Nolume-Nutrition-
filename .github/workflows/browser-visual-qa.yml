@@ -33,6 +33,9 @@ jobs:
       - name: Check collection filtering, browsing history and accessible cart
         if: ${{ !cancelled() && steps.chromium.outcome == 'success' }}
         run: node tests/shopping-qa.mjs
+      - name: Check phone catalogue layout and connected product buttons
+        if: ${{ !cancelled() && steps.chromium.outcome == 'success' }}
+        run: node tests/app-catalogue-qa.mjs
       - name: Check owner purchase preview, ad photo upload and shared launch updates
         if: ${{ !cancelled() && steps.chromium.outcome == 'success' }}
         run: node tests/owner-desk-qa.mjs

@@ -84,7 +84,7 @@ try{
  assert.equal(await app.locator('.hero').isVisible(),false);
  assert.equal(await app.locator('#grid .card').count(),3);
  const manifest=await (await app.request.get(base+'/manifest.webmanifest')).json();assert.equal(manifest.start_url,'/mobile-app.html');
- await app.locator('.add[data-id="whey"]').click();
+ await app.locator('[data-add="whey-coffee"]').click();
  await app.locator('[data-plus]').click();
  await app.locator('#customerName').fill('App Customer');
  await app.locator('#customerPhone').fill('9876543210');await app.locator('#customerAddress').fill('12 Training Street');await app.locator('#customerCity').fill('Chennai');await app.locator('#customerState').fill('Tamil Nadu');await app.locator('#customerPincode').fill('600001');await app.locator('#paymentPreference').selectOption('Request UPI payment instructions');
@@ -108,7 +108,7 @@ try{
  await app.close();
 
  const installPage=await browser.newPage({viewport:{width:390,height:844}});
- await installPage.goto(base+'/mobile-app.html');await installPage.locator('#grid .card').first().waitFor({state:'visible'});
+ await installPage.goto(base+'/mobile-app.html');await installPage.locator('.mvn-purchased-card').first().waitFor({state:'visible'});
  assert.equal(await installPage.locator('#appInstallGate').isVisible(),false,'browser app entry remains a browsable shop');
  await installPage.close();
  // Activate a test-only app campaign in this isolated browser-test database.
@@ -137,7 +137,7 @@ try{
  assert.equal(await promo.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'app marketing overflow');
  await promo.locator('.app-bottom-nav a[href="#shop"]').click();await promo.locator('#shop').waitFor({state:'visible'});
  assert.equal(await promo.locator('.storehead').count(),0,'app has a separate compact header');
- await promo.locator('.add[data-id="whey"]').click();
+ await promo.locator('[data-add="whey-coffee"]').click();
  await promo.locator('#offerCode').fill('TESTAPP');await promo.locator('#applyOffer').click();
  await promo.waitForFunction(()=>document.querySelector('#offerMessage').textContent.includes('Applied TESTAPP'));
  assert.match(await promo.locator('#cart-totals').textContent(),/4,899/);

@@ -178,6 +178,7 @@ try {
     await accountPage.screenshot({path:reportDir+'/'+preset.name+'-wholesale.png',fullPage:true,animations:'disabled'});
     await accountPage.goto(origin+'/support.html',{waitUntil:'domcontentloaded'});
     await accountPage.locator('.support-faq').first().waitFor({state:'visible'});
+    await accountPage.locator('.support-certificate img').waitFor({state:'visible'});
     assert.ok(await accountPage.locator('.support-certificate img').isVisible(),preset.name+' original certificate shown in Help Center');
     const helpOverflow=await accountPage.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
     assert.ok(helpOverflow<=2,preset.name+' Help Center has no horizontal overflow');
