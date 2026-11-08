@@ -26,3 +26,13 @@
 @media(max-width:850px){.mvn-qr-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:580px){.mvn-qr-home{padding:38px 15px}.mvn-qr-grid{grid-template-columns:1fr;max-width:440px}.mvn-qr-card{padding:18px}.mvn-qr-card p{min-height:0}.mvn-qr-page-main{padding:32px 15px}.mvn-qr-page-header{padding:18px 14px}.mvn-qr-page-header img{width:180px;height:54px}}
 @media print{.mvn-qr-page-header,.mvn-qr-page-footer,.mvn-qr-actions{display:none!important}.mvn-qr-page{background:#fff}.mvn-qr-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.mvn-qr-card{padding:12px;box-shadow:none}.mvn-qr-card img{width:170px}}
+
+/* Contact channels beneath the QR collection; use the existing navy and gold identity. */
+.mvn-contact-strip{margin:30px auto 8px;max-width:1160px;padding:25px 22px;border:1px solid #dce6f3;background:#fff;border-radius:12px}
+.mvn-contact-strip h2{font-size:13px;font-weight:900;letter-spacing:.12em;text-align:center;color:#14284b;margin:0 0 20px}
+.mvn-contact-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mvn-contact-items a{display:flex;flex-direction:column;gap:5px;min-width:0;padding:15px 16px;background:#f5f7fa;border-left:3px solid #be9854;border-radius:4px;text-decoration:none!important}
+.mvn-contact-items a span{font-size:10px;letter-spacing:.08em;color:#5d6675;font-weight:800}
+.mvn-contact-items a strong{font-size:13px;color:#152b4e;overflow-wrap:anywhere}
+.mvn-contact-items a:hover strong,.mvn-contact-items a:focus-visible strong{text-decoration:underline}
+@media(max-width:580px){.mvn-contact-strip{padding:20px 13px}.mvn-contact-items{grid-template-columns:1fr}.mvn-contact-items a{padding:12px 13px}}
