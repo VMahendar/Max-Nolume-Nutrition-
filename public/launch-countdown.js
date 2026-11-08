@@ -2,10 +2,8 @@
 // The countdown is presentation-only. Server-side account, ordering, and payment gates stay unchanged.
 const OPENING_UTC = Date.parse('2026-11-08T05:30:00.000Z'); // 11:00 AM IST, 8 Nov 2026
 const LAUNCH_DATE_LABEL = 'SUNDAY · 8 NOVEMBER 2026 · 11:00 AM';
-const supportedPreview = () => !document.body.hasAttribute('data-mvn-owner-preview') && (
-  document.body.classList.contains('retail-home') ||
-  document.body.classList.contains('app-store') ||
-  document.body.classList.contains('mvn-qr-page'));
+const supportedPreview = () => document.body.classList.contains('mvn-qr-page') &&
+  !document.body.hasAttribute('data-mvn-owner-preview');
 const pending = () => Date.now() < OPENING_UTC;
 
 function installOpeningCountdown() {
