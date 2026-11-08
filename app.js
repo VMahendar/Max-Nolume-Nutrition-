@@ -138,21 +138,20 @@ function renderPurchasedPromos(){
 }
 
 function render(){
-// Invoice-verified variants are already shown as separate tiles in renderPurchasedPacks().
-// Show additional live catalogue families here, without duplicating the same products.
-const items=P.filter(p=>!purchasedFamilies.has(p.id)&&(cat==="all"||p.cat===cat)&&p.variants.some(matchesPrice)&&((p.name+" "+(p.brand||"")+" "+p.variants.map(v=>v.label).join(" ")).toLowerCase().includes(q.toLowerCase())));
+// Render each product family exactly once in the primary grid on web and mobile.
+const items=P.filter(p=>(cat==="all"||p.cat===cat)&&p.variants.some(matchesPrice)&&((p.name+" "+(p.brand||"")+" "+p.variants.map(v=>v.label).join(" ")).toLowerCase().includes(q.toLowerCase())));
 if($("sort").value==="default")items.sort((a,b)=>Number(Boolean(coverImage(b,b.featuredIndex||0)))-Number(Boolean(coverImage(a,a.featuredIndex||0))));
 if($("sort").value==="name")items.sort((a,b)=>a.name.localeCompare(b.name));
 if($("sort").value==="low")items.sort((a,b)=>a.variants[displayVariant(a)].price-b.variants[displayVariant(b)].price);
 if($("sort").value==="high")items.sort((a,b)=>b.variants[displayVariant(b)].price-a.variants[displayVariant(a)].price);
-renderPurchasedPacks();renderPurchasedPromos();
-$("grid").innerHTML=items.length?items.map(card).join(""):"";
+// Purchased packs appear in the primary grid; do not create a second catalogue section.
+$("grid").innerHTML=items.length?items.map(card).join(""):'<div class="no-products"><h3>No matching products</h3><p>Try clearing your search and filters.</p><button type="button" id="emptyReset">View all products</button></div>';
 if($("emptyReset"))$("emptyReset").onclick=resetFilters;
 if($("collectionTitle"))$("collectionTitle").textContent=categoryNames[cat];
 document.querySelectorAll("[data-cat]").forEach(button=>{const active=button.dataset.cat===cat;button.classList.toggle("active",active);if(button.tagName==="BUTTON")button.setAttribute("aria-pressed",String(active));});
 const filters=$("activeFilters");if(filters){filters.replaceChildren();for(const [label,clear] of [[q?"Search: "+q:"",()=>{q="";$("q").value="";}],[priceRange!=="all"?priceLabels[priceRange]:"",()=>{priceRange="all";$("priceRange").value="all";}]]){if(!label)continue;const button=document.createElement("button");button.type="button";button.textContent=label+" ×";button.setAttribute("aria-label","Clear "+label);button.onclick=()=>{clear();render()};filters.append(button)}filters.hidden=!filters.childElementCount;}
  document.querySelectorAll(".photo img").forEach(img=>img.addEventListener("error",()=>{img.hidden=true;if(img.nextElementSibling)img.nextElementSibling.hidden=false}));
-$("resultText").textContent="Each purchased pack shown once · "+items.length+" additional product range"+(items.length===1?"":"s");
+$("resultText").textContent=items.length+" product range"+(items.length===1?"":"s")+" · choose pack and flavour";
 document.querySelectorAll(".variant").forEach(s=>s.addEventListener("change",()=>{const p=P.find(x=>x.id===s.id.slice(2));$("price-"+p.id).innerHTML=priceMarkup(p.variants[Number(s.value)]);swapPhoto(s.closest(".card").querySelector(".photo"),coverImage(p,s.value),p.name)}));
 document.querySelectorAll(".details-link").forEach(b=>b.addEventListener("click",()=>showDetail(b.dataset.detail)));
 document.querySelectorAll(".add").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.id+"|"+$("v-"+b.dataset.id).value;cart[k]=Math.min(999,(cart[k]||0)+1);persist();openBag()}));
