@@ -41,14 +41,35 @@ const cartSignature=()=>JSON.stringify(Object.entries(cart).sort().map(([key,qty
 const categoryNames={all:"ALL PRODUCTS",whey:"WHEY PROTEIN",mass:"MASS GAINERS",pre:"PRE-WORKOUT",creatine:"CREATINE",vitamins:"VITAMINS"};
 const priceLabels={all:"All prices",under1000:"Under ₹1,000","1000to3000":"₹1,000 – ₹3,000",over3000:"Over ₹3,000"};
 function matchesPrice(v){return priceRange==="all"||(priceRange==="under1000"&&v.price<1000)||(priceRange==="1000to3000"&&v.price>=1000&&v.price<=3000)||(priceRange==="over3000"&&v.price>3000)}
-function displayVariant(p){const featured=p.featuredIndex||0;return matchesPrice(p.variants[featured])?featured:Math.max(0,p.variants.findIndex(matchesPrice))}
+const failedPackPhotos=new Set();
+function visiblePackOptions(p){
+ return p.variants.map((v,i)=>({v,i})).filter(({i})=>{
+  const src=coverImage(p,i);
+  return src&&!failedPackPhotos.has(src);
+ });
+}
+function displayVariant(p){
+ const options=visiblePackOptions(p),matching=options.filter(({v})=>matchesPrice(v));
+ return (matching.find(({i})=>i===(p.featuredIndex||0))??matching[0]??options[0])?.i;
+}
+function hideFailedPackPhoto(img){
+ const src=img.getAttribute('src');
+ if(!src||failedPackPhotos.has(src))return;
+ failedPackPhotos.add(src);
+ render();
+ renderPurchasedPacks();
+ renderPurchasedPromos();
+ renderRecent();
+}
 try{const saved=JSON.parse(localStorage.getItem("mvn-recent-v1")||"[]");if(Array.isArray(saved))recent=[...new Set(saved.filter(id=>P.some(p=>p.id===id)))].slice(0,4)}catch{}
 function renderRecent(){
- const section=$("recentSection");if(!section)return;section.hidden=!recent.length;
- $("recentProducts").replaceChildren(...recent.map(id=>{
-  const p=P.find(item=>item.id===id),v=p.variants[p.featuredIndex||0],button=document.createElement("button");
+ const section=$("recentSection");if(!section)return;
+ const products=recent.map(id=>P.find(item=>item.id===id)).filter(p=>p&&visiblePackOptions(p).length);
+ section.hidden=!products.length;
+ $("recentProducts").replaceChildren(...products.map(p=>{
+  const id=p.id,index=displayVariant(p),v=p.variants[index],button=document.createElement("button");
   button.type="button";button.className="recent-product";
-  const image=coverImage(p,p.featuredIndex||0);
+  const image=coverImage(p,index);
   if(image){const img=document.createElement("img");img.src=image;img.alt="";img.loading="lazy";img.onerror=()=>img.hidden=true;button.append(img)}
   const name=document.createElement("strong");name.textContent=p.name;
   const price=document.createElement("span");price.textContent=v.label+" · "+money(v.price);
@@ -66,7 +87,7 @@ function swapPhoto(host,src,name){
  if(!placeholder){placeholder=document.createElement("div");placeholder.className="placeholder";placeholder.textContent="Verified pack photo coming soon";host.appendChild(placeholder)}
  if(!src){if(img)img.hidden=true;placeholder.hidden=false;return}
  if(!img){img=document.createElement("img");img.loading="lazy";img.alt=name;host.insertBefore(img,placeholder)}
- img.onerror=()=>{img.hidden=true;placeholder.hidden=false};
+ img.onerror=()=>{img.hidden=true;placeholder.hidden=false;hideFailedPackPhoto(img)};
  img.onload=()=>{img.hidden=false;placeholder.hidden=true};
  img.hidden=false;placeholder.hidden=true;img.src=src;
 }
@@ -85,7 +106,7 @@ function priceMarkup(v){
 }
 function card(p){
 const featured=displayVariant(p);const cover=coverImage(p,featured);const pic=cover?'<img loading="lazy" src="'+safe(cover)+'" alt="'+safe(p.name)+'"><div class="placeholder" hidden><b>'+safe(p.name)+'</b>Photo coming soon</div>':'<div class="placeholder"><b>'+safe(p.name)+'</b>Correct pack photo being verified</div>';
-return '<article class="card"><div class="photo">'+pic+'</div><div class="info"><small>'+safe(p.brand||'Unicorn Pro Series')+'</small><h3>'+safe(p.name)+'</h3><p>'+safe(p.desc)+'</p><label class="variant-label" for="v-'+p.id+'">FLAVOUR / PACK SIZE</label><select id="v-'+p.id+'" class="variant">'+p.variants.map((v,i)=>'<option value="'+i+'"'+(i===featured?' selected':'')+'>'+safe(v.label)+'</option>').join("")+'</select><div class="price" id="price-'+p.id+'">'+priceMarkup(p.variants[featured])+'</div><button class="details-link" type="button" data-detail="'+p.id+'">VIEW PRODUCT DETAILS →</button><button class="add" data-id="'+p.id+'">ADD TO CART +</button></div></article>';
+return '<article class="card"><div class="photo">'+pic+'</div><div class="info"><small>'+safe(p.brand||'Unicorn Pro Series')+'</small><h3>'+safe(p.name)+'</h3><p>'+safe(p.desc)+'</p><label class="variant-label" for="v-'+p.id+'">FLAVOUR / PACK SIZE</label><select id="v-'+p.id+'" class="variant">'+visiblePackOptions(p).map(({v,i})=>'<option value="'+i+'"'+(i===featured?' selected':'')+'>'+safe(v.label)+'</option>').join("")+'</select><div class="price" id="price-'+p.id+'">'+priceMarkup(p.variants[featured])+'</div><button class="details-link" type="button" data-detail="'+p.id+'">VIEW PRODUCT DETAILS →</button><button class="add" data-id="'+p.id+'">ADD TO CART +</button></div></article>';
 }
 
 function installCategoryShortcuts(){
@@ -107,11 +128,11 @@ function renderPurchasedPacks(){
  if(!section){
   section=document.createElement('section');section.id='mvn-purchased-packs';
   section.className='mvn-purchased-section';
-  section.innerHTML='<div class="mvn-purchased-heading"><div><span class="mvn-label">MAX VOLUME NUTRITION · UNICORN PRO SERIES</span><h2>SHOP YOUR EXACT PACK.</h2><p>All eight purchased variants are listed individually. Photos and availability are verified per pack; stock is confirmed before fulfilment.</p></div><a href="tel:+917708830513" aria-label="Call Max Volume Nutrition">CALL OUR TEAM ↗</a></div><div id="mvn-purchased-grid" class="mvn-purchased-grid"></div><p class="mvn-image-policy">Images must match the purchased size and flavour. Where a verified 1080-pixel image is not yet available, we show a clearly labelled photo-pending tile rather than another product’s packaging.</p>';
+  section.innerHTML='<div class="mvn-purchased-heading"><div><span class="mvn-label">MAX VOLUME NUTRITION · UNICORN PRO SERIES</span><h2>SHOP YOUR EXACT PACK.</h2><p>Browse individual packs with matching photos. Stock is confirmed before fulfilment.</p></div><a href="tel:+917708830513" aria-label="Call Max Volume Nutrition">CALL OUR TEAM ↗</a></div><div id="mvn-purchased-grid" class="mvn-purchased-grid"></div><p class="mvn-image-policy">Pack photos match the listed size and flavour.</p>';
   const title=$('shop').querySelector('.section-title');
   if(title)title.after(section);else $('shop').prepend(section);
  }
- const all=P.filter(p=>purchasedFamilies.has(p.id)).flatMap(p=>p.variants.map((v,i)=>({p,v,i})));
+ const all=P.filter(p=>purchasedFamilies.has(p.id)).flatMap(p=>visiblePackOptions(p).map(({v,i})=>({p,v,i})));
  const filtered=all.filter(({p,v})=>(cat==='all'||p.cat===cat)&&matchesPrice(v)&&(p.name+' '+v.label).toLowerCase().includes(q.toLowerCase()));
  const sort=$('sort')?.value||'default';
  if(sort==='low')filtered.sort((a,b)=>a.v.price-b.v.price);
@@ -126,7 +147,7 @@ function renderPurchasedPacks(){
  section.querySelector('#mvn-purchased-grid').innerHTML=html||'<p class="mvn-empty-packs">No purchased variants match this filter.</p>';
  section.querySelectorAll('[data-pack-add]').forEach(b=>b.onclick=()=>{const key=b.dataset.packAdd+'|'+b.dataset.index;cart[key]=Math.min(999,(cart[key]||0)+1);persist();openBag()});
  section.querySelectorAll('[data-pack-details]').forEach(b=>b.onclick=()=>showDetail(b.dataset.packDetails,Number(b.dataset.index)));
- section.querySelectorAll('.mvn-purchased-photo img').forEach(img=>img.addEventListener('error',()=>{img.hidden=true;const p=img.nextElementSibling;if(p)p.hidden=false}));
+ section.querySelectorAll('.mvn-purchased-photo img').forEach(img=>img.addEventListener('error',()=>hideFailedPackPhoto(img)));
 }
 function renderPurchasedPromos(){
  const section=$('mvn-purchased-packs');if(!section)return;
@@ -139,7 +160,7 @@ function renderPurchasedPromos(){
 
 function render(){
 // Render each product family exactly once in the primary grid on web and mobile.
-const items=P.filter(p=>(cat==="all"||p.cat===cat)&&p.variants.some(matchesPrice)&&((p.name+" "+(p.brand||"")+" "+p.variants.map(v=>v.label).join(" ")).toLowerCase().includes(q.toLowerCase())));
+const items=P.filter(p=>(cat==="all"||p.cat===cat)&&visiblePackOptions(p).some(({v})=>matchesPrice(v))&&((p.name+" "+(p.brand||"")+" "+visiblePackOptions(p).map(({v})=>v.label).join(" ")).toLowerCase().includes(q.toLowerCase())));
 if($("sort").value==="default")items.sort((a,b)=>Number(Boolean(coverImage(b,b.featuredIndex||0)))-Number(Boolean(coverImage(a,a.featuredIndex||0))));
 if($("sort").value==="name")items.sort((a,b)=>a.name.localeCompare(b.name));
 if($("sort").value==="low")items.sort((a,b)=>a.variants[displayVariant(a)].price-b.variants[displayVariant(b)].price);
@@ -150,7 +171,7 @@ if($("emptyReset"))$("emptyReset").onclick=resetFilters;
 if($("collectionTitle"))$("collectionTitle").textContent=categoryNames[cat];
 document.querySelectorAll("[data-cat]").forEach(button=>{const active=button.dataset.cat===cat;button.classList.toggle("active",active);if(button.tagName==="BUTTON")button.setAttribute("aria-pressed",String(active));});
 const filters=$("activeFilters");if(filters){filters.replaceChildren();for(const [label,clear] of [[q?"Search: "+q:"",()=>{q="";$("q").value="";}],[priceRange!=="all"?priceLabels[priceRange]:"",()=>{priceRange="all";$("priceRange").value="all";}]]){if(!label)continue;const button=document.createElement("button");button.type="button";button.textContent=label+" ×";button.setAttribute("aria-label","Clear "+label);button.onclick=()=>{clear();render()};filters.append(button)}filters.hidden=!filters.childElementCount;}
- document.querySelectorAll(".photo img").forEach(img=>img.addEventListener("error",()=>{img.hidden=true;if(img.nextElementSibling)img.nextElementSibling.hidden=false}));
+ document.querySelectorAll(".photo img").forEach(img=>img.addEventListener("error",()=>hideFailedPackPhoto(img)));
 $("resultText").textContent=items.length+" product range"+(items.length===1?"":"s")+" · choose pack and flavour";
 document.querySelectorAll(".variant").forEach(s=>s.addEventListener("change",()=>{const p=P.find(x=>x.id===s.id.slice(2));$("price-"+p.id).innerHTML=priceMarkup(p.variants[Number(s.value)]);swapPhoto(s.closest(".card").querySelector(".photo"),coverImage(p,s.value),p.name)}));
 document.querySelectorAll(".details-link").forEach(b=>b.addEventListener("click",()=>showDetail(b.dataset.detail)));
@@ -251,9 +272,11 @@ function showDetail(id,chosenIndex){
  const p=P.find(x=>x.id===id);if(!p)return;
  recent=[id,...recent.filter(value=>value!==id)].slice(0,4);try{localStorage.setItem("mvn-recent-v1",JSON.stringify(recent))}catch{}renderRecent();
  const dlg=$("productDialog"),root=$("productDetail");
- const initialIndex=Number(chosenIndex ?? $("v-"+id)?.value ?? p.featuredIndex ?? 0);
+ const selected=Number(chosenIndex ?? $("v-"+id)?.value ?? displayVariant(p));
+ const initialIndex=visiblePackOptions(p).some(({i})=>i===selected)?selected:displayVariant(p);
+ if(initialIndex===undefined)return;
  const cover=coverImage(p,initialIndex);const photo=cover?'<img src="'+safe(cover)+'" alt="'+safe(p.name)+'" loading="lazy"><div class="placeholder" hidden>Verified product image pending</div>':'<div class="placeholder"><b>'+safe(p.name)+'</b>Verified product image pending</div>';
- root.innerHTML='<div class="detail-layout"><div class="detail-photo">'+photo+'</div><div class="detail-copy"><span class="eyebrow dark">'+safe(p.brand||'Unicorn Pro Series')+'</span><h2>'+safe(p.name)+'</h2><p>'+safe(p.desc)+'</p><p class="detail-note">Product pack and flavour availability are confirmed before fulfilment. Front/back pack-label and ingredient photos will be added after verification; please request the current label when ordering.</p><label for="detail-variant">FLAVOUR / PACK SIZE</label><select id="detail-variant">'+p.variants.map((v,i)=>'<option value="'+i+'"'+(i===initialIndex?' selected':'')+'>'+safe(v.label)+'</option>').join("")+'</select><div class="price detail-price" id="detail-price">'+priceMarkup(p.variants[initialIndex])+'</div><button class="primary" id="detail-add">ADD TO CART +</button></div></div>';
+ root.innerHTML='<div class="detail-layout"><div class="detail-photo">'+photo+'</div><div class="detail-copy"><span class="eyebrow dark">'+safe(p.brand||'Unicorn Pro Series')+'</span><h2>'+safe(p.name)+'</h2><p>'+safe(p.desc)+'</p><p class="detail-note">Product pack and flavour availability are confirmed before fulfilment. Front/back pack-label and ingredient photos will be added after verification; please request the current label when ordering.</p><label for="detail-variant">FLAVOUR / PACK SIZE</label><select id="detail-variant">'+visiblePackOptions(p).map(({v,i})=>'<option value="'+i+'"'+(i===initialIndex?' selected':'')+'>'+safe(v.label)+'</option>').join("")+'</select><div class="price detail-price" id="detail-price">'+priceMarkup(p.variants[initialIndex])+'</div><button class="primary" id="detail-add">ADD TO CART +</button></div></div>';
  swapPhoto(root.querySelector(".detail-photo"),coverImage(p,initialIndex),p.name);
  const sel=$("detail-variant");sel.onchange=()=>{$("detail-price").innerHTML=priceMarkup(p.variants[Number(sel.value)]);swapPhoto(root.querySelector(".detail-photo"),coverImage(p,sel.value),p.name)};
  $("detail-add").onclick=()=>{const k=p.id+"|"+sel.value;cart[k]=Math.min(999,(cart[k]||0)+1);persist();dlg.close();openBag()};
