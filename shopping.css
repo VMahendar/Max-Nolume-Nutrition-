@@ -121,3 +121,63 @@
  .retail-home .mvn-inquiry-action{font-size:10px;min-height:39px;padding:11px 6px}
 }
 @media(max-width:360px){.retail-home .collection-results .grid{grid-template-columns:1fr!important}.retail-home .collection-results .photo{height:280px!important}}
+
+
+/* Invoice-verified pack gallery: 8 separate packs, shared with site and mobile PWA. */
+.retail-home .mvn-purchased-section{margin:20px auto 36px;max-width:1250px}
+.retail-home .mvn-purchased-heading{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:19px}
+.retail-home .mvn-purchased-heading .mvn-label{display:block;font-size:10px;font-weight:900;letter-spacing:.18em;color:#94743f;margin-bottom:6px}
+.retail-home .mvn-purchased-heading h2{font-size:clamp(23px,3vw,37px);font-weight:900;letter-spacing:-.04em;line-height:1.08;margin:0;color:#182333}
+.retail-home .mvn-purchased-heading p{font-size:13px;line-height:1.5;max-width:660px;color:#5d6670;margin:10px 0 0}
+.retail-home .mvn-purchased-heading>a{font-size:11px;white-space:nowrap;color:#172a3c;font-weight:800}
+.retail-home .mvn-purchased-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+.retail-home .mvn-purchased-card{min-width:0;border:1px solid #e2e6ea;background:#fff;display:flex;flex-direction:column;box-shadow:0 2px 12px rgba(27,38,48,.035);transition:border-color .2s,transform .2s}
+.retail-home .mvn-purchased-card:hover{border-color:#ae8a4c;transform:translateY(-2px)}
+.retail-home .mvn-purchased-photo{background:#f7f8f9;height:275px;display:flex;justify-content:center;align-items:center;overflow:hidden}
+.retail-home .mvn-purchased-photo img{width:100%;height:100%;object-fit:contain;box-sizing:border-box;padding:6px}
+.retail-home .mvn-hd-placeholder{height:100%;width:100%;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;background:linear-gradient(135deg,#f7f8f9,#eeeff0);padding:18px;color:#192d41}
+.retail-home .mvn-hd-placeholder span{font-size:10px;font-weight:900;letter-spacing:.12em;color:#a37f46}
+.retail-home .mvn-hd-placeholder strong{font-size:clamp(20px,2vw,27px);line-height:1.15;margin:13px 0 8px}
+.retail-home .mvn-hd-placeholder em{font-size:13px;font-style:normal;font-weight:700}
+.retail-home .mvn-hd-placeholder small{font-size:11px;color:#64707d;margin-top:15px;line-height:1.45}
+.retail-home .mvn-purchased-details{display:flex;flex-direction:column;flex:1;padding:17px 14px}
+.retail-home .mvn-purchased-brand{font-size:10px;letter-spacing:.09em;color:#ad8349;font-weight:800}
+.retail-home .mvn-purchased-details h3{font-size:18px;line-height:1.15;margin:8px 0 4px;color:#152333}
+.retail-home .mvn-purchased-details>p{font-size:12px;line-height:1.5;color:#596675;margin:0 0 12px}
+.retail-home .mvn-purchased-price{margin-top:auto}
+.retail-home .mvn-purchased-price .selling-price{font-size:23px!important}
+.retail-home .mvn-purchased-price .retail-offer-price{margin-top:8px}
+.retail-home .mvn-purchased-actions{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;margin-top:14px}
+.retail-home .mvn-purchased-actions button{cursor:pointer;min-height:43px;border-radius:2px;padding:9px 11px;font-size:10px;font-weight:900;letter-spacing:.02em}
+.retail-home .mvn-purchased-actions button:first-child{background:#19293b;border:1px solid #19293b;color:#fff}
+.retail-home .mvn-purchased-actions .mvn-detail-btn{background:white;border:1px solid #cbd1d8;color:#1a2734}
+.retail-home .mvn-purchased-secondary{display:flex;justify-content:space-between;gap:10px;margin-top:14px;font-size:11px}
+.retail-home .mvn-purchased-secondary a{color:#4e5966;font-weight:700}
+.retail-home .mvn-image-policy{font-size:11px;line-height:1.6;color:#626d77;margin:13px 0 0}
+.retail-home .mvn-purchased-promo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:15px 0 20px}
+.retail-home .mvn-promo-item{border:1px solid #e0d4bd;background:#faf7f1;padding:13px 15px;display:flex;flex-direction:column;gap:5px}
+.retail-home .mvn-promo-item>span{font-size:10px;color:#8c6f3e;letter-spacing:.1em;font-weight:850}
+.retail-home .mvn-promo-item>strong{font-size:22px;letter-spacing:.04em;color:#182333}
+.retail-home .mvn-promo-item>small{font-size:11px;line-height:1.5;color:#5d6670}
+.retail-home .mvn-promo-item>button{align-self:start;background:transparent;border:0;padding:5px 0;font-size:11px;font-weight:850;color:#202f40;cursor:pointer;text-decoration:underline}
+@media(max-width:1100px){.retail-home .mvn-purchased-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:790px){.retail-home .mvn-purchased-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){
+ .retail-home .mvn-purchased-section{padding:0 13px;margin:12px auto 26px}
+ .retail-home .mvn-purchased-heading{align-items:start}
+ .retail-home .mvn-purchased-heading h2{font-size:23px}
+ .retail-home .mvn-purchased-heading p{font-size:11px}
+ .retail-home .mvn-purchased-heading>a{font-size:10px}
+ .retail-home .mvn-purchased-grid{gap:10px}
+ .retail-home .mvn-purchased-photo{height:215px}
+ .retail-home .mvn-purchased-details{padding:12px 10px}
+ .retail-home .mvn-purchased-details h3{font-size:16px}
+ .retail-home .mvn-purchased-price .selling-price{font-size:20px!important}
+ .retail-home .mvn-purchased-actions{grid-template-columns:1fr}
+ .retail-home .mvn-purchased-actions button{min-height:41px}
+ .retail-home .mvn-purchased-promo{grid-template-columns:1fr}
+ .retail-home .mvn-hd-placeholder{padding:8px}
+ .retail-home .mvn-hd-placeholder strong{font-size:17px}
+ .retail-home .mvn-hd-placeholder small{font-size:10px}
+}
+@media(max-width:360px){.retail-home .mvn-purchased-grid{grid-template-columns:1fr}.retail-home .mvn-purchased-photo{height:320px}}
