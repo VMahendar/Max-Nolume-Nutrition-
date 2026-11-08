@@ -91,9 +91,13 @@ function swapPhoto(host,src,name){
  img.onload=()=>{img.hidden=false;placeholder.hidden=true};
  img.hidden=false;placeholder.hidden=true;img.src=src;
 }
-function retailOfferMarkup(v){
+function bestRetailOffer(v){
  const subtotal=Math.round(v.price*100);let best=null;
  for(const campaign of availableOffers){if(Date.parse(campaign.endsAt)<=Date.now()||subtotal<campaign.minimumPaise||!/^[A-Z0-9-]{3,30}$/.test(campaign.code))continue;let discount=campaign.type==='percent'?Math.floor(subtotal*campaign.amount/100):campaign.amount;if(campaign.capPaise>0)discount=Math.min(discount,campaign.capPaise);discount=Math.min(discount,subtotal);if(!best||discount>best.discount)best={campaign,discount};}
+ return best;
+}
+function retailOfferMarkup(v){
+ const subtotal=Math.round(v.price*100),best=bestRetailOffer(v);
  return best?'<div class="retail-offer-price"><span class="limited-deal-label">LIMITED '+(best.campaign.occasion?.toLowerCase().includes('diwali')?'DIWALI':'RETAIL')+' OFFER</span><strong>'+money((subtotal-best.discount)/100)+'</strong><span>Code '+best.campaign.code+' at checkout</span><span>Valid through '+new Date(Date.parse(best.campaign.endsAt)-1).toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'short'})+'</span></div>':'';
 }
 function priceMarkup(v){
@@ -104,6 +108,12 @@ function priceMarkup(v){
  '</div>'+(hasMrp?'<span class="discount-value">'+percent+'% OFF · SAVE '+money(v.mrp-v.price)+'</span>':'')+
  '<small class="selling-caption">Regular retail price</small>'+retailOfferMarkup(v);
 }
+function appPriceMarkup(v){
+ const offer=bestRetailOffer(v),regular=Math.round(v.price*100);
+ if(offer){const end=new Date(Date.parse(offer.campaign.endsAt)-1).toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'short'});return '<strong class="price-current price-current--promo">'+money((regular-offer.discount)/100)+'</strong><span class="price-original">Regular <del>'+money(v.price)+'</del></span><span class="price-note">With code '+safe(offer.campaign.code)+' at checkout · through '+safe(end)+'</span>';}
+ return '<strong class="price-current">'+money(v.price)+'</strong>'+(Number.isSafeInteger(v.mrp)&&v.mrp>v.price?'<span class="price-original">MRP <del>'+money(v.mrp)+'</del></span>':'')+'<span class="price-note">Regular selling price</span>';
+}
+function purchasedPack(variantId){for(const p of P){const i=retailVariantIds[p.id]?.indexOf(variantId);if(i!==undefined&&i>=0&&p.variants[i])return {p,i,v:p.variants[i]};}return null;}
 function card(p){
 const featured=displayVariant(p);const cover=coverImage(p,featured);const pic=cover?'<img loading="lazy" src="'+safe(cover)+'" alt="'+safe(p.name)+'"><div class="placeholder" hidden><b>'+safe(p.name)+'</b>Photo coming soon</div>':'<div class="placeholder"><b>'+safe(p.name)+'</b>Correct pack photo being verified</div>';
 return '<article class="card"><div class="photo">'+pic+'</div><div class="info"><small>'+safe(p.brand||'Unicorn Pro Series')+'</small><h3>'+safe(p.name)+'</h3><p>'+safe(p.desc)+'</p><label class="variant-label" for="v-'+p.id+'">FLAVOUR / PACK SIZE</label><select id="v-'+p.id+'" class="variant">'+visiblePackOptions(p).map(({v,i})=>'<option value="'+i+'"'+(i===featured?' selected':'')+'>'+safe(v.label)+'</option>').join("")+'</select><div class="price" id="price-'+p.id+'">'+priceMarkup(p.variants[featured])+'</div><button class="details-link" type="button" data-detail="'+p.id+'">VIEW PRODUCT DETAILS →</button><button class="add" data-id="'+p.id+'">ADD TO CART +</button></div></article>';
@@ -132,7 +142,9 @@ function renderPurchasedPacks(){
   const title=$('shop').querySelector('.section-title');
   if(title)title.after(section);else $('shop').prepend(section);
  }
- const all=P.filter(p=>purchasedFamilies.has(p.id)).flatMap(p=>visiblePackOptions(p).map(({v,i})=>({p,v,i})));
+ const isApp=document.body.classList.contains('app-store');
+ if(isApp){const layout=$('shop').querySelector('.shopping-layout');layout.after(section);section.querySelector('h2').textContent='Shop supplements';section.querySelector('.mvn-purchased-heading p').textContent='Choose your pack and flavour.';document.body.classList.add('app-catalog-ready');}
+ const all=P.filter(p=>isApp||purchasedFamilies.has(p.id)).flatMap(p=>visiblePackOptions(p).map(({v,i})=>({p,v,i})));
  const filtered=all.filter(({p,v})=>(cat==='all'||p.cat===cat)&&matchesPrice(v)&&(p.name+' '+v.label).toLowerCase().includes(q.toLowerCase()));
  const sort=$('sort')?.value||'default';
  if(sort==='low')filtered.sort((a,b)=>a.v.price-b.v.price);
@@ -142,11 +154,11 @@ function renderPurchasedPacks(){
   const src=coverImage(p,i), label=p.name+' · '+v.label;
   const photo=src?'<img src="'+safe(src)+'" alt="'+safe(label)+' verified variant photograph" loading="lazy"><div class="mvn-hd-placeholder" hidden><strong>'+safe(p.name)+'</strong><span>Correct high-resolution pack photo requested</span></div>':'<div class="mvn-hd-placeholder"><span>UNICORN PRO SERIES</span><strong>'+safe(p.name)+'</strong><em>'+safe(v.label)+'</em><small>1080 × 1080 product photo pending</small></div>';
   const text='Hello Max Volume Nutrition, please confirm the exact pack, current stock and delivery for '+label+'.';
-  return '<article class="mvn-purchased-card" data-purchase-pack="'+safe(retailVariantIds[p.id]?.[i]||'')+'"><div class="mvn-purchased-photo">'+photo+'</div><div class="mvn-purchased-details"><span class="mvn-purchased-brand">UNICORN PRO SERIES</span><h3>'+safe(p.name)+'</h3><p>'+safe(v.label)+'</p><div class="mvn-purchased-price">'+priceMarkup(v)+'</div><div class="mvn-purchased-actions"><button type="button" data-pack-add="'+safe(p.id)+'" data-index="'+i+'">ADD TO CART +</button><button type="button" class="mvn-detail-btn" data-pack-details="'+safe(p.id)+'" data-index="'+i+'">DETAILS</button></div><div class="mvn-purchased-secondary"><a href="https://wa.me/'+PHONE+'?text='+encodeURIComponent(text)+'" rel="noopener noreferrer" target="_blank" aria-label="Ask on WhatsApp about '+safe(label)+'">WhatsApp enquiry ↗</a><a href="tel:+917708830513" aria-label="Call about '+safe(label)+'">Call ↗</a></div></div></article>';
+  return '<article class="mvn-purchased-card product-card" data-purchase-pack="'+safe(retailVariantIds[p.id]?.[i]||'')+'"><div class="mvn-purchased-photo">'+photo+'</div><div class="mvn-purchased-details"><span class="mvn-purchased-brand product-series">UNICORN PRO SERIES</span><h3 class="product-name">'+safe(p.name)+'</h3><p class="product-variant">'+safe(v.label)+'</p><div class="mvn-purchased-price product-prices">'+(isApp?appPriceMarkup(v):priceMarkup(v))+'</div><div class="mvn-purchased-actions product-actions"><button type="button" class="product-button product-button--cart" data-pack-add="'+safe(p.id)+'" data-index="'+i+'" data-add="'+safe(retailVariantIds[p.id]?.[i]||'')+'" aria-label="Add '+safe(label)+' to cart">Add to Cart</button><button type="button" class="mvn-detail-btn product-button product-button--details" data-pack-details="'+safe(p.id)+'" data-index="'+i+'" data-details="'+safe(retailVariantIds[p.id]?.[i]||'')+'" aria-label="Details for '+safe(label)+'">Details</button></div><div class="mvn-purchased-secondary"><a href="https://wa.me/'+PHONE+'?text='+encodeURIComponent(text)+'" rel="noopener noreferrer" target="_blank" aria-label="Ask on WhatsApp about '+safe(label)+'">WhatsApp enquiry ↗</a><a href="tel:+917708830513" aria-label="Call about '+safe(label)+'">Call ↗</a></div></div></article>';
  }).join('');
  section.querySelector('#mvn-purchased-grid').innerHTML=html||'<p class="mvn-empty-packs">No purchased variants match this filter.</p>';
- section.querySelectorAll('[data-pack-add]').forEach(b=>b.onclick=()=>{const key=b.dataset.packAdd+'|'+b.dataset.index;cart[key]=Math.min(999,(cart[key]||0)+1);persist();openBag()});
- section.querySelectorAll('[data-pack-details]').forEach(b=>b.onclick=()=>showDetail(b.dataset.packDetails,Number(b.dataset.index)));
+ section.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const pack=purchasedPack(b.dataset.add);if(!pack)return;const key=pack.p.id+'|'+pack.i;cart[key]=Math.min(999,(cart[key]||0)+1);persist();openBag()});
+ section.querySelectorAll('[data-details]').forEach(b=>b.onclick=()=>{const pack=purchasedPack(b.dataset.details);if(pack)showDetail(pack.p.id,pack.i)});
  section.querySelectorAll('.mvn-purchased-photo img').forEach(img=>img.addEventListener('error',()=>hideFailedPackPhoto(img)));
 }
 function renderPurchasedPromos(){
@@ -164,6 +176,7 @@ let appFeatureSelection=appFeaturePacks[0];
 function renderAppProduct(){
  const stage=$("appProductStage");
  if(!stage)return;
+ if(document.body.classList.contains('catalogue-app')){stage.hidden=true;return;}
  const packs=P.flatMap(p=>visiblePackOptions(p).map(({v,i})=>({p,v,i,key:retailVariantIds[p.id]?.[i]})))
   .filter(({key})=>appFeaturePacks.includes(key))
   .sort((a,b)=>appFeaturePacks.indexOf(a.key)-appFeaturePacks.indexOf(b.key));
@@ -206,6 +219,7 @@ function renderAppProduct(){
 }
 
 function render(){
+ renderPurchasedPacks();
  renderAppProduct();
 // Render each product family exactly once in the primary grid on web and mobile.
 const items=P.filter(p=>(cat==="all"||p.cat===cat)&&visiblePackOptions(p).some(({v})=>matchesPrice(v))&&((p.name+" "+(p.brand||"")+" "+visiblePackOptions(p).map(({v})=>v.label).join(" ")).toLowerCase().includes(q.toLowerCase())));
@@ -225,10 +239,10 @@ document.querySelectorAll(".variant").forEach(s=>s.addEventListener("change",()=
 document.querySelectorAll(".details-link").forEach(b=>b.addEventListener("click",()=>showDetail(b.dataset.detail)));
 document.querySelectorAll(".add").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.id+"|"+$("v-"+b.dataset.id).value;cart[k]=Math.min(999,(cart[k]||0)+1);persist();openBag()}));
 }
-function setCat(c){if(!Object.hasOwn(categoryNames,c))return;cat=c;document.querySelectorAll(".cats [data-cat]").forEach(b=>b.classList.toggle("active",b.dataset.cat===c));render();$("shop").scrollIntoView({behavior:"smooth"})}
+function setCat(c){if(!Object.hasOwn(categoryNames,c))return;cat=c;document.querySelectorAll(".cats [data-cat],.mvn-quick-track [data-cat]").forEach(b=>b.classList.toggle("active",b.dataset.cat===c));render();$("shop").scrollIntoView({behavior:"smooth"})}
 function totals(){let n=0,subtotal=0;for(const [k,qty] of Object.entries(cart)){const item=getItem(k);if(!item)continue;const quantity=Math.min(999,Math.max(0,Number(qty)||0));n+=quantity;subtotal+=item.v.price*quantity;}const discount=appliedOffer?.signature===cartSignature()&&appliedOffer.campaign.code===$("offerCode").value.trim().toUpperCase()&&Date.parse(appliedOffer.campaign.endsAt)>Date.now()?appliedOffer.discountPaise/100:0;return{n,subtotal,discount,total:subtotal-discount}}
 function drawCart(){
-const {n,subtotal,discount,total}=totals();$("count").textContent=n;if($("floatingCount"))$("floatingCount").textContent=n;
+const {n,subtotal,discount,total}=totals();$("count").textContent=n;if($("floatingCount"))$("floatingCount").textContent=n;if($("floatingCart"))$("floatingCart").hidden=!n;
 let html=n?"":'<p class="empty-cart">Your cart is empty. Choose your supplements to get started.</p>';
 for(const [k,qty] of Object.entries(cart)){const item=getItem(k);if(!item)continue;html+='<div class="row"><b>'+safe(item.p.name)+'</b><small>'+safe(item.v.label)+' · '+money(item.v.price)+'</small><div class="qty"><button data-minus="'+k+'" aria-label="Decrease quantity">−</button><span>'+qty+'</span><button data-plus="'+k+'" aria-label="Increase quantity">+</button><strong>'+money(item.v.price*qty)+'</strong></div></div>'}
 $("items").innerHTML=html;

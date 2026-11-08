@@ -20,14 +20,14 @@ try{
  const page=await browser.newPage({viewport:{width,height:950}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(base+'/');
  await page.evaluate(()=>dispatchEvent(new Event('appinstalled')));
- assert.equal(await page.locator('.permanent-app-link').isVisible(),true);
- await page.locator('.permanent-app-link').click();
+ const installationHelp=page.locator('[data-install-help]:visible').first();
+ await installationHelp.scrollIntoViewIfNeeded();await installationHelp.click();
  assert.equal(await page.getByRole('heading',{name:'Install the MVN app',exact:true}).isVisible(),true);
  await page.getByRole('button',{name:'Close installation help'}).click();
  await page.locator('#priceRange').selectOption('under1000');
- assert.equal(await page.locator('#grid .card').count(),2);
+ assert.equal(await page.locator('#grid .card').count(),1);
  await page.locator('#priceRange').selectOption('1000to3000');
- assert.equal(await page.locator('#grid .card').count(),2);
+ assert.equal(await page.locator('#grid .card').count(),1);
  assert.match(await page.locator('#v-mass option:checked').textContent(),/3 kg/);
  assert.match(await page.locator('#price-mass').textContent(),/2,599/);
  await page.locator('#resetFilters').click();
@@ -36,14 +36,14 @@ try{
  await page.locator('#q').fill('zzzz-no-match');
  assert.equal(await page.getByRole('heading',{name:'No matching products'}).count(),1);
  await page.getByRole('button',{name:'View all products'}).click();
- assert.equal(await page.locator('#grid .card').count(),5);
+ assert.equal(await page.locator('#grid .card').count(),3);
  await page.locator('#q').fill('<img src=x onerror=alert(1)>');
  assert.equal(await page.locator('#activeFilters img').count(),0);
  await page.locator('#resetFilters').click();
  await page.locator('.cats [data-cat="mass"]').click();
  assert.equal(await page.locator('#grid .card').count(),1);
  await page.locator('.nav [data-cat="all"]').click();
- assert.equal(await page.locator('#grid .card').count(),5);
+ assert.equal(await page.locator('#grid .card').count(),3);
  await page.locator('[data-detail="whey"]').click();
  await page.locator('#detailClose').click();
  assert.equal(await page.locator('#recentProducts button').count(),1);
@@ -82,9 +82,9 @@ try{
  await app.waitForFunction(()=>document.querySelector('#price-whey').textContent.includes('5,123'));
  assert.equal(await app.locator('body.app-store').count(),1);
  assert.equal(await app.locator('.hero').isVisible(),false);
- assert.equal(await app.locator('#grid .card').count(),5);
+ assert.equal(await app.locator('#grid .card').count(),3);
  const manifest=await (await app.request.get(base+'/manifest.webmanifest')).json();assert.equal(manifest.start_url,'/mobile-app.html');
- await app.locator('.add[data-id="whey"]').click();
+ await app.locator('[data-add="whey-coffee"]').click();
  await app.locator('[data-plus]').click();
  await app.locator('#customerName').fill('App Customer');
  await app.locator('#customerPhone').fill('9876543210');await app.locator('#customerAddress').fill('12 Training Street');await app.locator('#customerCity').fill('Chennai');await app.locator('#customerState').fill('Tamil Nadu');await app.locator('#customerPincode').fill('600001');await app.locator('#paymentPreference').selectOption('Request UPI payment instructions');
@@ -108,8 +108,8 @@ try{
  await app.close();
 
  const installPage=await browser.newPage({viewport:{width:390,height:844}});
- await installPage.goto(base+'/mobile-app.html');await installPage.locator('#appInstallGate').waitFor({state:'visible'});
- assert.equal(await installPage.locator('#grid').isVisible(),false,'browser app entry offers installation instead of the shop');
+ await installPage.goto(base+'/mobile-app.html');await installPage.locator('.mvn-purchased-card').first().waitFor({state:'visible'});
+ assert.equal(await installPage.locator('#appInstallGate').isVisible(),false,'browser app entry remains a browsable shop');
  await installPage.close();
  // Activate a test-only app campaign in this isolated browser-test database.
  const db=new DatabaseSync(resolve(dataDir,'orders.sqlite'));
@@ -137,7 +137,7 @@ try{
  assert.equal(await promo.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'app marketing overflow');
  await promo.locator('.app-bottom-nav a[href="#shop"]').click();await promo.locator('#shop').waitFor({state:'visible'});
  assert.equal(await promo.locator('.storehead').count(),0,'app has a separate compact header');
- await promo.locator('.add[data-id="whey"]').click();
+ await promo.locator('[data-add="whey-coffee"]').click();
  await promo.locator('#offerCode').fill('TESTAPP');await promo.locator('#applyOffer').click();
  await promo.waitForFunction(()=>document.querySelector('#offerMessage').textContent.includes('Applied TESTAPP'));
  assert.match(await promo.locator('#cart-totals').textContent(),/4,899/);
