@@ -12,7 +12,7 @@ import {stagingGate} from './staging.mjs';
 const allowStaging=stagingGate();
 import {isIP} from 'node:net';
 import {readFileSync,realpathSync,existsSync} from 'node:fs';
-import {resolve,extname,sep} from 'node:path';
+import {resolve,extname,sep,posix} from 'node:path';
 import {randomUUID,randomBytes,timingSafeEqual} from 'node:crypto';
 import {signatureMatches,quote,customerValid} from './lib.mjs';
 import {openCommerce,Problem,fail,hash,clean,integer,email,passwordHash,passwordMatches,taxQuote,stateCode} from './commerce.mjs';
@@ -32,6 +32,9 @@ initializeOwnerWork(C);
 initializeLeadInbox(C);
 const origin=process.env.PUBLIC_ORIGIN||'http://localhost:3000',production=process.env.NODE_ENV==='production';
 const previousStoreOrigin='https://max-volume-nutrition-preview.onrender.com';
+const publicLaunchAt=Date.parse('2026-11-08T11:00:00+05:30');
+const publicLaunchService=[origin,process.env.RENDER_EXTERNAL_URL].includes(previousStoreOrigin);
+const launchStorePages=new Set(['/','/index.html','/mobile-app.html','/account.html','/wholesale-account.html','/dealer.html']);
 function canonicalStoreOrigin(){
   const configured=process.env.STORE_PUBLIC_URL;
   if(!configured)return previousStoreOrigin;
@@ -101,6 +104,22 @@ if(u.pathname==='/owner-preview'&&['GET','HEAD'].includes(req.method)){
   html=html.replace('</body>','<script src="/owner-preview.js" defer></script></body>');
   res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'private, no-store','X-Robots-Tag':'noindex, nofollow'});
   return res.end(req.method==='HEAD'?undefined:html);
+}
+const launchRemaining=publicLaunchService?publicLaunchAt-Date.now():0;
+if(launchRemaining>0){
+  const launchPath=posix.normalize(decodeURIComponent(u.pathname));
+  if(['GET','HEAD'].includes(req.method)&&launchStorePages.has(launchPath)){
+    const countdown=readFileSync(resolve(root,'scan.html'),'utf8')
+      .replace('<html lang="en">','<html lang="en" class="mvn-prelaunch-pending">')
+      .replace('<script type="module" src="/scan-codes.js"></script>','')
+      .replace(/<body[\s\S]*<\/body>/,`<body class="mvn-qr-page" data-store-launch-ms="${launchRemaining}"><noscript>Max Volume Nutrition opens at 11:00 AM IST. Refresh this page at opening time.</noscript></body>`);
+    res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','X-Robots-Tag':'noindex, follow'});
+    return res.end(req.method==='HEAD'?undefined:countdown);
+  }
+  if(req.method==='POST'&&['/api/checkout','/api/enquiries'].includes(launchPath)){
+    res.setHeader('Retry-After',String(Math.ceil(launchRemaining/1000)));
+    return json(res,503,{error:'The store opens at 11:00 AM IST.'});
+  }
 }
 if(/^\/assets\/updates\/[a-z0-9-]+\.jpg$/.test(u.pathname)&&['GET','HEAD'].includes(req.method)){
  const image=db.prepare('SELECT content FROM store_update_images WHERE path=?').get(u.pathname.slice(1));if(!image)fail(404,'Image not found.');res.writeHead(200,{'Content-Type':'image/jpeg'});return res.end(req.method==='HEAD'?undefined:image.content);
