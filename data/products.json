@@ -48,7 +48,7 @@
     "name": "Nitro Mass",
     "category": "Mass Gainer",
     "subtitle": "Build your nutrition routine",
-    "description": "Unicorn Pro Series Nitro Mass. The 5 kg bucket is pictured using the owner's uploaded pack photograph. The 3 kg pack is a separate variant; its exact photo is pending verification. Always check the received label for ingredients and nutrition.",
+    "description": "Unicorn Pro Series Nitro Mass Double Rich Chocolate, available in a 3 kg jar and a 5 kg bucket. Always check the received label for ingredients and nutrition.",
     "image": "assets/Screenshot_2026_1103_003852.jpg",
     "variants": [
       {
@@ -71,15 +71,21 @@
       },
       {
         "id": "mass-3kg",
-        "label": "3 kg · Pack to confirm",
+        "label": "3 kg · Double Rich Chocolate",
         "pricePaise": 259900,
         "stock": null,
-        "image": null,
+        "image": "assets/nitro-mass-3kg-double-rich-chocolate.webp",
         "prices": {
           "wholesale": 195000,
           "gym": 215000
         },
-        "images": []
+        "images": [
+          {
+            "src": "assets/nitro-mass-3kg-double-rich-chocolate.webp",
+            "label": "3 kg jar — front",
+            "alt": "Unicorn Pro Series Nitro Mass Double Rich Chocolate 3 kg jar"
+          }
+        ]
       }
     ],
     "brand": "Unicorn Pro Series"
