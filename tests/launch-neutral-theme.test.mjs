@@ -35,3 +35,12 @@ test('approved prelaunch identity uses original logo and correctly labeled brand
  assert.match(css,/\.mvn-clock-open \.mvn-clock-brands\{display:none!important\}/,'expanded brand cards must not clutter launched store');
  assert.doesNotMatch(css,/\[class\*="product"\]/,'countdown must not destroy the underlying store product display');
 });
+
+
+test('customer-visible countdown shows 11 AM without IST while opening instant stays unchanged',()=>{
+ const js=readFileSync('public/launch-countdown.js','utf8');
+ assert.match(js,/const OPENING_UTC = Date\.parse\('2026-11-08T05:30:00\.000Z'\)/);
+ assert.match(js,/STORE OPERATIONS OPEN AT <span>11:00 AM<\/span>/);
+ assert.match(js,/const LAUNCH_DATE_LABEL = 'SUNDAY · 8 NOVEMBER 2026 · 11:00 AM'/);
+ assert.doesNotMatch(js,/<span>11:00 AM IST<\/span>/);
+});

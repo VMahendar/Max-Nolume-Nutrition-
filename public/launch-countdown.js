@@ -1,7 +1,7 @@
 // Existing MVN storefront: visually blurred pre-launch preview and automatic reveal.
 // The countdown is presentation-only. Server-side account, ordering, and payment gates stay unchanged.
 const OPENING_UTC = Date.parse('2026-11-08T05:30:00.000Z'); // 11:00 AM IST, 8 Nov 2026
-const LAUNCH_DATE_LABEL = 'SUNDAY · 8 NOVEMBER 2026 · 11:00 AM IST';
+const LAUNCH_DATE_LABEL = 'SUNDAY · 8 NOVEMBER 2026 · 11:00 AM';
 const supportedPreview = () => !document.body.hasAttribute('data-mvn-owner-preview') && (
   document.body.classList.contains('retail-home') ||
   document.body.classList.contains('app-store') ||
@@ -19,7 +19,7 @@ function installOpeningCountdown() {
       <div class="mvn-clock-label">
         <img class="mvn-clock-logo" src="/max-volume-logo-wide.png" alt="Max Volume Nutrition — original gold logo" width="390" height="110">
         <span class="mvn-clock-eyebrow">MAX VOLUME NUTRITION · OFFICIAL ONLINE STORE</span>
-        <strong class="mvn-clock-headline" id="mvn-clock-title">STORE OPERATIONS OPEN AT <span>11:00 AM IST</span></strong>
+        <strong class="mvn-clock-headline" id="mvn-clock-title">STORE OPERATIONS OPEN AT <span>11:00 AM</span></strong>
         <p class="mvn-clock-description">Retail · Gym Supply · Wholesale Distribution<br>Serving Tamil Nadu &amp; Puducherry</p>
         <div class="mvn-clock-brands" aria-label="Brand availability">
           <div class="mvn-clock-brand"><small>AVAILABLE NOW</small><strong>UNICORN PRO SERIES</strong></div>
@@ -37,7 +37,7 @@ function installOpeningCountdown() {
         <span><strong data-clock="seconds">00</strong><small>SECONDS</small></span>
       </div>
       <div class="mvn-clock-footer">
-        <span id="mvn-clock-note">THE COUNTDOWN ENDS AT 11:00 AM IST</span>
+        <span id="mvn-clock-note">THE COUNTDOWN ENDS AT 11:00 AM</span>
         <a id="mvn-clock-link" href="#shop" hidden>EXPLORE THE COLLECTION →</a>
       </div>
     </div>`;
