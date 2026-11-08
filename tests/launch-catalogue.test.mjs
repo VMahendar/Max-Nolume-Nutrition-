@@ -51,15 +51,15 @@ test('eight verified retail variants retain published customer prices and privat
  }finally{try{c?.db.close()}finally{rmSync(dir,{recursive:true,force:true})}}
 });
 
-test('public catalogue never displays mismatched Cranberry 250g artwork as 100g, or 5kg bucket as 3kg box',()=>{
+test('public catalogue matches both Pro Creatine 250 g flavour photos, and keeps the 5kg bucket separate from the 3kg box',()=>{
  const dir=mkdtempSync(resolve(tmpdir(),'mvn-launch-media-'));
  let c;
  try{
   c=openCommerce(dir);
   const all=c.catalogue(null),creatine=all.find(p=>p.id==='pro-creatine'),mass=all.find(p=>p.id==='nitro-mass');
   assert.equal(creatine.image,null);
-  assert.equal(creatine.variants.find(v=>v.id==='creatine-blueberry').image,null);
-  assert.equal(creatine.variants.find(v=>v.id==='creatine-cranberry').image,null,'250g artwork must not be presented as a 100g pack');
+  assert.equal(creatine.variants.find(v=>v.id==='creatine-blueberry').image,'https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png');
+  assert.equal(creatine.variants.find(v=>v.id==='creatine-cranberry').image,'assets/pro-creatine.png');
   assert.equal(mass.variants.find(v=>v.id==='mass-3kg').image,null);
   assert.equal(mass.variants.find(v=>v.id==='mass-5kg').image,'assets/Screenshot_2026_1103_003852.jpg');
   assert.equal(mass.variants.find(v=>v.id==='mass-5kg').images[0].src,'assets/Screenshot_2026_1103_003852.jpg');
@@ -72,7 +72,7 @@ test('public catalogue never displays mismatched Cranberry 250g artwork as 100g,
   c.db.prepare("UPDATE products SET data=? WHERE id='pro-creatine'").run(JSON.stringify(old));
   const corrected=c.catalogue(null).find(p=>p.id==='pro-creatine');
   assert.equal(corrected.image,null);
-  assert.equal(corrected.variants[0].image,null);
-  assert.equal(corrected.variants[1].image,null,'legacy generic image must not override pack-specific safety');
+  assert.equal(corrected.variants[0].image,'https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png');
+  assert.equal(corrected.variants[1].image,'assets/pro-creatine.png','legacy generic image must be assigned only to Cranberry');
  }finally{try{c?.db.close()}finally{rmSync(dir,{recursive:true,force:true})}}
 });
