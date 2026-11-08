@@ -6,7 +6,7 @@ const P=[
 {id:"mass3",name:"Nitro Mass 3 kg",cat:"mass",variants:[{label:"3 kg",price:2599,img:null}],desc:"Nitro Mass 3 kg mass gainer.",img:""},
 {id:"mass5",name:"Nitro Mass 5 kg",cat:"mass",variants:[{label:"5 kg · Bucket",price:3499,img:"assets/nitro-mass-5kg.svg"}],desc:"Nitro Mass 5 kg mass gainer bucket.",img:"assets/nitro-mass-5kg.svg"},
 {id:"pre",name:"Sturdy Pre-Workout",cat:"pre",variants:[{label:"Watermelon · 250 g",price:1399}],desc:"Pre-workout formula for your training routine.",img:""},
-{id:"creatine",name:"Pro Creatine",cat:"creatine",featuredIndex:1,variants:[{label:"Blueberry · 100 g",price:899,mrp:1499,img:null},{label:"Cranberry · 100 g",price:899,mrp:1499,img:null}],desc:"Creatine supplement in two flavour options.",img:""},
+{id:"creatine",name:"Pro Creatine",cat:"creatine",featuredIndex:1,variants:[{label:"Blueberry · 250 g",price:899,mrp:1499,img:"https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png"},{label:"Cranberry · 250 g",price:899,mrp:1499,img:"assets/pro-creatine.png"}],desc:"Creatine supplement in two flavour options.",img:""},
 {id:"vitamins",name:"Musclevite Multivitamin",cat:"vitamins",variants:[{label:"Multivitamin · 1 pack",price:699}],desc:"Daily multivitamin supplement.",img:""}
 ];
 
