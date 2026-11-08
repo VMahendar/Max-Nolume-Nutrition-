@@ -1,0 +1,131 @@
+/* Phone layout shared by the website and Android app preview. */
+@media (max-width:700px) {
+ .retail-home{--phone-gutter:14px;--phone-gap:12px}
+ .retail-home :is(main,section,header,nav,form,.info,.price){min-width:0}
+ .retail-home:not(.app-store) .announce{height:auto!important;min-height:28px!important;padding:6px 14px!important;font-size:8px!important;gap:8px!important}
+ .retail-home:not(.app-store) .announce-right{max-width:55%;font-size:7px;line-height:1.4}
+ .retail-home:not(.app-store) .storehead{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;padding:8px 14px 12px!important;gap:8px 12px!important;height:auto!important}
+ .retail-home:not(.app-store) .storehead .brand-identity{grid-column:1!important;grid-row:1!important;justify-self:start!important;width:min(178px,100%)!important;height:56px!important}
+ .retail-home:not(.app-store) .brand-identity .original-brand-logo{width:100%!important;height:56px!important;object-fit:contain!important}
+ .retail-home:not(.app-store) .storehead .head-actions{grid-column:2!important;grid-row:1!important;gap:8px!important;width:auto!important}
+ .retail-home:not(.app-store) .head-actions :is(.permanent-app-link,.wa){display:none!important}
+ .retail-home:not(.app-store) .head-actions .account-link{display:grid!important;place-items:center;min-width:44px;min-height:44px;padding:0!important}
+ .retail-home:not(.app-store) .head-actions .account-link>span{display:none!important}
+ .retail-home:not(.app-store) #bag{display:flex!important;align-items:center;justify-content:center;min-height:44px!important;padding:0 10px!important;gap:6px!important}
+ .retail-home:not(.app-store) #bag>span{display:none!important}
+ .retail-home:not(.app-store) .storehead .header-search{grid-column:1/-1!important;grid-row:2!important}
+ .retail-home:not(.app-store) .header-descriptor{display:none!important}
+ .retail-home #search{min-height:44px!important;height:44px!important}
+ .retail-home #search input{font-size:14px!important;padding:0 10px!important}
+ .retail-home:not(.app-store) .nav{height:48px!important;gap:20px!important;padding:0 14px!important}
+ .retail-home:not(.app-store) .nav a{display:flex;align-items:center;min-height:44px;font-size:10px!important}
+ .retail-home:not(.app-store) .hero-copy{padding:26px 16px 20px!important}
+ .retail-home:not(.app-store) .hero h1{font-size:clamp(38px,11vw,48px)!important;line-height:1!important;margin:14px 0!important}
+ .retail-home:not(.app-store) .hero-copy>p{font-size:13px!important;line-height:1.6!important;margin:12px 0 16px!important}
+ .retail-home:not(.app-store) .hero-buttons{gap:8px!important;margin:0 0 16px!important}
+ .retail-home:not(.app-store) .hero-buttons a{min-height:44px!important;padding:12px!important}
+ .retail-home:not(.app-store) .hero-visual{min-height:0!important;height:245px!important;padding:12px 16px!important}
+ .retail-home:not(.app-store) .hero-visual img{max-height:200px!important}
+ .retail-home:not(.app-store) .trust{gap:8px 14px!important;margin:0!important;font-size:8px!important}
+ .retail-home #shop{padding:28px 14px 36px!important}
+ .retail-home #shop .section-title{margin-bottom:20px!important}
+ .retail-home #shop .section-title h2{font-size:28px!important;line-height:1.15!important;margin:8px 0!important}
+ .retail-home #shop .section-title p{font-size:12px!important;line-height:1.6!important;margin:8px 0 0!important}
+ .retail-home .productbar{display:flex!important;align-items:center!important;gap:12px!important;min-height:66px!important;padding:12px 0!important}
+ .retail-home .productbar h3{font-size:18px!important;line-height:1.25!important;margin:0 0 4px!important}
+ .retail-home .sort-label{display:grid!important;gap:4px!important;flex:none;font-size:8px!important;margin:0!important}
+ .retail-home #sort{max-width:132px!important;min-height:44px!important;padding:8px!important;font-size:11px!important}
+ .retail-home .cats{padding:10px 0!important;gap:8px!important;margin:0!important}
+ .retail-home .cats button{min-height:44px!important;padding:10px 12px!important;font-size:10px!important}
+ .retail-home .shopping-layout{gap:14px!important}
+ .retail-home .collection-filters{position:static!important;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr)!important;gap:8px 12px!important;padding:12px!important}
+ .retail-home .filter-heading{grid-column:1/-1!important;margin:0!important;min-height:32px}
+ .retail-home .filter-heading h3{font-size:13px!important;margin:0!important}
+ .retail-home .filter-heading button{min-height:32px!important}
+ .retail-home .collection-filters label{font-size:9px!important;margin:0!important}
+ .retail-home #priceRange{min-height:44px!important;padding:8px!important;font-size:12px!important}
+ .retail-home .filter-hint{margin:0!important;font-size:10px!important;line-height:1.5!important}
+ .retail-home .collection-results .grid{gap:10px!important;align-items:stretch!important}
+ .retail-home .collection-results .card{border-radius:8px!important}
+ .retail-home .collection-results .card .photo{height:178px!important;padding:12px!important}
+ .retail-home .collection-results .card .photo img{height:100%!important;max-height:154px!important;width:100%!important;max-width:100%!important;object-fit:contain!important}
+ .retail-home .collection-results .card .info{padding:12px!important;gap:0!important}
+ .retail-home .collection-results .card .info>small{font-size:8px!important;line-height:1.4!important}
+ .retail-home .collection-results .card .info h3{font-size:16px!important;line-height:1.25!important;min-height:40px!important;margin:6px 0 10px!important}
+ .retail-home .collection-results .card .info>p{display:none!important}
+ .retail-home .collection-results .variant-label{font-size:8px!important;line-height:1.4!important;margin:0 0 5px!important}
+ .retail-home .collection-results .info select{height:44px!important;min-height:44px!important;width:100%!important;font-size:11px!important;padding:6px!important}
+ .retail-home .collection-results .card .price{min-height:0!important;margin:12px 0 0!important;padding:0!important;border:0!important}
+ .retail-home .collection-results .price-main{gap:4px 7px!important;align-items:baseline!important;line-height:1.3!important}
+ .retail-home .collection-results .selling-price{font-size:20px!important;line-height:1.2!important}
+ .retail-home .collection-results .mrp-value{font-size:9px!important;line-height:1.3!important}
+ .retail-home .collection-results .selling-caption{display:block!important;font-size:9px!important;line-height:1.4!important;margin:4px 0 0!important}
+ .retail-home .collection-results .retail-offer-price{padding:8px!important;margin-top:8px!important}
+ .retail-home .collection-results .retail-offer-price strong{display:block!important;font-size:19px!important;line-height:1.2!important;margin:3px 0!important}
+ .retail-home .collection-results .retail-offer-price span{font-size:9px!important;line-height:1.35!important;margin:3px 0 0!important;letter-spacing:0!important}
+ .retail-home .collection-results .details-link{margin:12px 0 0!important;min-height:44px!important;line-height:1.3!important;padding:8px 5px!important;font-size:9px!important}
+ .retail-home .collection-results .add{margin:8px 0 0!important;min-height:44px!important;height:auto!important;line-height:1.3!important;padding:10px 5px!important;font-size:10px!important}
+ .app-store .native-app-header{height:64px;padding:6px 14px;gap:8px}
+ .app-store .native-app-header>div{gap:8px}
+ .app-store .native-app-header a:not(.app-brand),.app-store .native-app-header button,.app-store .app-menu>summary{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+ .app-store .app-brand{height:50px;flex-basis:168px}
+ .retail-home.app-store #search.native-app-search{margin:12px 14px!important;width:calc(100% - 28px)!important}
+ .retail-home.app-store #shop{padding:0 14px 110px!important;scroll-margin-top:76px}
+ .app-store .mvn-quick-categories{margin:0!important;padding:12px 14px!important}
+ .app-store .mvn-quick-caption{margin-bottom:8px!important}
+ .app-store .mvn-quick-track{gap:8px!important}
+ .app-store .mvn-quick-track button{min-height:44px!important}
+ .app-store .app-product-stage{margin:12px 0 24px;border-radius:12px}
+ .app-store .app-product-art{min-height:0;height:200px}
+ .app-store .app-product-art img{height:190px;width:76%;padding:12px 0;max-height:190px}
+ .app-store .app-product-edition{top:12px;left:12px;font-size:8px;padding:5px 7px}
+ .app-store .app-product-summary{padding:14px}
+ .app-store .app-product-summary h1{font-size:28px;line-height:1.05;letter-spacing:-.035em}
+ .app-store .app-product-kicker{margin:0 0 6px;font-size:9px}
+ .app-store .app-product-pack{margin:6px 0 10px;font-size:12px;line-height:1.5}
+ .app-store .app-product-price{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px;margin-bottom:12px}
+ .app-store .app-product-price .price-main{width:auto!important}
+ .app-store .app-product-price .selling-caption{display:block;font-size:9px}
+ .app-store .app-product-price .discount-value{font-size:9px!important}
+ .app-store .app-product-price .retail-offer-price{width:100%;margin:6px 0 0;padding:8px;display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px}
+ .app-store .app-product-price .retail-offer-price :is(span,strong){margin:0!important;line-height:1.3}
+ .app-store .app-product-price .retail-offer-price span{font-size:9px}
+ .app-store .app-product-price .retail-offer-price strong{font-size:19px!important}
+ .app-store .app-product-picker{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;scroll-snap-type:x proximity}
+ .app-store .app-product-picker button{flex:0 0 142px;min-height:52px;scroll-snap-align:start;padding:6px}
+ .app-store .app-product-actions{grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+ .app-store .app-product-actions button{min-height:44px;font-size:11px;line-height:1.35;padding:8px}
+ .app-store .app-product-add{gap:6px;flex-wrap:wrap;justify-content:center}
+ .retail-home.app-store .cats{display:none!important} /* same categories remain in the visible shortcut row */
+ .retail-home.app-store .collection-filters{grid-template-columns:1fr 1.4fr!important}
+ .retail-home.app-store .app-bottom-nav{min-height:64px;padding:8px 8px max(8px,env(safe-area-inset-bottom));align-items:center}
+ .retail-home.app-store .app-bottom-nav a{min-height:44px;display:flex;align-items:center;justify-content:center;padding:8px 4px;font-size:10px}
+ .retail-home.app-store #floatingCart{bottom:calc(76px + env(safe-area-inset-bottom));right:14px}
+ .retail-home #drawer{width:100%!important;max-width:430px!important;padding:16px!important;max-height:100dvh!important}
+ .retail-home .product-dialog{width:calc(100% - 24px)!important;max-height:calc(100dvh - 24px)!important;padding:16px!important}
+ .retail-home .product-dialog .detail-layout{gap:16px!important}
+}
+@media(max-width:359px){
+ .retail-home:not(.app-store) .storehead .brand-identity{width:145px!important}
+ .retail-home .collection-results .grid{gap:8px!important}
+ .retail-home .collection-results .card .photo{height:150px!important;padding:10px!important}
+ .retail-home .collection-results .card .photo img{max-height:130px!important}
+ .retail-home .collection-results .card .info{padding:10px!important}
+ .retail-home .collection-results .card .info h3{font-size:14px!important;min-height:35px!important}
+ .retail-home .collection-results .selling-price{font-size:18px!important}
+ .app-store .native-app-header{gap:6px;padding-inline:10px}
+ .app-store .native-app-header>div{gap:6px}
+ .app-store .app-brand{flex-basis:140px}
+ .app-store .native-app-header a:not(.app-brand),.app-store .native-app-header button{font-size:11px}
+ .app-store .app-product-summary{padding:12px}
+}
+
+.retail-home #floatingCart[hidden]{display:none!important}
+@media(max-width:700px){
+ .retail-home.app-store #floatingCart{display:none!important} /* the sticky header already provides Cart */
+ .retail-home .productbar>div{min-width:0!important}
+ .retail-home .productbar>div>.eyebrow{display:none!important}
+ .retail-home .productbar #resultText{font-size:11px!important;line-height:1.4!important}
+ .retail-home .productbar .sort-label{width:124px!important;max-width:40%!important}
+ .retail-home .productbar #sort{width:100%!important}
+}
