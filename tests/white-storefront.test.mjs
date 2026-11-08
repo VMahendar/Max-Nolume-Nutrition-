@@ -37,7 +37,7 @@ test('homepage excludes demonstrably incorrect product photos and retains verifi
   assert.equal(source.find(p=>p.id==='sturdy-pre').image,null);
   assert.equal(source.find(p=>p.id==='pro-creatine').variants.find(v=>v.id==='creatine-cranberry').image,'assets/pro-creatine.png');
  }
- assert.match(app,/3 kg · (?:Box|Pack) photo pending",price:2599,img:null/,'3kg pack must not use 5kg photo');
+ assert.match(app,/3 kg · Double Rich Chocolate",price:2599,img:"assets\/nitro-mass-3kg-double-rich-chocolate\.webp"/,'3 kg must use its own verified jar photo');
  assert.match(app,/Chocolate · 5 lbs.*?img:null/,'Chocolate must not use Coffee photo');
  assert.match(app,/Blueberry · 250 g.*?img:\"https:\/\/unicornproseries.com\/wp-content\/uploads\/2026\/05\/Pro-Creatine-Blueberry-1.png\"/,'Blueberry must use the official Blueberry photo');
 });

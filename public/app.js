@@ -73,7 +73,7 @@ function swapPhoto(host,src,name){
 function retailOfferMarkup(v){
  const subtotal=Math.round(v.price*100);let best=null;
  for(const campaign of availableOffers){if(Date.parse(campaign.endsAt)<=Date.now()||subtotal<campaign.minimumPaise||!/^[A-Z0-9-]{3,30}$/.test(campaign.code))continue;let discount=campaign.type==='percent'?Math.floor(subtotal*campaign.amount/100):campaign.amount;if(campaign.capPaise>0)discount=Math.min(discount,campaign.capPaise);discount=Math.min(discount,subtotal);if(!best||discount>best.discount)best={campaign,discount};}
- return best?'<div class="retail-offer-price"><span class="limited-deal-label">LIMITED '+(best.campaign.occasion?.toLowerCase().includes('diwali')?'DIWALI':'RETAIL')+' OFFER</span><strong>'+money((subtotal-best.discount)/100)+'</strong><span>With '+best.campaign.code+' · apply code in cart</span><span>Ends '+new Date(Date.parse(best.campaign.endsAt)-1).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'})+' IST</span></div>':'';
+ return best?'<div class="retail-offer-price"><span class="limited-deal-label">LIMITED '+(best.campaign.occasion?.toLowerCase().includes('diwali')?'DIWALI':'RETAIL')+' OFFER</span><strong>'+money((subtotal-best.discount)/100)+'</strong><span>Code '+best.campaign.code+' at checkout</span><span>Valid through '+new Date(Date.parse(best.campaign.endsAt)-1).toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'short'})+'</span></div>':'';
 }
 function priceMarkup(v){
  const hasMrp=Number.isSafeInteger(v.mrp)&&v.mrp>v.price;
