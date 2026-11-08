@@ -3,15 +3,16 @@
 const PHONE="917708830513";
 const P=[
 {id:"whey",name:"Potency Whey",cat:"whey",size:"5 lbs",featuredIndex:1,variants:[{label:"Chocolate · 5 lbs",price:4999,mrp:8599,img:null},{label:"Coffee · 5 lbs",price:4999,mrp:8599,img:"assets/potency-whey-coffee-5lb.webp"}],desc:"Premium whey protein for daily training and recovery.",img:""},
-{id:"mass",name:"Nitro Mass",cat:"mass",featuredIndex:1,variants:[{label:"3 kg · Pack photo pending",price:2599,img:null},{label:"5 kg · Bucket",price:3499,img:"assets/nitro-mass-5kg.svg"}],desc:"Mass gainer available in two pack sizes.",img:""},
+{id:"mass3",name:"Nitro Mass 3 kg",cat:"mass",variants:[{label:"3 kg",price:2599,img:null}],desc:"Nitro Mass 3 kg mass gainer.",img:""},
+{id:"mass5",name:"Nitro Mass 5 kg",cat:"mass",variants:[{label:"5 kg · Bucket",price:3499,img:"assets/nitro-mass-5kg.svg"}],desc:"Nitro Mass 5 kg mass gainer bucket.",img:"assets/nitro-mass-5kg.svg"},
 {id:"pre",name:"Sturdy Pre-Workout",cat:"pre",variants:[{label:"Watermelon · 250 g",price:1399}],desc:"Pre-workout formula for your training routine.",img:""},
 {id:"creatine",name:"Pro Creatine",cat:"creatine",featuredIndex:1,variants:[{label:"Blueberry · 100 g",price:899,mrp:1499,img:null},{label:"Cranberry · 100 g",price:899,mrp:1499,img:null}],desc:"Creatine supplement in two flavour options.",img:""},
 {id:"vitamins",name:"Musclevite Multivitamin",cat:"vitamins",variants:[{label:"Multivitamin · 1 pack",price:699}],desc:"Daily multivitamin supplement.",img:""}
 ];
 
 /* The eight invoice-verified packs only; current stock remains subject to confirmation. */
-const purchasedFamilies=new Set(['whey','mass','pre','creatine','vitamins']);
-const retailVariantIds={whey:['whey-chocolate','whey-coffee'],mass:['mass-3kg','mass-5kg'],pre:['pre-watermelon'],creatine:['creatine-blueberry','creatine-cranberry'],vitamins:['musclevite-pack']};
+const purchasedFamilies=new Set(['whey','mass3','mass5','pre','creatine','vitamins']);
+const retailVariantIds={whey:['whey-chocolate','whey-coffee'],mass3:['mass-3kg'],mass5:['mass-5kg'],pre:['pre-watermelon'],creatine:['creatine-blueberry','creatine-cranberry'],vitamins:['musclevite-pack']};
 async function refreshRetailPrices(){
  const response=await fetch('/api/retail/catalog',{cache:'no-store',signal:AbortSignal.timeout(8000)});
  if(!response.ok)throw Error('Current prices are unavailable. Please reconnect and try again.');
