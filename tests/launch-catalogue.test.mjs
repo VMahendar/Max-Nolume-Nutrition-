@@ -51,7 +51,7 @@ test('eight verified retail variants retain published customer prices and privat
  }finally{try{c?.db.close()}finally{rmSync(dir,{recursive:true,force:true})}}
 });
 
-test('public catalogue matches both Pro Creatine 250 g flavour photos, and keeps the 5kg bucket separate from the 3kg box',()=>{
+test('public catalogue matches both Pro Creatine 250 g flavour photos, and keeps the 5kg bucket separate from the 3kg jar',()=>{
  const dir=mkdtempSync(resolve(tmpdir(),'mvn-launch-media-'));
  let c;
  try{
@@ -60,7 +60,7 @@ test('public catalogue matches both Pro Creatine 250 g flavour photos, and keeps
   assert.equal(creatine.image,null);
   assert.equal(creatine.variants.find(v=>v.id==='creatine-blueberry').image,'https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png');
   assert.equal(creatine.variants.find(v=>v.id==='creatine-cranberry').image,'assets/pro-creatine.png');
-  assert.equal(mass.variants.find(v=>v.id==='mass-3kg').image,null);
+  assert.equal(mass.variants.find(v=>v.id==='mass-3kg').image,'assets/nitro-mass-3kg-double-rich-chocolate.webp');
   assert.equal(mass.variants.find(v=>v.id==='mass-5kg').image,'assets/Screenshot_2026_1103_003852.jpg');
   assert.equal(mass.variants.find(v=>v.id==='mass-5kg').images[0].src,'assets/Screenshot_2026_1103_003852.jpg');
   const whey=all.find(p=>p.id==='potency-whey');
