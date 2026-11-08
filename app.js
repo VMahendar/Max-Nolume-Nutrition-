@@ -158,7 +158,55 @@ function renderPurchasedPromos(){
  host.querySelectorAll('[data-promo-code]').forEach(b=>b.onclick=()=>{openBag();appliedOffer=null;$('offerCode').value=b.dataset.promoCode;drawCart();$('offerMessage').textContent='Apply the offer code to check your cart discount.';$('offerCode').focus()});
 }
 
+// The app feature uses the same pack indexes, pricing and cart as the catalogue.
+const appFeaturePacks=['whey-coffee','mass-3kg','mass-5kg','creatine-cranberry'];
+let appFeatureSelection=appFeaturePacks[0];
+function renderAppProduct(){
+ const stage=$("appProductStage");
+ if(!stage)return;
+ const packs=P.flatMap(p=>visiblePackOptions(p).map(({v,i})=>({p,v,i,key:retailVariantIds[p.id]?.[i]})))
+  .filter(({key})=>appFeaturePacks.includes(key))
+  .sort((a,b)=>appFeaturePacks.indexOf(a.key)-appFeaturePacks.indexOf(b.key));
+ const selected=packs.find(({key})=>key===appFeatureSelection)??packs[0];
+ stage.hidden=!selected||cat!=="all"||!!q.trim()||priceRange!=="all";
+ if(stage.hidden)return;
+ const {p,v,i,key}=selected;
+ stage.innerHTML=`
+  <div class="app-product-art" data-family="${safe(p.cat)}">
+   <span class="app-product-edition">UNICORN PRO SERIES</span>
+   <span class="app-product-type" aria-hidden="true">${safe(p.cat==="mass"?"MASS":p.cat==="creatine"?"CREATINE":"WHEY")}</span>
+   <img src="${safe(coverImage(p,i))}" alt="${safe(p.name+" "+v.label)}" fetchpriority="high">
+  </div>
+  <div class="app-product-summary">
+   <p class="app-product-kicker">FEATURED COLLECTION</p>
+   <h1>${safe(p.name)}</h1>
+   <p class="app-product-pack">${safe(v.label)}</p>
+   <div class="app-product-price">${priceMarkup(v)}</div>
+   <div class="app-product-picker" role="group" aria-label="Choose a featured pack">
+    ${packs.map(item=>`<button type="button" data-feature-pack="${safe(item.key)}" aria-pressed="${item.key===key}"><img src="${safe(coverImage(item.p,item.i))}" alt=""><span>${safe(item.p.name)}<small>${safe(item.v.label)}</small></span></button>`).join("")}
+   </div>
+   <div class="app-product-actions">
+    <button class="app-product-add" type="button">Add to cart <span>${money(v.price)}</span></button>
+    <button class="app-product-details" type="button">View product details</button>
+   </div>
+  </div>`;
+ stage.querySelector(".app-product-art img").addEventListener("error",e=>hideFailedPackPhoto(e.currentTarget));
+ stage.querySelectorAll("[data-feature-pack]").forEach(button=>button.onclick=()=>{
+  appFeatureSelection=button.dataset.featurePack;
+  renderAppProduct();
+  stage.querySelector('[aria-pressed="true"]')?.focus();
+ });
+ stage.querySelector(".app-product-add").onclick=()=>{
+  const cartKey=p.id+"|"+i;
+  cart[cartKey]=Math.min(999,(cart[cartKey]||0)+1);
+  persist();
+  openBag();
+ };
+ stage.querySelector(".app-product-details").onclick=()=>showDetail(p.id,i);
+}
+
 function render(){
+ renderAppProduct();
 // Render each product family exactly once in the primary grid on web and mobile.
 const items=P.filter(p=>(cat==="all"||p.cat===cat)&&visiblePackOptions(p).some(({v})=>matchesPrice(v))&&((p.name+" "+(p.brand||"")+" "+visiblePackOptions(p).map(({v})=>v.label).join(" ")).toLowerCase().includes(q.toLowerCase())));
 if($("sort").value==="default")items.sort((a,b)=>Number(Boolean(coverImage(b,b.featuredIndex||0)))-Number(Boolean(coverImage(a,a.featuredIndex||0))));
@@ -239,7 +287,7 @@ let offerExpiryTimer;
 const defaultOfferMarkup=$("offerCards").innerHTML;
 async function loadOffers(){
  try{const response=await fetch('/api/promotions?surface='+offerSurface,{cache:'no-store'});if(!response.ok)return;const {campaigns}=await response.json();availableOffers=campaigns||[];clearTimeout(offerExpiryTimer);if(availableOffers.length){const next=Math.min(...availableOffers.map(c=>Date.parse(c.endsAt)));offerExpiryTimer=setTimeout(()=>void loadOffers(),Math.max(1000,Math.min(86400000,next-Date.now()+500)));}document.querySelectorAll('.variant').forEach(select=>{const p=P.find(item=>item.id===select.id.slice(2));$("price-"+p.id).innerHTML=priceMarkup(p.variants[Number(select.value)])});
- renderPurchasedPacks();renderPurchasedPromos();
+ renderPurchasedPacks();renderPurchasedPromos();renderAppProduct();
   if(!availableOffers.length){$("offerCards").innerHTML=defaultOfferMarkup;return;}
  $("offerCards").replaceChildren(...availableOffers.map(c=>{const card=document.createElement('article');card.className='offer-card';
  for(const [tag,text] of [['span',c.occasion||'MVN SPECIAL'],['h3',c.title],['p',c.description],['small','Retail customers only · Ends '+new Date(Date.parse(c.endsAt)-1).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'})+' IST']]){const el=document.createElement(tag);el.textContent=text;card.append(el)}
