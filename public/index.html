@@ -31,6 +31,60 @@
 .site-footer .footer-contact-card > .footer-contact-social + a:not(.footer-contact-social) { margin-top: 8px; }
 .site-footer .footer-contact-card > a > .footer-contact-arrow { margin-inline-start: auto; flex-basis: 15px; width: 15px; height: 15px; }
 </style>
+<style>
+.retail-home:not(.app-store) .collection-results .card .price {
+  display: grid;
+  gap: 6px;
+  padding: 10px 0 8px;
+}
+.retail-home:not(.app-store) .collection-results .card .price-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+.retail-home:not(.app-store) .collection-results .card .selling-price,
+.retail-home:not(.app-store) .collection-results .card .retail-offer-price > strong {
+  color: #10233d !important;
+  font-size: clamp(22px, 5vw, 30px) !important;
+  font-weight: 850;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.retail-home:not(.app-store) .collection-results .card .mrp-value {
+  color: #545b66 !important;
+  font-size: 12px !important;
+}
+.retail-home:not(.app-store) .collection-results .card .selling-caption {
+  color: #545b66 !important;
+  font-size: 11px !important;
+  line-height: 1.35;
+}
+.retail-home:not(.app-store) .collection-results .card .discount-value {
+  justify-self: start;
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: #edf6ef !important;
+  color: #205332 !important;
+  font-size: 11px !important;
+  line-height: 1.35;
+}
+.retail-home:not(.app-store) .collection-results .card .retail-offer-price {
+  display: grid;
+  gap: 5px;
+  padding: 9px;
+  border: 1px solid #e2cdbf;
+  border-radius: 8px;
+  background: #fff5ed !important;
+  color: #713b22 !important;
+  overflow-wrap: anywhere;
+}
+.retail-home:not(.app-store) .collection-results .card .retail-offer-price > strong,
+.retail-home:not(.app-store) .collection-results .card .retail-offer-price > span {
+  color: #713b22 !important;
+}
+</style>
 </head>
 <body class="retail-home">
 <!-- Keep original MVN artwork; remove only its dark rectangle at display time. -->
