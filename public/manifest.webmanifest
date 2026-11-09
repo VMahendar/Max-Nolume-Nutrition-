@@ -4,7 +4,7 @@
   "short_name": "MVN Store",
   "description": "Sports nutrition, customer accounts and WhatsApp order confirmation.",
   "start_url": "/mobile-app.html",
-  "scope": "/",
+  "scope": "/mobile-app.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
@@ -30,14 +30,13 @@
     {
       "name": "Retail offers",
       "url": "/mobile-app.html#offers"
-    },
+    }
+  ],
+  "related_applications": [
     {
-      "name": "My Account",
-      "url": "/account.html"
-    },
-    {
-      "name": "Help Center",
-      "url": "/support.html"
+      "platform": "webapp",
+      "url": "/manifest.webmanifest",
+      "id": "/"
     }
   ]
 }
