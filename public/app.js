@@ -138,7 +138,7 @@ function renderPurchasedPacks(){
  if(!section){
   section=document.createElement('section');section.id='mvn-purchased-packs';
   section.className='mvn-purchased-section';
-  section.innerHTML='<div class="mvn-purchased-heading"><div><span class="mvn-label">MAX VOLUME NUTRITION · UNICORN PRO SERIES</span><h2>SHOP YOUR EXACT PACK.</h2><p>Browse individual packs with matching photos. Stock is confirmed before fulfilment.</p></div><a href="tel:+917708830513" aria-label="Call Max Volume Nutrition">CALL OUR TEAM ↗</a></div><div id="mvn-purchased-grid" class="mvn-purchased-grid"></div><p class="mvn-image-policy">Pack photos match the listed size and flavour.</p>';
+  section.innerHTML='<div class="mvn-purchased-heading"><div><span class="mvn-label">MAX VOLUME NUTRITION · UNICORN PRO SERIES</span><h2>SHOP YOUR EXACT PACK.</h2><p>Browse individual packs with matching photos. Stock is confirmed before fulfilment.</p></div><a href="tel:+917708830513" aria-label="Call Max Volume Nutrition">CALL OUR TEAM ↗</a></div><div id="mvn-purchased-grid" class="mvn-purchased-grid"></div>';
   const title=$('shop').querySelector('.section-title');
   if(title)title.after(section);else $('shop').prepend(section);
  }
