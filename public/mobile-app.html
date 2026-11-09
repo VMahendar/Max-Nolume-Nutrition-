@@ -36,8 +36,8 @@
   <div class="section-title"><div><span class="eyebrow dark">SPORTS NUTRITION · CURATED FOR YOU</span><h2>SHOP THE <strong>COLLECTION.</strong></h2></div><p>Explore verified pack variants and customer selling prices. Order requests are confirmed directly with our team.</p></div>
   <div class="productbar"><div><span class="eyebrow dark">AVAILABLE TO ORDER</span><h3 id="collectionTitle">ALL PRODUCTS</h3><span id="resultText" role="status" aria-live="polite">Current collection</span></div><label class="sort-label">SORT BY <select id="sort"><option value="default">Featured</option><option value="name">Name A–Z</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option></select></label></div>
   <div class="cats"><button class="active" data-cat="all" type="button">ALL PRODUCTS</button><button data-cat="whey" type="button">WHEY</button><button data-cat="mass" type="button">MASS GAINER</button><button data-cat="creatine" type="button">CREATINE</button><button data-cat="pre" type="button">PRE-WORKOUT</button><button data-cat="vitamins" type="button">VITAMINS</button></div>
-  <div class="shopping-layout">
-  <aside class="collection-filters" aria-label="Collection filters">
+  <button class="mvn-reference-filter" id="mvnFilterToggle" type="button" aria-expanded="false" aria-controls="mvnFilters">FILTER &amp; SORT <span aria-hidden="true">+</span></button><div class="shopping-layout">
+  <aside id="mvnFilters" class="collection-filters" aria-label="Collection filters">
     <div class="filter-heading"><h3>Refine your selection</h3><button type="button" id="resetFilters">Reset</button></div>
     <label for="priceRange">PRICE PER PACK</label>
     <select id="priceRange"><option value="all">All prices</option><option value="under1000">Under ₹1,000</option><option value="1000to3000">₹1,000 – ₹3,000</option><option value="over3000">Over ₹3,000</option></select>
@@ -94,4 +94,4 @@
 <button id="floatingCart" class="floating-cart" type="button" aria-label="View shopping cart"><span>🛒 VIEW CART</span><strong id="floatingCount" aria-live="polite">0</strong></button>
 <nav class="app-bottom-nav" aria-label="App navigation"><a href="#shop">Shop</a><a href="#offers">Offers</a><a href="#brands">Launches</a><a href="#certificate">Certificate</a><a href="account.html?app=1">Account</a></nav>
 <script src="app.js" defer></script><script src="secure-payments.js" defer></script><script src="app-shell.js" defer></script>
-</body></html>
+<script>document.getElementById('mvnFilterToggle')?.addEventListener('click',function(){const f=document.getElementById('mvnFilters');const open=f.classList.toggle('mvn-filter-open');this.setAttribute('aria-expanded',String(open));this.querySelector('span').textContent=open?'−':'+';});</script></body></html>
