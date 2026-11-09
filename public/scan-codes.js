@@ -30,18 +30,6 @@ function qrCard(item) {
 }
 function initQrCodes(){
  const page=document.getElementById('mvn-qr-list');
- if(page){page.replaceChildren(...QR_LINKS.map(qrCard));return;}
- if(!document.body.classList.contains('retail-home')&&!document.body.classList.contains('app-store'))return;
- if(document.getElementById('mvn-qr-home'))return;
- const section=document.createElement('section');section.id='mvn-qr-home';section.className='mvn-qr-home';
- section.innerHTML='<div class="mvn-qr-home-head"><span>MAX VOLUME NUTRITION · SCAN & CONNECT</span><h2>TAKE MVN WITH YOU.</h2><p>Scan from another phone to shop, install our web app, or contact us on WhatsApp. No payment or automatic messages are sent by scanning.</p></div>';
- const grid=document.createElement('div');grid.className='mvn-qr-grid';grid.append(...QR_LINKS.map(qrCard));section.append(grid);
- const target=document.querySelector('footer')||document.querySelector('#offers')||document.querySelector('main');
- if(target)target.before(section);else document.body.append(section);
+ if(page)page.replaceChildren(...QR_LINKS.map(qrCard));
 }
-function initStyles(){
- if(document.querySelector('link[href="/scan-codes.css"]'))return;
- const link=document.createElement('link');link.rel='stylesheet';link.href='/scan-codes.css';document.head.append(link);
-}
-initStyles();
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initQrCodes,{once:true});else initQrCodes();
