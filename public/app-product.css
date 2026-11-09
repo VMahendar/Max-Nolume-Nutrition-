@@ -79,3 +79,49 @@ body.retail-home.app-store #shop{padding:8px 16px 24px!important;max-width:none!
 
 html:has(body.app-store){overflow-x:clip;scroll-padding-bottom:90px}
 .app-store .product-button{scroll-margin-block:90px}
+
+
+/* Mobile fit correction: retain existing cart, variants and app routing. */
+@media (max-width:679px) {
+ html:has(body.app-store),body.retail-home.app-store{width:100%!important;max-width:none!important;min-width:0!important;overflow-x:clip!important}
+ body.retail-home.app-store{font-size:16px!important}
+ .app-store .native-app-header{width:100%!important;min-height:76px!important;height:auto!important;padding:10px 14px!important}
+ .app-store .app-brand{flex:1 1 auto!important;max-width:225px!important;height:56px!important}
+ .app-store .app-brand img{width:100%!important;height:100%!important;object-fit:contain!important}
+ .app-store .native-app-header a:not(.app-brand){font-size:13px!important}
+ .app-store #bag{min-height:46px!important;font-size:14px!important}
+ body.app-store #search.native-app-search{width:calc(100% - 28px)!important;margin:12px 14px!important;height:52px!important}
+ body.app-store #search button{min-width:58px!important;min-height:52px!important;color:#fff!important;font-size:14px!important}
+ .app-store .mvn-quick-categories{padding-inline:14px!important}
+ .app-store .mvn-quick-caption strong{font-size:12px!important}
+ .app-store .mvn-quick-track button{font-size:13px!important;min-height:46px!important}
+ body.retail-home.app-store #shop{width:100%!important;padding:14px 14px 110px!important;margin:0!important}
+ .app-store .app-catalogue-header h1{font-size:clamp(30px,8vw,42px)!important}
+ .app-store .app-catalogue-header p{font-size:12px!important}
+ .app-store .productbar h3{font-size:18px!important}
+ .app-store #resultText{font-size:12px!important}
+ .app-store .collection-filters{grid-template-columns:minmax(0,1fr) minmax(0,1.6fr)!important}
+ .app-store .collection-filters label{font-size:12px!important}
+ .app-store .collection-results{width:100%!important;min-width:0!important}
+ .app-store .collection-results .grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:16px!important}
+ .app-store .collection-results .card{width:100%!important;min-width:0!important;border-radius:16px!important;overflow:hidden!important}
+ .app-store .collection-results .card .photo{height:270px!important;padding:18px!important}
+ .app-store .collection-results .card .photo img{max-height:240px!important;object-fit:contain!important}
+ .app-store .collection-results .card .info{padding:18px!important}
+ .app-store .collection-results .card .info>small{font-size:11px!important}
+ .app-store .collection-results .card .info h3{font-size:23px!important;line-height:1.2!important;min-height:0!important}
+ .app-store .collection-results .card .info p{font-size:14px!important;line-height:1.5!important}
+ .app-store .collection-results .selling-price{font-size:24px!important}
+ .app-store .collection-results .card button{min-height:48px!important;font-size:14px!important}
+ .app-store .mvn-purchased-grid{grid-template-columns:minmax(0,1fr)!important}
+ .app-store .mvn-purchased-photo{height:280px!important}
+ .app-store .mvn-purchased-photo img{max-height:252px!important}
+ .app-store .mvn-purchased-card.product-card{padding:16px!important}
+ .app-store .mvn-purchased-details .product-name{font-size:24px!important}
+ .app-store .mvn-purchased-details .product-variant{font-size:15px!important}
+ .app-store .product-prices .price-current{font-size:25px!important}
+ .app-store .product-actions .product-button{font-size:14px!important;min-height:50px!important}
+ .app-store .app-bottom-nav{max-width:none!important;min-height:74px!important}
+ .app-store .app-bottom-nav a{font-size:11px!important;min-height:56px!important}
+ .app-store .app-bottom-nav svg{width:24px!important;height:24px!important}
+}
