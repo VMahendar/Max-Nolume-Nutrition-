@@ -139,3 +139,29 @@ html:has(body.app-store){overflow-x:clip;scroll-padding-bottom:90px}
  .app-store .native-app-header .app-brand{min-width:150px!important}
  .app-store .app-bottom-nav a{font-size:12px!important}
 }
+
+
+/* Compact mobile catalogue: show multiple products per screen; details remain in product dialog. */
+@media (max-width:1100px){
+ .app-store .collection-results .grid,.app-store .mvn-purchased-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+ .app-store .collection-results .card,.app-store .mvn-purchased-card.product-card{min-width:0!important;width:100%!important;padding:9px!important;gap:8px!important;border-radius:12px!important}
+ .app-store .collection-results .card .photo,.app-store .mvn-purchased-photo{height:160px!important;min-height:0!important;padding:7px!important;border-radius:8px!important}
+ .app-store .collection-results .card .photo img,.app-store .mvn-purchased-photo img{height:100%!important;max-height:148px!important;width:100%!important;object-fit:contain!important}
+ .app-store .collection-results .card .info{padding:8px 3px!important}
+ .app-store .collection-results .card .info h3,.app-store .mvn-purchased-details .product-name{font-size:16px!important;line-height:1.22!important;min-height:0!important}
+ .app-store .collection-results .card .info>small,.app-store .product-series{font-size:9px!important;line-height:1.3!important}
+ .app-store .collection-results .card .info p,.app-store .mvn-purchased-details .product-variant{font-size:11px!important;line-height:1.4!important}
+ .app-store .collection-results .selling-price,.app-store .product-prices .price-current{font-size:19px!important}
+ .app-store .product-prices .price-original,.app-store .product-prices .price-note{font-size:10px!important}
+ .app-store .mvn-purchased-details .product-prices{margin-top:8px!important}
+ .app-store .mvn-purchased-actions.product-actions{grid-template-columns:minmax(0,1fr)!important;gap:6px!important;margin-top:8px!important}
+ .app-store .product-actions .product-button{font-size:12px!important;min-height:42px!important}
+ .app-store .mvn-purchased-secondary{gap:5px!important;flex-wrap:wrap!important}
+ .app-store .mvn-purchased-secondary a{font-size:10px!important;min-height:30px!important}
+ .app-store .collection-results .card button{min-height:42px!important;font-size:12px!important}
+}
+@media(max-width:360px){
+ .app-store .collection-results .grid,.app-store .mvn-purchased-grid{gap:8px!important}
+ .app-store .collection-results .card .photo,.app-store .mvn-purchased-photo{height:135px!important}
+ .app-store .collection-results .card .photo img,.app-store .mvn-purchased-photo img{max-height:125px!important}
+}
