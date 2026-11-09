@@ -26,6 +26,96 @@
 <style>
 body.app-store:not(.standalone-app) > :not(#appInstallGate) { display: none !important; }
 </style>
+<style>
+.app-store.standalone-app .native-app-header {
+  display: grid !important;
+  grid-template-columns: 48px minmax(0, 1fr) 48px !important;
+  align-items: center !important;
+  width: 100% !important;
+  box-sizing: border-box;
+  height: auto !important;
+  min-height: 64px !important;
+  padding: 6px 12px !important;
+  gap: 8px !important;
+  background: #fff !important;
+  border-bottom: 1px solid #eee !important;
+}
+.app-store.standalone-app .native-app-header .app-brand {
+  grid-area: 1 / 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 0 !important;
+  width: 100%;
+  max-width: 240px !important;
+  height: 50px !important;
+  justify-self: center;
+  background: none;
+  filter: none;
+}
+.app-store.standalone-app .native-app-header .app-brand img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  opacity: 1;
+  filter: url(#mvnAppLogoOutline) !important;
+}
+.app-store.standalone-app .native-app-header .app-menu {
+  grid-area: 1 / 1;
+  position: relative !important;
+  inset: auto !important;
+  width: 48px !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+.app-store.standalone-app .native-app-header :is(.app-menu > summary, #bag) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 48px !important;
+  min-width: 48px !important;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: #fff;
+  color: #111;
+  cursor: pointer;
+}
+.app-store.standalone-app .native-app-header summary { list-style: none; }
+.app-store.standalone-app .native-app-header summary::-webkit-details-marker { display: none; }
+.app-store.standalone-app .native-app-header .app-menu summary::after,
+.app-store.standalone-app .native-app-header #bag::before { content: none !important; }
+.app-store.standalone-app .native-app-header #bag { grid-area: 1 / 3; }
+.app-store.standalone-app .native-app-header #count {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 16px;
+  padding: 1px 4px;
+  border-radius: 10px;
+  background: #111;
+  color: #fff;
+  font-size: 11px;
+}
+.app-store.standalone-app .native-app-header .app-menu[open] > .app-header-menu {
+  position: absolute !important;
+  top: calc(100% + 6px);
+  left: 0;
+  width: min(220px, calc(100vw - 24px));
+  padding: 6px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px #0002;
+}
+.app-store.standalone-app .native-app-header .app-header-menu a {
+  display: flex !important;
+  justify-content: flex-start;
+  padding: 10px 12px;
+  color: #111;
+}
+</style>
 </head>
 <body class="retail-home app-store catalogue-app"><section id="appInstallGate" class="app-install-gate"><img src="max-volume-logo.png" alt="Max Volume Nutrition"><span>YOUR STORE. ON YOUR HOME SCREEN.</span><h1>Install MVN Store</h1><p>Shop supplements, discover retail offers and prepare your WhatsApp order in the installed app.</p><button type="button" data-install-app hidden>Install app</button><div><h2>Android</h2><p>Open the browser menu and choose Install app or Add to home screen.</p><h2>iPhone</h2><p>Open in Safari, tap Share, then Add to Home Screen.</p><p>Already installed? Launch MVN Store from your home-screen icon.</p></div><a href="index.html">Back to the website</a></section>
 <!-- Keep original MVN artwork; remove only its dark rectangle at display time. -->
@@ -40,7 +130,20 @@ body.app-store:not(.standalone-app) > :not(#appInstallGate) { display: none !imp
   </filter>
  </defs>
 </svg>
-<header class="native-app-header"><a href="mobile-app.html" class="app-brand" aria-label="Max Volume Nutrition home"><img src="max-volume-logo-wide.png" alt="Max Volume Nutrition" style="filter:url(#mvnAppLogoOutline)!important"></a><div><details class="app-menu"><summary aria-label="App options">⋯</summary><button type="button" data-install-app hidden>Install on this device</button><a href="index.html">Open website</a></details><a href="account.html?app=1" aria-label="My account">Account</a><button id="bag" type="button" aria-label="Open shopping cart">Cart <em id="count" aria-live="polite">0</em></button></div></header><form id="search" class="native-app-search" role="search"><span aria-hidden="true">⌕</span><input id="q" autocomplete="off" aria-label="Search products" placeholder="Search protein, creatine and more"><button type="submit">Go</button></form><main id="shop"><header class="app-catalogue-header"><p>Max Volume Nutrition</p><h1>Shop supplements</h1></header>
+<header class="native-app-header">
+  <details class="app-menu">
+    <summary aria-label="App menu"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></summary>
+    <nav class="app-header-menu" aria-label="App menu">
+      <a href="#shop">Shop products</a>
+      <a href="#offers">Offers</a>
+      <a href="account.html?app=1">My account</a>
+      <a href="support.html">Contact us</a>
+      <a href="/">Open website</a>
+    </nav>
+  </details>
+  <a href="#shop" class="app-brand" aria-label="Max Volume Nutrition home"><img src="max-volume-logo-wide.png" alt="Max Volume Nutrition"></a>
+  <button id="bag" type="button" aria-label="Open shopping cart"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.3 11h11.2l2-8H6M9 20h.01M17 20h.01"/></svg><em id="count" aria-live="polite">0</em></button>
+</header><form id="search" class="native-app-search" role="search"><span aria-hidden="true">⌕</span><input id="q" autocomplete="off" aria-label="Search products" placeholder="Search protein, creatine and more"><button type="submit">Go</button></form><main id="shop"><header class="app-catalogue-header"><p>Max Volume Nutrition</p><h1>Shop supplements</h1></header>
   <section id="appProductStage" class="app-product-stage" aria-label="Featured products" hidden></section>
   <div class="section-title"><div><span class="eyebrow dark">SPORTS NUTRITION · CURATED FOR YOU</span><h2>SHOP THE <strong>COLLECTION.</strong></h2></div><p>Explore verified pack variants and customer selling prices. Order requests are confirmed directly with our team.</p></div>
   <div class="productbar"><div><span class="eyebrow dark">AVAILABLE TO ORDER</span><h3 id="collectionTitle">ALL PRODUCTS</h3><span id="resultText" role="status" aria-live="polite">Current collection</span></div><label class="sort-label">SORT BY <select id="sort"><option value="default">Featured</option><option value="name">Name A–Z</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option></select></label></div>
