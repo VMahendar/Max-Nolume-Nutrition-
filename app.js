@@ -302,6 +302,11 @@ const defaultOfferMarkup=$("offerCards").innerHTML;
 async function loadOffers(){
  try{const response=await fetch('/api/promotions?surface='+offerSurface,{cache:'no-store'});if(!response.ok)return;const {campaigns}=await response.json();availableOffers=campaigns||[];clearTimeout(offerExpiryTimer);if(availableOffers.length){const next=Math.min(...availableOffers.map(c=>Date.parse(c.endsAt)));offerExpiryTimer=setTimeout(()=>void loadOffers(),Math.max(1000,Math.min(86400000,next-Date.now()+500)));}document.querySelectorAll('.variant').forEach(select=>{const p=P.find(item=>item.id===select.id.slice(2));$("price-"+p.id).innerHTML=priceMarkup(p.variants[Number(select.value)])});
  renderPurchasedPacks();renderPurchasedPromos();renderAppProduct();
+ const shortcut=$("appOfferShortcut");
+ if(shortcut){
+  shortcut.hidden=!availableOffers.length;
+  shortcut.querySelector("span").textContent=availableOffers.map(c=>c.title).join(" · ");
+ }
   if(!availableOffers.length){$("offerCards").innerHTML=defaultOfferMarkup;return;}
  $("offerCards").replaceChildren(...availableOffers.map(c=>{const card=document.createElement('article');card.className='offer-card';
  for(const [tag,text] of [['span',c.occasion||'MVN SPECIAL'],['h3',c.title],['p',c.description],['small','Retail customers only · Ends '+new Date(Date.parse(c.endsAt)-1).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'})+' IST']]){const el=document.createElement(tag);el.textContent=text;card.append(el)}
