@@ -146,20 +146,20 @@ function renderPurchasedPacks(){
  layout.after(section);
  section.querySelector('h2').textContent='Shop supplements';
  section.querySelector('.mvn-purchased-heading p').textContent='Choose your pack and flavour.';
- document.body.classList.add('app-catalog-ready');
- const all=P.flatMap(p=>visiblePackOptions(p).map(({v,i})=>({p,v,i})));
+ const all=P.flatMap(p=>p.variants.map((v,i)=>({p,v,i})));
  const filtered=all.filter(({p,v})=>(cat==='all'||p.cat===cat)&&matchesPrice(v)&&(p.name+' '+v.label).toLowerCase().includes(q.toLowerCase()));
  const sort=$('sort')?.value||'default';
  if(sort==='low')filtered.sort((a,b)=>a.v.price-b.v.price);
  else if(sort==='high')filtered.sort((a,b)=>b.v.price-a.v.price);
  else if(sort==='name')filtered.sort((a,b)=>(a.p.name+' '+a.v.label).localeCompare(b.p.name+' '+b.v.label));
  const html=filtered.map(({p,v,i})=>{
-  const src=coverImage(p,i), label=p.name+' · '+v.label;
+  const image=coverImage(p,i),src=failedPackPhotos.has(image)?'':image,label=p.name+' · '+v.label;
   const photo=src?'<img src="'+safe(src)+'" alt="'+safe(label)+' verified variant photograph" loading="lazy"><div class="mvn-hd-placeholder" hidden><strong>'+safe(p.name)+'</strong><span>Correct high-resolution pack photo requested</span></div>':'<div class="mvn-hd-placeholder"><span>UNICORN PRO SERIES</span><strong>'+safe(p.name)+'</strong><em>'+safe(v.label)+'</em><small>1080 × 1080 product photo pending</small></div>';
   const text='Hello Max Volume Nutrition, please confirm the exact pack, current stock and delivery for '+label+'.';
-  return '<article class="mvn-purchased-card product-card" data-purchase-pack="'+safe(retailVariantIds[p.id]?.[i]||'')+'"><div class="mvn-purchased-photo">'+photo+'</div><div class="mvn-purchased-details"><span class="mvn-purchased-brand product-series">UNICORN PRO SERIES</span><h3 class="product-name">'+safe(p.name)+'</h3><p class="product-variant">'+safe(v.label)+'</p><div class="mvn-purchased-price product-prices">'+(isApp?appPriceMarkup(v):priceMarkup(v))+'</div><div class="mvn-purchased-actions product-actions"><button type="button" class="product-button product-button--cart" data-pack-add="'+safe(p.id)+'" data-index="'+i+'" data-add="'+safe(retailVariantIds[p.id]?.[i]||'')+'" aria-label="Add '+safe(label)+' to cart">Add to Cart</button><button type="button" class="mvn-detail-btn product-button product-button--details" data-pack-details="'+safe(p.id)+'" data-index="'+i+'" data-details="'+safe(retailVariantIds[p.id]?.[i]||'')+'" aria-label="Details for '+safe(label)+'">Details</button></div><div class="mvn-purchased-secondary"><a href="https://wa.me/'+PHONE+'?text='+encodeURIComponent(text)+'" rel="noopener noreferrer" target="_blank" aria-label="Ask on WhatsApp about '+safe(label)+'">WhatsApp enquiry ↗</a><a href="tel:+917708830513" aria-label="Call about '+safe(label)+'">Call ↗</a></div></div></article>';
+  return '<article class="mvn-purchased-card product-card" data-purchase-pack="'+safe(retailVariantIds[p.id]?.[i]||'')+'"><div class="mvn-purchased-photo">'+photo+'</div><div class="mvn-purchased-details"><span class="mvn-purchased-brand product-series">UNICORN PRO SERIES</span><h3 class="product-name">'+safe(p.name)+'</h3><p class="product-variant">'+safe(v.label)+'</p><div class="mvn-purchased-price product-prices">'+appPriceMarkup(v)+'</div><div class="mvn-purchased-actions product-actions"><button type="button" class="product-button product-button--cart" data-pack-add="'+safe(p.id)+'" data-index="'+i+'" data-add="'+safe(retailVariantIds[p.id]?.[i]||'')+'" aria-label="Add '+safe(label)+' to cart">Add to Cart</button><button type="button" class="mvn-detail-btn product-button product-button--details" data-pack-details="'+safe(p.id)+'" data-index="'+i+'" data-details="'+safe(retailVariantIds[p.id]?.[i]||'')+'" aria-label="Details for '+safe(label)+'">Details</button></div><div class="mvn-purchased-secondary"><a href="https://wa.me/'+PHONE+'?text='+encodeURIComponent(text)+'" rel="noopener noreferrer" target="_blank" aria-label="Ask on WhatsApp about '+safe(label)+'">WhatsApp enquiry ↗</a><a href="tel:+917708830513" aria-label="Call about '+safe(label)+'">Call ↗</a></div></div></article>';
  }).join('');
  section.querySelector('#mvn-purchased-grid').innerHTML=html||'<p class="mvn-empty-packs">No purchased variants match this filter.</p>';
+ document.body.classList.toggle('app-catalog-ready',all.length>0);
  section.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const pack=purchasedPack(b.dataset.add);if(!pack)return;const key=pack.p.id+'|'+pack.i;cart[key]=Math.min(999,(cart[key]||0)+1);persist();openBag()});
  section.querySelectorAll('[data-details]').forEach(b=>b.onclick=()=>{const pack=purchasedPack(b.dataset.details);if(pack)showDetail(pack.p.id,pack.i)});
  section.querySelectorAll('.mvn-purchased-photo img').forEach(img=>img.addEventListener('error',()=>hideFailedPackPhoto(img)));
