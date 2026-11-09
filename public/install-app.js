@@ -35,3 +35,10 @@ window.addEventListener('beforeinstallprompt',event=>{
  if(!actions.length||installed()||hasInstalledApp)return;event.preventDefault();installPrompt=event;actions.forEach(action=>action.hidden=false);
 });
 window.addEventListener('appinstalled',()=>{markInstalled();dialog?.close();});
+
+// Older home-screen installs can still launch at the website root.
+if (installed() && ['/', '/index.html'].includes(location.pathname)) {
+ const appUrl = new URL('/mobile-app.html', location.origin);
+ appUrl.hash = location.hash;
+ location.replace(appUrl.href);
+}
