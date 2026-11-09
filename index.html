@@ -32,6 +32,36 @@
 .site-footer .footer-contact-card > a > .footer-contact-arrow { margin-inline-start: auto; flex-basis: 15px; width: 15px; height: 15px; }
 </style>
 <style>
+.retail-home:not(.app-store) .collection-results .card .photo {
+  display: grid;
+  place-items: center;
+  height: auto !important;
+  min-height: 0 !important;
+  aspect-ratio: 1 / 1;
+  padding: clamp(6px, 1.5vw, 14px) !important;
+  box-sizing: border-box;
+  background: #f4f6f9 !important;
+}
+.retail-home:not(.app-store) .collection-results .card .photo > img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0;
+  max-height: 100% !important;
+  padding: 0 !important;
+  object-fit: contain !important;
+  object-position: center;
+  transform: none !important;
+}
+.retail-home:not(.app-store) .collection-results .card .info > h3 {
+  margin: 5px 0 4px;
+  color: #111d2e !important;
+  font-size: clamp(19px, 4.2vw, 25px) !important;
+  font-weight: 900 !important;
+  line-height: 1.12;
+  letter-spacing: -.025em;
+  overflow-wrap: anywhere;
+}
 .retail-home:not(.app-store) .collection-results .card .price {
   display: grid;
   gap: 6px;
