@@ -165,3 +165,38 @@ html:has(body.app-store){overflow-x:clip;scroll-padding-bottom:90px}
  .app-store .collection-results .card .photo,.app-store .mvn-purchased-photo{height:135px!important}
  .app-store .collection-results .card .photo img,.app-store .mvn-purchased-photo img{max-height:125px!important}
 }
+
+
+/* MVN premium mobile catalogue visual refresh. No product data or commerce logic changes. */
+@media(max-width:1100px){
+ body.retail-home.app-store{--page:#fff;--card:#fff;--ink:#101010;--muted:#656565;--border:#e6e6e6;--primary:#111;--secondary:#f1f1f1;background:#fff!important;max-width:none!important}
+ .app-store .native-app-header{background:#fff!important;border-bottom:1px solid #eee!important;min-height:76px!important;padding:10px 18px!important;box-shadow:none!important}
+ .app-store .native-app-header .app-brand{height:56px!important;flex:1 1 170px!important;max-width:235px!important}
+ .app-store .native-app-header .app-brand img{width:100%!important;height:100%!important;object-fit:contain!important;filter:none!important}
+ .app-store .native-app-header :is(a,button,summary){color:#111!important}
+ .app-store #bag{background:#111!important;color:#fff!important;min-width:66px!important;border-radius:4px!important}
+ .app-store #bag *{color:#fff!important}
+ body.app-store #search.native-app-search{margin:10px 16px!important;width:calc(100% - 32px)!important;height:48px!important;border-radius:0!important}
+ body.app-store #search button{background:#111!important;color:#fff!important;font-size:12px!important}
+ .app-store .mvn-quick-categories{padding:10px 16px 18px!important;background:#fff!important}
+ .app-store .mvn-quick-caption{display:none!important}
+ .app-store .mvn-quick-track{gap:20px!important;border-bottom:1px solid #e9e9e9!important}
+ .app-store .mvn-quick-track button{border:0!important;border-radius:0!important;background:#fff!important;color:#777!important;padding:12px 2px!important;font-size:13px!important;font-weight:800!important;text-transform:uppercase!important;min-height:48px!important}
+ .app-store .mvn-quick-track button.active{color:#111!important;background:#fff!important;border-bottom:3px solid #111!important}
+ body.retail-home.app-store #shop{padding:10px 16px 100px!important;background:#fff!important}
+ .app-store .app-catalogue-header h1{font-size:clamp(32px,9vw,48px)!important;font-weight:950!important;letter-spacing:-.055em!important;text-transform:uppercase!important}
+ .app-store .app-catalogue-header p{display:none!important}
+ .app-store .productbar{margin-top:8px!important}
+ .app-store .collection-filters{background:#fff!important;border:1px solid #111!important;border-radius:0!important;margin:16px 0!important}
+ .app-store .collection-results .grid,.app-store .mvn-purchased-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+ .app-store .collection-results .card,.app-store .mvn-purchased-card.product-card{box-shadow:none!important;border:0!important;border-radius:0!important;padding:0!important;background:#fff!important;min-width:0!important}
+ .app-store .collection-results .card .photo,.app-store .mvn-purchased-photo{height:210px!important;min-height:0!important;background:#f4f4f4!important;border-radius:0!important;padding:10px!important}
+ .app-store .collection-results .card .photo img,.app-store .mvn-purchased-photo img{height:100%!important;max-height:190px!important;width:100%!important;object-fit:contain!important}
+ .app-store .collection-results .card .info,.app-store .mvn-purchased-details{padding:12px 3px!important}
+ .app-store .collection-results .card .info h3,.app-store .mvn-purchased-details .product-name{font-size:17px!important;line-height:1.25!important;font-weight:850!important;color:#111!important}
+ .app-store .collection-results .card .info p,.app-store .mvn-purchased-details .product-variant{font-size:12px!important;color:#666!important}
+ .app-store .collection-results .selling-price,.app-store .product-prices .price-current{font-size:19px!important;color:#111!important}
+ .app-store .product-actions .product-button,.app-store .collection-results .card button{border-radius:2px!important;min-height:42px!important}
+ .app-store .app-bottom-nav{max-width:none!important}
+}
+@media(max-width:380px){.app-store .collection-results .card .photo,.app-store .mvn-purchased-photo{height:165px!important}.app-store .collection-results .card .photo img,.app-store .mvn-purchased-photo img{max-height:145px!important}}
