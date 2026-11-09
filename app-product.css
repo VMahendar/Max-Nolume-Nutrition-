@@ -154,3 +154,11 @@ html:has(body.app-store){overflow-x:clip;scroll-padding-bottom:90px}
  .app-store .app-bottom-nav{display:none!important}
  body.retail-home.app-store{padding-bottom:20px!important}
 }
+
+
+/* Full-pack photography and copper-logo edge definition. */
+@media(max-width:1100px){
+ .app-store .collection-results .card .photo,.app-store .mvn-purchased-photo{height:auto!important;aspect-ratio:1 / 1.12!important;min-height:0!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:14px!important;overflow:hidden!important;background:#f4f4f4!important}
+ .app-store .collection-results .card .photo img,.app-store .mvn-purchased-photo img{display:block!important;width:82%!important;max-width:82%!important;height:82%!important;max-height:82%!important;min-height:0!important;object-fit:contain!important;object-position:center center!important;transform:none!important;margin:auto!important}
+ .app-store .native-app-header .app-brand img{filter:url(#mvnGoldKey) drop-shadow(.65px 0 0 #111) drop-shadow(-.65px 0 0 #111) drop-shadow(0 .65px 0 #111) drop-shadow(0 -.65px 0 #111)!important;object-fit:contain!important}
+}
