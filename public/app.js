@@ -109,7 +109,7 @@ function priceMarkup(v){
 }
 function appPriceMarkup(v){
  const offer=bestRetailOffer(v),regular=Math.round(v.price*100);
- if(offer){const end=new Date(Date.parse(offer.campaign.endsAt)-1).toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'short'});return '<strong class="price-current price-current--promo">'+money((regular-offer.discount)/100)+'</strong><span class="price-original">Regular <del>'+money(v.price)+'</del></span><span class="price-note">With code '+safe(offer.campaign.code)+' at checkout · through '+safe(end)+'</span>';}
+ if(offer){const end=new Date(Date.parse(offer.campaign.endsAt)-1).toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'short'});return '<span class="app-price-offer-label">'+safe(offer.campaign.occasion||'Retail offer')+'</span><strong class="price-current price-current--promo">'+money((regular-offer.discount)/100)+'</strong><span class="price-original">Regular <del>'+money(v.price)+'</del></span><span class="price-note">With code '+safe(offer.campaign.code)+' at checkout · through '+safe(end)+'</span>';}
  return '<strong class="price-current">'+money(v.price)+'</strong>'+(Number.isSafeInteger(v.mrp)&&v.mrp>v.price?'<span class="price-original">MRP <del>'+money(v.mrp)+'</del></span>':'')+'<span class="price-note">Regular selling price</span>';
 }
 function purchasedPack(variantId){for(const p of P){const i=retailVariantIds[p.id]?.indexOf(variantId);if(i!==undefined&&i>=0&&p.variants[i])return {p,i,v:p.variants[i]};}return null;}
@@ -308,8 +308,7 @@ async function loadOffers(){
  renderPurchasedPacks();renderPurchasedPromos();renderAppProduct();
  const shortcut=$("appOfferShortcut");
  if(shortcut){
-  shortcut.hidden=!availableOffers.length;
-  shortcut.querySelector("span").textContent=availableOffers.map(c=>c.title).join(" · ");
+  shortcut.querySelector("span").textContent=availableOffers.map(c=>c.title).join(" · ")||"See current offers and festival updates";
  }
   if(!availableOffers.length){$("offerCards").innerHTML=defaultOfferMarkup;return;}
  $("offerCards").replaceChildren(...availableOffers.map(c=>{const card=document.createElement('article');card.className='offer-card';
