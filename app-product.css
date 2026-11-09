@@ -162,3 +162,15 @@ html:has(body.app-store){overflow-x:clip;scroll-padding-bottom:90px}
  .app-store .collection-results .card .photo img,.app-store .mvn-purchased-photo img{display:block!important;width:82%!important;max-width:82%!important;height:82%!important;max-height:82%!important;min-height:0!important;object-fit:contain!important;object-position:center center!important;transform:none!important;margin:auto!important}
  .app-store .native-app-header .app-brand img{filter:url(#mvnGoldKey) drop-shadow(.65px 0 0 #111) drop-shadow(-.65px 0 0 #111) drop-shadow(0 .65px 0 #111) drop-shadow(0 -.65px 0 #111)!important;object-fit:contain!important}
 }
+
+
+/* Keep the mobile menu compact and anchored to the left; never overlay catalogue with dark install instructions. */
+@media(max-width:1100px){
+ .app-store .native-app-header .app-menu{position:relative!important;z-index:40!important;background:transparent!important;color:#111!important;box-shadow:none!important}
+ .app-store .native-app-header .app-menu[open]{background:#fff!important}
+ .app-store .native-app-header .app-menu>summary{background:#fff!important;color:#111!important;border:0!important;box-shadow:none!important}
+ .app-store .native-app-header .app-menu[open]>:not(summary){display:block!important;position:relative!important;background:#fff!important;color:#111!important;font-size:13px!important;line-height:1.5!important}
+ .app-store .native-app-header .app-menu[open]{position:absolute!important;left:12px!important;top:18px!important;width:min(240px,calc(100vw - 24px))!important;padding:0 12px 12px!important;border:1px solid #ddd!important;border-radius:4px!important;box-shadow:0 8px 22px #0002!important}
+ .app-store .native-app-header .app-menu[open] a{color:#111!important;display:block!important;padding:12px 4px!important}
+ .app-store .native-app-header .app-menu[open] p{display:none!important}
+}
