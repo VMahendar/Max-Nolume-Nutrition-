@@ -48,7 +48,7 @@ body.app-store:not(.standalone-app) > :not(#appInstallGate) { display: none !imp
   min-width: 0 !important;
   width: 100%;
   max-width: 240px !important;
-  height: 50px !important;
+  height: clamp(60px, 18vw, 76px) !important;
   justify-self: center;
   background: none;
   filter: none;
@@ -135,8 +135,8 @@ body.app-store:not(.standalone-app) > :not(#appInstallGate) { display: none !imp
 <svg class="logo-filter-defs" xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true" focusable="false">
  <defs>
   <filter id="mvnAppLogoOutline" color-interpolation-filters="sRGB" x="-10%" y="-20%" width="120%" height="140%">
-   <feColorMatrix type="matrix" values="0.94 0 0 0 0  0 0.78 0 0 0  0 0 0.74 0 0  3 0 -3 0 -0.16" result="copper"/>
-   <feMorphology in="copper" operator="dilate" radius="1.5" result="outlineShape"/>
+   <feColorMatrix type="matrix" values="1 0 0 0 0  0 0.83 0 0 0  0 0 0.78 0 0  0 0 0 1 0" result="copper"/>
+   <feMorphology in="copper" operator="dilate" radius="1.15" result="outlineShape"/>
    <feFlood flood-color="#080808" result="black"/>
    <feComposite in="black" in2="outlineShape" operator="in" result="outline"/>
    <feMerge><feMergeNode in="outline"/><feMergeNode in="copper"/></feMerge>
@@ -156,7 +156,7 @@ body.app-store:not(.standalone-app) > :not(#appInstallGate) { display: none !imp
  <a href="https://wa.me/917708830513" target="_blank" rel="noopener">Chat on WhatsApp ↗</a>
 </nav>
   </details>
-  <a href="#shop" class="app-brand" aria-label="Max Volume Nutrition home"><img src="max-volume-logo-wide.png" alt="Max Volume Nutrition"></a>
+  <a href="#shop" class="app-brand" aria-label="Max Volume Nutrition home"><img src="/mvn-app-header-logo.webp" width="440" height="227" alt="Max Volume Nutrition"></a>
   <button id="bag" type="button" aria-label="Open shopping cart"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.3 11h11.2l2-8H6M9 20h.01M17 20h.01"/></svg><em id="count" aria-live="polite">0</em></button>
 </header><form id="search" class="native-app-search" role="search"><span aria-hidden="true">⌕</span><input id="q" autocomplete="off" aria-label="Search products" placeholder="Search protein, creatine and more"><button type="submit">Go</button></form><main id="shop"><header class="app-catalogue-header"><p>Max Volume Nutrition</p><h1>Shop supplements</h1></header>
   <a id="appOfferShortcut" class="app-offer-shortcut" href="#offers" hidden><strong>OFFERS &amp; FESTIVALS</strong><span></span><b aria-hidden="true">→</b></a>
