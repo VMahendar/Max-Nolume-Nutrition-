@@ -10,7 +10,6 @@ const P=[
 ];
 
 /* The eight invoice-verified packs only; current stock remains subject to confirmation. */
-const purchasedFamilies=new Set(['whey','mass','pre','creatine','vitamins']);
 const retailVariantIds={whey:['whey-chocolate','whey-coffee'],mass:['mass-3kg','mass-5kg'],pre:['pre-watermelon'],creatine:['creatine-blueberry','creatine-cranberry'],vitamins:['musclevite-pack']};
 async function refreshRetailPrices(){
  const response=await fetch('/api/retail/catalog',{cache:'no-store',signal:AbortSignal.timeout(8000)});
@@ -134,6 +133,7 @@ function installCategoryShortcuts(){
 /* Render every invoice-listed variant as an independent, priced pack tile above
    the traditional variant selectors. Both use the same cart key and live API price. */
 function renderPurchasedPacks(){
+ if(!document.body.classList.contains('app-store'))return;
  let section=$('mvn-purchased-packs');
  if(!section){
   section=document.createElement('section');section.id='mvn-purchased-packs';
@@ -142,9 +142,12 @@ function renderPurchasedPacks(){
   const title=$('shop').querySelector('.section-title');
   if(title)title.after(section);else $('shop').prepend(section);
  }
- const isApp=document.body.classList.contains('app-store');
- if(isApp){const layout=$('shop').querySelector('.shopping-layout');layout.after(section);section.querySelector('h2').textContent='Shop supplements';section.querySelector('.mvn-purchased-heading p').textContent='Choose your pack and flavour.';document.body.classList.add('app-catalog-ready');}
- const all=P.filter(p=>isApp||purchasedFamilies.has(p.id)).flatMap(p=>visiblePackOptions(p).map(({v,i})=>({p,v,i})));
+ const layout=$('shop').querySelector('.shopping-layout');
+ layout.after(section);
+ section.querySelector('h2').textContent='Shop supplements';
+ section.querySelector('.mvn-purchased-heading p').textContent='Choose your pack and flavour.';
+ document.body.classList.add('app-catalog-ready');
+ const all=P.flatMap(p=>visiblePackOptions(p).map(({v,i})=>({p,v,i})));
  const filtered=all.filter(({p,v})=>(cat==='all'||p.cat===cat)&&matchesPrice(v)&&(p.name+' '+v.label).toLowerCase().includes(q.toLowerCase()));
  const sort=$('sort')?.value||'default';
  if(sort==='low')filtered.sort((a,b)=>a.v.price-b.v.price);
@@ -162,10 +165,12 @@ function renderPurchasedPacks(){
  section.querySelectorAll('.mvn-purchased-photo img').forEach(img=>img.addEventListener('error',()=>hideFailedPackPhoto(img)));
 }
 function renderPurchasedPromos(){
- const section=$('mvn-purchased-packs');if(!section)return;
+ const section=$('mvn-purchased-packs')||$('shop');
+ const heading=section?.querySelector('.mvn-purchased-heading, .section-title');
+ if(!heading)return;
  let host=section.querySelector('.mvn-purchased-promo');
  if(!availableOffers.length){if(host)host.remove();return;}
- if(!host){host=document.createElement('div');host.className='mvn-purchased-promo';section.querySelector('.mvn-purchased-heading').after(host)}
+ if(!host){host=document.createElement('div');host.className='mvn-purchased-promo';heading.after(host)}
  host.innerHTML=availableOffers.filter(c=>Date.parse(c.endsAt)>Date.now()&&Date.parse(c.startsAt)<=Date.now()).map(c=>'<div class="mvn-promo-item"><span>'+safe(c.occasion||'RETAIL OFFER')+'</span><strong>'+safe(c.code)+'</strong><small>'+safe(c.description)+' · One code per cart · Apply at checkout</small><button type="button" data-promo-code="'+safe(c.code)+'">USE OFFER ↗</button></div>').join('');
  host.querySelectorAll('[data-promo-code]').forEach(b=>b.onclick=()=>{openBag();appliedOffer=null;$('offerCode').value=b.dataset.promoCode;drawCart();$('offerMessage').textContent='Apply the offer code to check your cart discount.';$('offerCode').focus()});
 }
@@ -221,13 +226,12 @@ function renderAppProduct(){
 function render(){
  renderPurchasedPacks();
  renderAppProduct();
-// Render each product family exactly once in the primary grid on web and mobile.
+// The website uses this product-family grid. The app displays the individual packs.
 const items=P.filter(p=>(cat==="all"||p.cat===cat)&&visiblePackOptions(p).some(({v})=>matchesPrice(v))&&((p.name+" "+(p.brand||"")+" "+visiblePackOptions(p).map(({v})=>v.label).join(" ")).toLowerCase().includes(q.toLowerCase())));
 if($("sort").value==="default")items.sort((a,b)=>Number(Boolean(coverImage(b,b.featuredIndex||0)))-Number(Boolean(coverImage(a,a.featuredIndex||0))));
 if($("sort").value==="name")items.sort((a,b)=>a.name.localeCompare(b.name));
 if($("sort").value==="low")items.sort((a,b)=>a.variants[displayVariant(a)].price-b.variants[displayVariant(b)].price);
 if($("sort").value==="high")items.sort((a,b)=>b.variants[displayVariant(b)].price-a.variants[displayVariant(a)].price);
-// Purchased packs appear in the primary grid; do not create a second catalogue section.
 $("grid").innerHTML=items.length?items.map(card).join(""):'<div class="no-products"><h3>No matching products</h3><p>Try clearing your search and filters.</p><button type="button" id="emptyReset">View all products</button></div>';
 if($("emptyReset"))$("emptyReset").onclick=resetFilters;
 if($("collectionTitle"))$("collectionTitle").textContent=categoryNames[cat];
