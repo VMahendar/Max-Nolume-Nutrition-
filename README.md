@@ -22,8 +22,8 @@ Unicorn Pro Series is the current Tamil Nadu distributor collection; more brands
 
 | Variant | Retail price |
 |---|---:|
-| Potency Whey 5 lb Chocolate | ₹4,999 |
-| Potency Whey 5 lb Coffee | ₹4,999 |
+| Potency Whey 5 lb Chocolate | ₹5,500 |
+| Potency Whey 5 lb Coffee | ₹5,500 |
 | Nitro Mass 5 kg **bucket** | ₹3,499 |
 | Nitro Mass 3 kg **box** | ₹2,599 |
 | Sturdy Pre-Workout 250 g | ₹1,399 |
