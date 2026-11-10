@@ -63,6 +63,19 @@ const removeOldWheyPhoto=entry=>!retiredWheySources.has(typeof entry==='string'?
 const referenceVariants=new Map(seedProducts.flatMap(p=>p.variants.map(v=>[v.id,{...v,productId:p.id}])));
 if(!setting('seeded'))tx(()=>{const seed=seedProducts;for(const p of seed){p.id ||= 'product-'+randomUUID();db.prepare('INSERT INTO products VALUES(?,?)').run(p.id,JSON.stringify(p));for(const v of p.variants)db.prepare('INSERT INTO inventory(variant_id,on_hand) VALUES(?,?)').run(v.id,v.stock);}for(const row of db.prepare("SELECT payload FROM orders WHERE status='paid'").all())for(const line of JSON.parse(row.payload).lines)db.prepare('UPDATE inventory SET on_hand=MAX(0,on_hand-?) WHERE variant_id=?').run(line.quantity,line.variantId);set('store',JSON.parse(readFileSync('data/store.json')));set('tax',{enabled:false,approved:false,sellerStateCode:'33',sellerGstin:'',legalName:'',address:'',shippingRateBps:0,invoicePrefix:'MV'});set('seeded',true);});
 
+
+// Owner-approved November 2026 Whey retail price change. Modify only the two
+// unchanged legacy ₹4,999 prices; preserve owner custom prices, trade tiers and stock.
+if(!setting('retail-whey-5500-nov2026'))tx(()=>{
+ const row=db.prepare("SELECT data FROM products WHERE id='potency-whey'").get();
+ if(row){
+  const p=JSON.parse(row.data),changed=[];
+  for(const v of p.variants||[])if(['whey-chocolate','whey-coffee'].includes(v.id)&&v.pricePaise===499900){v.pricePaise=550000;changed.push(v.id);}
+  if(changed.length){db.prepare("UPDATE products SET data=? WHERE id='potency-whey'").run(JSON.stringify(p));audit('system','retail.price.update','potency-whey',{variantIds:changed,fromPaise:499900,toPaise:550000});}
+ }
+ set('retail-whey-5500-nov2026',true);
+});
+
 // Correct Pro Creatine packs in persistent stores created before the verified 250 g photos were available.
 tx(()=>{const row=db.prepare("SELECT data FROM products WHERE id='pro-creatine'").get();if(!row)return;const p=JSON.parse(row.data);let changed=false;const description='Unicorn Pro Series Pro Creatine in 250 g packs. Choose Blueberry or Cranberry. Read the pack label for ingredients and directions.';if(p.description!==description){p.description=description;changed=true;}if(p.image!==null){p.image=null;changed=true;}for(const v of p.variants){const image=v.id==='creatine-blueberry'?'https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png':'assets/pro-creatine.png';const label=v.id==='creatine-blueberry'?'250 g · Blueberry':'250 g · Cranberry';if(v.label!==label){v.label=label;changed=true;}if(v.image!==image){v.image=image;changed=true;}}if(changed)db.prepare("UPDATE products SET data=? WHERE id='pro-creatine'").run(JSON.stringify(p));});
 function reserved(){const amounts=new Map();for(const row of db.prepare("SELECT payload FROM orders WHERE status IN ('preparing','pending','provider_review')").all())for(const l of JSON.parse(row.payload).lines)amounts.set(l.variantId,(amounts.get(l.variantId)||0)+l.quantity);return amounts;}
