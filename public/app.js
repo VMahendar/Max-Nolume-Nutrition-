@@ -223,7 +223,44 @@ function renderAppProduct(){
  stage.querySelector(".app-product-details").onclick=()=>showDetail(p.id,i);
 }
 
+
+/* Distinct product-first website landing; mobile app retains its own layout. */
+let spotlightProduct='whey',spotlightVariant=null,spotlightQty=1;
+function renderSpotlight(){
+ const section=$('mvnSpotlight');if(!section)return;
+ const items=['whey','mass','creatine'].map(id=>P.find(p=>p.id===id)).filter(p=>p&&visiblePackOptions(p).length);
+ if(!items.length){section.hidden=true;return}
+ section.hidden=false;
+ const p=items.find(p=>p.id===spotlightProduct)||items[0];spotlightProduct=p.id;
+ const options=visiblePackOptions(p);
+ if(!options.some(item=>item.i===spotlightVariant))spotlightVariant=displayVariant(p);
+ const item=options.find(item=>item.i===spotlightVariant)||options[0];
+ if(!item)return;
+ const v=item.v,img=$('mvnSpotlightImage'),src=coverImage(p,item.i);
+ if(img.getAttribute('src')!==src)img.src=src;
+ img.alt=p.name+' '+v.label;
+ img.onerror=()=>hideFailedPackPhoto(img);
+ $('mvnSpotlightTitle').textContent=p.name;
+ $('mvnSpotlightDescription').textContent=p.desc||'Choose your correct pack and order through WhatsApp.';
+ $('mvnSpotlightPrice').innerHTML=priceMarkup(v);
+ $('mvnSpotlightQty').textContent=spotlightQty;
+ $('mvnSpotlightAdd').textContent='ADD TO CART · '+money(v.price*spotlightQty);
+ $('mvnSpotlightTabs').innerHTML=items.map(product=>{
+  const i=displayVariant(product),photo=coverImage(product,i);
+  return '<button type="button" data-mvn-product="'+safe(product.id)+'" aria-pressed="'+String(product.id===p.id)+'">'+
+    (photo?'<img src="'+safe(photo)+'" alt="" loading="lazy">':'')+'<span>'+safe(product.name)+'</span></button>';
+ }).join('');
+ $('mvnSpotlightTabs').querySelectorAll('[data-mvn-product]').forEach(button=>button.onclick=()=>{spotlightProduct=button.dataset.mvnProduct;spotlightVariant=null;spotlightQty=1;renderSpotlight()});
+ $('mvnSpotlightVariants').innerHTML=options.map(({v,i})=>'<button type="button" data-mvn-variant="'+i+'" aria-pressed="'+String(i===item.i)+'"><span>'+safe(v.label)+'</span><b>'+money(v.price)+'</b></button>').join('');
+ $('mvnSpotlightVariants').querySelectorAll('[data-mvn-variant]').forEach(button=>button.onclick=()=>{spotlightVariant=Number(button.dataset.mvnVariant);spotlightQty=1;renderSpotlight()});
+ $('mvnSpotlightMinus').onclick=()=>{spotlightQty=Math.max(1,spotlightQty-1);renderSpotlight()};
+ $('mvnSpotlightPlus').onclick=()=>{spotlightQty=Math.min(99,spotlightQty+1);renderSpotlight()};
+ $('mvnSpotlightAdd').onclick=()=>{const key=p.id+'|'+item.i;cart[key]=Math.min(999,(cart[key]||0)+spotlightQty);persist();openBag()};
+ $('mvnSpotlightDetails').onclick=()=>showDetail(p.id,item.i);
+}
+
 function render(){
+ renderSpotlight();
  renderPurchasedPacks();
  renderAppProduct();
 // The website uses this product-family grid. The app displays the individual packs.
