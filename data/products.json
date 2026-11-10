@@ -10,7 +10,7 @@
       {
         "id": "whey-chocolate",
         "label": "5 lb · Chocolate",
-        "pricePaise": 499900,
+        "pricePaise": 550000,
         "stock": null,
         "mrpPaise": 859900,
         "prices": {
@@ -23,7 +23,7 @@
       {
         "id": "whey-coffee",
         "label": "5 lb · Coffee",
-        "pricePaise": 499900,
+        "pricePaise": 550000,
         "stock": null,
         "mrpPaise": 859900,
         "prices": {
