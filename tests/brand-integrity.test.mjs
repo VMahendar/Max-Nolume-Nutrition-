@@ -23,7 +23,7 @@ test('the old Whey pack is not displayed or misrepresented as new packaging',()=
   const wheyProducts=JSON.parse(readFileSync('public/catalog.json','utf8'));
   const whey=wheyProducts.find(p=>p.id==='potency-whey');
   assert.ok(whey,'Potency Whey product must remain in the catalogue');
-  assert.deepEqual(whey.variants.map(v=>v.pricePaise),[499900,499900]);
+  assert.deepEqual(whey.variants.map(v=>v.pricePaise),[550000,550000]);
   assert.equal(whey.image,null,'Unverified product picture must not be published');
   assert.deepEqual(whey.images,[]);
   for(const file of ['products.js','public/app.js','index.html','public/index.html','data/products.json','public/catalog.json']){
