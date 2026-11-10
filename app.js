@@ -338,6 +338,67 @@ document.addEventListener("keydown",e=>{
 installCategoryShortcuts();render();drawCart();renderRecent();
 refreshRetailPrices().then(()=>{render();drawCart();renderRecent()}).catch(error=>{if($("priceMessage"))$("priceMessage").textContent=error.message});
 
+
+/* Website-only premium product detail. The installed app intentionally retains its own layout. */
+function showWebsiteProductDetail(p,options,initialIndex,dlg,root){
+ let current=initialIndex,quantity=1;
+ const optionButtons=options.map(({v,i})=>
+  '<button type="button" class="mvn-pack-choice" data-mvn-pack="'+i+'" aria-pressed="'+(i===initialIndex)+'"><span>'+safe(v.label)+'</span><strong>'+money(v.price)+'</strong></button>'
+ ).join('');
+ const photoButtons=options.filter(({i})=>Boolean(coverImage(p,i))).map(({v,i})=>
+  '<button type="button" class="mvn-photo-choice" data-mvn-photo="'+i+'" aria-label="View '+safe(v.label)+' pack"><img src="'+safe(coverImage(p,i))+'" alt="" loading="lazy"></button>'
+ ).join('');
+ root.innerHTML=
+  '<div class="mvn-detail-assurance" aria-label="Ordering information"><span>Clear retail prices</span><span>Choose the exact pack</span><span>WhatsApp order confirmation</span></div>'+
+  '<div class="mvn-detail-layout">'+
+   '<section class="mvn-detail-gallery" aria-label="Product photographs">'+
+    '<div class="mvn-detail-stage detail-photo"></div>'+
+    (photoButtons?'<div class="mvn-detail-thumbnails" aria-label="Available pack photos">'+photoButtons+'</div>':'')+
+    '<p class="mvn-detail-gallery-note">Photos display the selected pack only. Ask our team for current front and back label images.</p>'+
+   '</section>'+
+   '<section class="mvn-detail-content">'+
+    '<span class="mvn-detail-brand">'+safe(p.brand||'Unicorn Pro Series')+'</span>'+
+    '<h2>'+safe(p.name)+'</h2>'+
+    '<p class="mvn-detail-description">'+safe(p.desc)+'</p>'+
+    '<div class="mvn-detail-price price" id="detail-price">'+priceMarkup(p.variants[initialIndex])+'</div>'+
+    '<div class="mvn-detail-step"><b>01</b><span>SELECT FLAVOUR / PACK SIZE</span></div>'+
+    '<div class="mvn-pack-choices" aria-label="Choose the exact product pack">'+optionButtons+'</div>'+
+    '<div class="mvn-detail-step"><b>02</b><span>QUANTITY</span></div>'+
+    '<div class="mvn-quantity-row"><div class="mvn-quantity" aria-label="Quantity"><button type="button" data-mvn-qty="-1" aria-label="Decrease quantity">−</button><output id="mvn-detail-quantity" aria-live="polite">1</output><button type="button" data-mvn-qty="1" aria-label="Increase quantity">+</button></div><span>Stock confirmed with our team before fulfilment</span></div>'+
+    '<button type="button" class="mvn-detail-cart" id="detail-add">ADD TO CART · '+money(p.variants[initialIndex].price)+'</button>'+
+    '<button type="button" class="mvn-detail-checkout" id="detail-buy">REVIEW ORDER DETAILS</button>'+
+    '<p class="mvn-detail-order-note">No online payment is taken. Review your cart, then send your order request via WhatsApp.</p>'+
+    '<details class="mvn-detail-accordion"><summary>About this product</summary><p>'+safe(p.desc)+'</p></details>'+
+    '<details class="mvn-detail-accordion"><summary>Pack labels and availability</summary><p>Our team confirms the selected flavour, size and current stock before accepting your order. Request the current product label if needed.</p></details>'+
+   '</section>'+
+  '</div>';
+ const stage=root.querySelector('.mvn-detail-stage');
+ const packButtons=[...root.querySelectorAll('[data-mvn-pack]')];
+ const photoChoices=[...root.querySelectorAll('[data-mvn-photo]')];
+ const update=()=>{
+  const variant=p.variants[current];
+  swapPhoto(stage,coverImage(p,current),p.name+' — '+variant.label);
+  root.querySelector('#detail-price').innerHTML=priceMarkup(variant);
+  root.querySelector('#mvn-detail-quantity').textContent=quantity;
+  root.querySelector('#detail-add').textContent='ADD TO CART · '+money(variant.price*quantity);
+  packButtons.forEach(button=>button.setAttribute('aria-pressed',String(Number(button.dataset.mvnPack)===current)));
+  photoChoices.forEach(button=>button.setAttribute('aria-current',String(Number(button.dataset.mvnPhoto)===current)));
+ };
+ packButtons.forEach(button=>button.addEventListener('click',()=>{current=Number(button.dataset.mvnPack);update()}));
+ photoChoices.forEach(button=>button.addEventListener('click',()=>{current=Number(button.dataset.mvnPhoto);update()}));
+ root.querySelectorAll('[data-mvn-qty]').forEach(button=>button.addEventListener('click',()=>{quantity=Math.max(1,Math.min(99,quantity+Number(button.dataset.mvnQty)));update()}));
+ const addToOrder=(review)=>{
+  const key=p.id+'|'+current;
+  cart[key]=Math.min(999,(cart[key]||0)+quantity);
+  persist();dlg.close();openBag();
+  if(review)$('customerName')?.focus();
+ };
+ root.querySelector('#detail-add').onclick=()=>addToOrder(false);
+ root.querySelector('#detail-buy').onclick=()=>addToOrder(true);
+ update();
+ if(typeof dlg.showModal==='function')dlg.showModal();else dlg.setAttribute('open','');
+}
+
 function showDetail(id,chosenIndex){
  const p=P.find(x=>x.id===id);if(!p)return;
  recent=[id,...recent.filter(value=>value!==id)].slice(0,4);try{localStorage.setItem("mvn-recent-v1",JSON.stringify(recent))}catch{}renderRecent();
@@ -346,6 +407,7 @@ function showDetail(id,chosenIndex){
  const options=document.body.classList.contains('app-store')?p.variants.map((v,i)=>({v,i})):visiblePackOptions(p);
  const initialIndex=options.some(({i})=>i===selected)?selected:options[0]?.i;
  if(initialIndex===undefined)return;
+ if(!document.body.classList.contains('app-store'))return showWebsiteProductDetail(p,options,initialIndex,dlg,root);
  const cover=coverImage(p,initialIndex);const photo=cover?'<img src="'+safe(cover)+'" alt="'+safe(p.name)+'" loading="lazy"><div class="placeholder" hidden>Verified product image pending</div>':'<div class="placeholder"><b>'+safe(p.name)+'</b>Verified product image pending</div>';
  root.innerHTML='<div class="detail-layout"><div class="detail-photo">'+photo+'</div><div class="detail-copy"><span class="eyebrow dark">'+safe(p.brand||'Unicorn Pro Series')+'</span><h2>'+safe(p.name)+'</h2><p>'+safe(p.desc)+'</p><p class="detail-note">Product pack and flavour availability are confirmed before fulfilment. Front/back pack-label and ingredient photos will be added after verification; please request the current label when ordering.</p><label for="detail-variant">FLAVOUR / PACK SIZE</label><select id="detail-variant">'+options.map(({v,i})=>'<option value="'+i+'"'+(i===initialIndex?' selected':'')+'>'+safe(v.label)+'</option>').join("")+'</select><div class="price detail-price" id="detail-price">'+priceMarkup(p.variants[initialIndex])+'</div><button class="primary" id="detail-add">ADD TO CART +</button></div></div>';
  swapPhoto(root.querySelector(".detail-photo"),coverImage(p,initialIndex),p.name);
