@@ -136,7 +136,7 @@ try {
   assert.equal(noJsResponse.status(),200,'JavaScript-disabled homepage responds');
   assert.equal(await withoutJs.locator('#grid article.card').count(),5,'five product cards render before JavaScript');
   assert.equal(await withoutJs.locator('#grid a.add[href^="https://wa.me/"]').count(),5,'every fallback card offers a real enquiry action');
-  assert.match(await withoutJs.locator('#grid').textContent(),/4,999/,'retail prices remain visible without JavaScript');
+  assert.match(await withoutJs.locator('#grid').textContent(),/5,500/,'retail prices remain visible without JavaScript');
   await withoutJs.close();
   const page=await browser.newPage();
   assert.equal((await page.goto(origin+'/account.html')).status(),200,'account route');
@@ -265,7 +265,7 @@ try {
   assert.equal(whey.variants.find(v=>v.id==='whey-chocolate').pricePaise,385000,'private dealer Whey price');
   const retailer=await buyer.evaluate(async()=>(await (await fetch('/api/retail/catalog')).json()).products);
   const publicWhey=retailer.find(p=>p.id==='potency-whey').variants[0];
-  assert.equal(publicWhey.pricePaise,499900,'public Whey price remains retail');
+  assert.equal(publicWhey.pricePaise,550000,'public Whey price remains retail');
   assert.equal(Object.hasOwn(publicWhey,'prices'),false,'private tiers not leaked into public API');
   await buyer.locator('#logout').click();
   await buyer.locator('#anonymous').waitFor({state:'visible',timeout:12000});
