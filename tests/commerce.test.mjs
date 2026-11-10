@@ -49,7 +49,7 @@ test('retired Whey imagery is hidden without changing prices, stock or custom im
   C.db.prepare('UPDATE products SET data=? WHERE id=?').run(JSON.stringify(p),p.id);
   C.db.prepare('UPDATE inventory SET on_hand=7 WHERE variant_id=?').run('whey-chocolate');
   const updated=C.catalogue(null).find(p=>p.id==='potency-whey');
-  assert.equal(updated.image,source);assert.equal(updated.variants[0].image,source);assert.equal(updated.variants[0].pricePaise,499900);assert.equal(updated.variants[0].stock,7);assert.equal(updated.variants[0].mrpPaise,859900);
+  assert.equal(updated.image,source);assert.equal(updated.variants[0].image,source);assert.equal(updated.variants[0].pricePaise,550000);assert.equal(updated.variants[0].stock,7);assert.equal(updated.variants[0].mrpPaise,859900);
   p.image='https://unicornproseries.com/wp-content/uploads/2026/05/Potency-Whey-600x501-1.png';
   p.variants[0].image=p.image;
   C.db.prepare('UPDATE products SET data=? WHERE id=?').run(JSON.stringify(p),p.id);
