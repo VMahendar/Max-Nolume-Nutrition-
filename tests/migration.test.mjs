@@ -24,7 +24,7 @@ test('retail Whey price migration upgrades stored ₹4,999 but preserves custom 
   c=openCommerce(dir);
   const row=c.db.prepare("SELECT data FROM products WHERE id='potency-whey'").get();
   const p=JSON.parse(row.data);
-  p.variants.find(v=>v.id==='whey-chocolate').pricePaise=550000;
+  p.variants.find(v=>v.id==='whey-chocolate').pricePaise=499900;
   p.variants.find(v=>v.id==='whey-coffee').pricePaise=530000;
   const wholesale=p.variants.map(v=>v.prices.wholesale);
   c.db.prepare("UPDATE products SET data=? WHERE id='potency-whey'").run(JSON.stringify(p));
