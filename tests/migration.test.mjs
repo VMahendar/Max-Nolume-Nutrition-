@@ -42,3 +42,27 @@ test('retail Whey price migration upgrades stored ₹4,999 but preserves custom 
   assert.equal(c.db.prepare("SELECT COUNT(*) AS n FROM audit WHERE action='retail.price.update'").get().n,1);
  }finally{try{c?.db.close()}finally{rmSync(dir,{recursive:true,force:true})}}
 });
+
+
+test('Whey retail migration updates old price but respects owner overrides',async()=>{
+ const {openCommerce}=await import('../commerce.mjs');
+ const dir=mkdtempSync(resolve(tmpdir(),'mvn-whey-price-'));
+ let c;
+ try{
+  c=openCommerce(dir);
+  const original=JSON.parse(c.db.prepare("SELECT data FROM products WHERE id='potency-whey'").get().data);
+  original.variants[0].pricePaise=499900;
+  original.variants[1].pricePaise=530000;
+  c.db.prepare("UPDATE products SET data=? WHERE id='potency-whey'").run(JSON.stringify(original));
+  c.db.prepare("DELETE FROM settings WHERE key='retail-whey-5500-nov2026'").run();
+  c.db.close();
+  c=openCommerce(dir);
+  let product=c.catalogue(null,true).find(p=>p.id==='potency-whey');
+  assert.deepEqual(product.variants.map(v=>v.pricePaise),[550000,530000]);
+  assert.deepEqual(product.variants.map(v=>v.prices.wholesale),[385000,385000]);
+  c.db.close();
+  c=openCommerce(dir);
+  product=c.catalogue(null,true).find(p=>p.id==='potency-whey');
+  assert.deepEqual(product.variants.map(v=>v.pricePaise),[550000,530000]);
+ }finally{try{c?.db.close()}finally{rmSync(dir,{recursive:true,force:true})}}
+});
