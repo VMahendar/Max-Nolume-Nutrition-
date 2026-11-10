@@ -152,12 +152,23 @@ function renderPurchasedPacks(){
  if(sort==='low')filtered.sort((a,b)=>a.v.price-b.v.price);
  else if(sort==='high')filtered.sort((a,b)=>b.v.price-a.v.price);
  else if(sort==='name')filtered.sort((a,b)=>(a.p.name+' '+a.v.label).localeCompare(b.p.name+' '+b.v.label));
- const html=filtered.map(({p,v,i})=>{
+ const cards=filtered.map(({p,v,i})=>{
   const image=coverImage(p,i),src=failedPackPhotos.has(image)?'':image,label=p.name+' · '+v.label;
   const photo=src?'<img src="'+safe(src)+'" alt="'+safe(label)+' verified variant photograph" loading="lazy"><div class="mvn-hd-placeholder" hidden><strong>'+safe(p.name)+'</strong><span>Correct high-resolution pack photo requested</span></div>':'<div class="mvn-hd-placeholder"><span>UNICORN PRO SERIES</span><strong>'+safe(p.name)+'</strong><em>'+safe(v.label)+'</em><small>1080 × 1080 product photo pending</small></div>';
   const text='Hello Max Volume Nutrition, please confirm the exact pack, current stock and delivery for '+label+'.';
-  return '<article class="mvn-purchased-card product-card" data-purchase-pack="'+safe(retailVariantIds[p.id]?.[i]||'')+'"><div class="mvn-purchased-photo">'+photo+'</div><div class="mvn-purchased-details"><span class="mvn-purchased-brand product-series">UNICORN PRO SERIES</span><h3 class="product-name">'+safe(p.name)+'</h3><p class="product-variant">'+safe(v.label)+'</p><div class="mvn-purchased-price product-prices">'+appPriceMarkup(v)+'</div><div class="mvn-purchased-actions product-actions"><button type="button" class="product-button product-button--cart" data-pack-add="'+safe(p.id)+'" data-index="'+i+'" data-add="'+safe(retailVariantIds[p.id]?.[i]||'')+'" aria-label="Add '+safe(label)+' to cart">Add to Cart</button><button type="button" class="mvn-detail-btn product-button product-button--details" data-pack-details="'+safe(p.id)+'" data-index="'+i+'" data-details="'+safe(retailVariantIds[p.id]?.[i]||'')+'" aria-label="Details for '+safe(label)+'">Details</button></div><div class="mvn-purchased-secondary"><a href="https://wa.me/'+PHONE+'?text='+encodeURIComponent(text)+'" rel="noopener noreferrer" target="_blank" aria-label="Ask on WhatsApp about '+safe(label)+'">WhatsApp enquiry ↗</a><a href="tel:+917708830513" aria-label="Call about '+safe(label)+'">Call ↗</a></div></div></article>';
- }).join('');
+  return {cat:p.cat,markup:'<article class="mvn-purchased-card product-card" data-purchase-pack="'+safe(retailVariantIds[p.id]?.[i]||'')+'"><div class="mvn-purchased-photo">'+photo+'</div><div class="mvn-purchased-details"><span class="mvn-purchased-brand product-series">UNICORN PRO SERIES</span><h3 class="product-name">'+safe(p.name)+'</h3><p class="product-variant">'+safe(v.label)+'</p><div class="mvn-purchased-price product-prices">'+appPriceMarkup(v)+'</div><div class="mvn-purchased-actions product-actions"><button type="button" class="product-button product-button--cart" data-pack-add="'+safe(p.id)+'" data-index="'+i+'" data-add="'+safe(retailVariantIds[p.id]?.[i]||'')+'" aria-label="Add '+safe(label)+' to cart">Add to Cart</button><button type="button" class="mvn-detail-btn product-button product-button--details" data-pack-details="'+safe(p.id)+'" data-index="'+i+'" data-details="'+safe(retailVariantIds[p.id]?.[i]||'')+'" aria-label="Details for '+safe(label)+'">Details</button></div><div class="mvn-purchased-secondary"><a href="https://wa.me/'+PHONE+'?text='+encodeURIComponent(text)+'" rel="noopener noreferrer" target="_blank" aria-label="Ask on WhatsApp about '+safe(label)+'">WhatsApp enquiry ↗</a><a href="tel:+917708830513" aria-label="Call about '+safe(label)+'">Call ↗</a></div></div></article>';
+ });
+ const html=cat==='all'
+  ? Array.from(new Set(['whey','mass','creatine','pre','vitamins',...cards.map(item=>item.cat)]))
+   .map(group=>{
+    const grouped=cards.filter(item=>item.cat===group);
+    if(!grouped.length)return '';
+    const titles={whey:'Whey Protein',mass:'Mass Gainers',creatine:'Creatine',pre:'Pre-Workout',vitamins:'Vitamins'};
+    const title=titles[group]||'More Supplements';
+    const note=group==='mass'?'Nitro Mass 3 kg and 5 kg — choose each pack separately.':group==='whey'?'Choose your whey flavour and exact pack.':'Browse the available packs below.';
+    return '<section class="mvn-product-group" data-group="'+safe(group)+'" aria-label="'+safe(title)+'"><header class="mvn-product-group-heading"><span>UNICORN PRO SERIES</span><h2>'+safe(title)+'</h2><p>'+safe(note)+'</p></header><div class="mvn-product-group-grid">'+grouped.map(item=>item.markup).join('')+'</div></section>';
+   }).join('')
+  : cards.map(item=>item.markup).join('');
  section.querySelector('#mvn-purchased-grid').innerHTML=html||'<p class="mvn-empty-packs">No purchased variants match this filter.</p>';
  document.body.classList.toggle('app-catalog-ready',all.length>0);
  section.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const pack=purchasedPack(b.dataset.add);if(!pack)return;const key=pack.p.id+'|'+pack.i;cart[key]=Math.min(999,(cart[key]||0)+1);persist();openBag()});
