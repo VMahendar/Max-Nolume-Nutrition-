@@ -30,7 +30,7 @@ Work continues on `codex/complete-store-review` from `edf0e3710429bd189659945df5
 
 | Variant | Customer price |
 |---|---:|
-| Potency Whey 5 lb Chocolate / Coffee | ₹4,999 |
+| Potency Whey 5 lb Chocolate / Coffee | ₹5,500 |
 | Nitro Mass 5 kg Double Rich Chocolate bucket | ₹3,499 |
 | Nitro Mass 3 kg (pack to confirm) | ₹2,599 |
 | Pro Creatine 100 g Blueberry / Cranberry | ₹899 |
