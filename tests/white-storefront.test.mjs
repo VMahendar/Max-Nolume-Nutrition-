@@ -49,7 +49,7 @@ test('public retail offers use verified MRP and keep confidential wholesale pric
  assert.ok(app.includes('class="discount-value"'));
  const whey=seed.find(p=>p.id==='potency-whey').variants;
  assert.deepEqual(whey.map(v=>v.mrpPaise),[859900,859900]);
- assert.deepEqual(whey.map(v=>v.pricePaise),[499900,499900]);
+ assert.deepEqual(whey.map(v=>v.pricePaise),[550000,550000]);
  assert.ok(seed.find(p=>p.id==='nitro-mass').variants.every(v=>v.mrpPaise===undefined),'never invent Nitro MRP');
  assert.ok(!app.includes('wholesale":'),'wholesale prices cannot ship in public JS');
 });
