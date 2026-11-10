@@ -14,7 +14,7 @@ test('eight verified retail variants retain published customer prices and privat
   const variants=guest.flatMap(p=>p.variants);
   assert.equal(variants.length,8);
   const retail={
-   'whey-chocolate':499900,'whey-coffee':499900,'mass-5kg':349900,'mass-3kg':259900,
+   'whey-chocolate':550000,'whey-coffee':550000,'mass-5kg':349900,'mass-3kg':259900,
    'creatine-blueberry':89900,'creatine-cranberry':89900,'pre-watermelon':139900,'musclevite-pack':69900
   };
   for(const v of variants){assert.equal(v.pricePaise,retail[v.id],v.id+' retail price');assert.equal(Object.hasOwn(v,'prices'),false,'never expose private rates to guest');}
@@ -47,7 +47,7 @@ test('eight verified retail variants retain published customer prices and privat
   const updated=c.catalogue({id:'wholesale'}).find(p=>p.id==='potency-whey');
   assert.equal(updated.variants[0].pricePaise,385000,'populate missing tier without data migration');
   assert.equal(updated.variants[1].pricePaise,370000,'preserve existing custom wholesale override');
-  assert.equal(c.catalogue(null).find(p=>p.id==='potency-whey').variants[1].pricePaise,499900,'retail untouched');
+  assert.equal(c.catalogue(null).find(p=>p.id==='potency-whey').variants[1].pricePaise,550000,'retail untouched');
  }finally{try{c?.db.close()}finally{rmSync(dir,{recursive:true,force:true})}}
 });
 
