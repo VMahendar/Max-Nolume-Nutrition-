@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {evaluateLaunch} from '../deploy/launch-readiness.mjs';
 
 function fixture(){
- const prices={'whey-chocolate':499900,'whey-coffee':499900,'mass-5kg':349900,'mass-3kg':259900,'creatine-blueberry':89900,'creatine-cranberry':89900,'pre-watermelon':139900,'musclevite-pack':69900};
+ const prices={'whey-chocolate':550000,'whey-coffee':550000,'mass-5kg':349900,'mass-3kg':259900,'creatine-blueberry':89900,'creatine-cranberry':89900,'pre-watermelon':139900,'musclevite-pack':69900};
  return Object.entries(prices).map(([id,pricePaise])=>({name:id,image:'assets/current-'+id+'.png',variants:[{id,label:id,pricePaise,stock:5,images:[{src:'assets/front.png',label:'Front'},{src:'assets/back.png',label:'Back'},{src:'assets/ingredients.png',label:'Ingredients'}]}]}));
 }
 const readyEnv={
