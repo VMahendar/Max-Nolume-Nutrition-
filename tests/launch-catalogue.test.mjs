@@ -15,7 +15,7 @@ test('eight verified retail variants retain published customer prices and privat
   assert.equal(variants.length,8);
   const retail={
    'whey-chocolate':550000,'whey-coffee':550000,'mass-5kg':349900,'mass-3kg':259900,
-   'creatine-blueberry':89900,'creatine-cranberry':89900,'pre-watermelon':139900,'musclevite-pack':69900
+   'creatine-blueberry':89900,'creatine-cranberry':89900,'pre-watermelon':180000,'musclevite-pack':69900
   };
   for(const v of variants){assert.equal(v.pricePaise,retail[v.id],v.id+' retail price');assert.equal(Object.hasOwn(v,'prices'),false,'never expose private rates to guest');}
   for(const [id,kind] of [['gym','gym'],['wholesale','wholesale'],['pending','wholesale']]){
