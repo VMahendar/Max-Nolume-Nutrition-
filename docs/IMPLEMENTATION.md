@@ -34,7 +34,7 @@ Work continues on `codex/complete-store-review` from `edf0e3710429bd189659945df5
 | Nitro Mass 5 kg Double Rich Chocolate bucket | ₹3,499 |
 | Nitro Mass 3 kg (pack to confirm) | ₹2,599 |
 | Pro Creatine 100 g Blueberry / Cranberry | ₹899 |
-| Sturdy Pre-Workout 250 g Watermelon | ₹1,399 |
+| Sturdy Pre-Workout 250 g Watermelon | ₹1,800 (MRP ₹2,199) |
 | Musclevite (pack details to confirm) | ₹699 |
 
 ## Required external inputs
