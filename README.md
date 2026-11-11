@@ -26,7 +26,7 @@ Unicorn Pro Series is the current Tamil Nadu distributor collection; more brands
 | Potency Whey 5 lb Coffee | ₹5,500 |
 | Nitro Mass 5 kg **bucket** | ₹3,499 |
 | Nitro Mass 3 kg **box** | ₹2,599 |
-| Sturdy Pre-Workout 250 g | ₹1,399 |
+| Sturdy Pre-Workout 250 g | ₹1,800 (MRP ₹2,199) |
 | Pro Creatine 100 g Blueberry | ₹899 |
 | Pro Creatine 100 g Cranberry | ₹899 |
 | Musclevite Multivitamin | ₹699 |
