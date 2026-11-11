@@ -9,9 +9,9 @@ The owner designated https://unicornproseries.com/ as the reference source. Prod
 | Potency Whey | ₹8,599 | ₹5,500 | https://unicornproseries.com/product/potency-whey/ |
 | Pro Creatine | ₹1,499 | ₹899 | https://unicornproseries.com/product/pro-creatine/ |
 | Nitro Mass 5 kg | Not confirmed for this pack | ₹3,499 | https://unicornproseries.com/product/nitro-mass/ |
-| Sturdy Pre-Workout Watermelon 250 g | Not confirmed for this flavour/pack | ₹1,399 | https://unicornproseries.com/product/sturdy-pre-workout-pineapple/ |
+| Sturdy Pre-Workout Watermelon 250 g | ₹2,199 (owner-confirmed MRP, 11 Nov 2026) | ₹1,800 | Owner-provided pricing; verify printed pack label |
 
-The Nitro page exposes a sale-price range, and the pre-workout page has a range across flavours. These range endpoints are not treated as pack-specific MRPs. Manufacturer sale prices do not replace the owner's selling prices. Original pack/variant labels are retained; exact label/size/flavour matching and printed package MRP remain part of the pre-production media check.
+The Nitro page exposes a sale-price range, and the pre-workout page has a range across flavours. Those range endpoints are not treated as pack-specific MRPs; the pre-workout MRP shown above comes from the owner. Manufacturer sale prices do not replace the owner's selling prices. Original pack/variant labels are retained; exact label/size/flavour matching and printed package MRP remain part of the pre-production media check.
 
 ## Display and administrator editing
 
