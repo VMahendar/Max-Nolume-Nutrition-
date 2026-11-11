@@ -136,12 +136,13 @@
       {
         "id": "pre-watermelon",
         "label": "250 g · Watermelon",
-        "pricePaise": 139900,
+        "pricePaise": 180000,
         "stock": null,
         "prices": {
           "wholesale": 105000,
           "gym": 115000
-        }
+        },
+        "mrpPaise": 219900
       }
     ],
     "brand": "Unicorn Pro Series"
