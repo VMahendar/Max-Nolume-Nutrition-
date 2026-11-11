@@ -107,14 +107,27 @@
     "category": "Pre-Workout",
     "subtitle": "For your pre-training routine",
     "description": "Unicorn Pro Series pre-workout. Read the product label for caffeine content, directions and warnings. Confirm suitability before use.",
-    "image": null,
+    "image": "assets/sturdy-watermelon-front.webp",
     "variants": [
       {
         "id": "pre-watermelon",
         "label": "250 g · Watermelon",
         "pricePaise": 180000,
         "stock": null,
-        "mrpPaise": 219900
+        "mrpPaise": 219900,
+        "image": "assets/sturdy-watermelon-front.webp",
+        "images": [
+          {
+            "src": "assets/sturdy-watermelon-front.webp",
+            "label": "Front of tub",
+            "alt": "Unicorn Pro Series Sturdy Pre-Workout Watermelon 250 g front tub, isolated product image"
+          },
+          {
+            "src": "assets/sturdy-watermelon-back.webp",
+            "label": "Original back label",
+            "alt": "Original photograph of Sturdy Watermelon 250 g supplement facts and warnings, product only"
+          }
+        ]
       }
     ],
     "brand": "Unicorn Pro Series"
