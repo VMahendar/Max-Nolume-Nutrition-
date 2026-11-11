@@ -1,3 +1,4 @@
+import './deploy/prepare-product-media.mjs';
 import {startLocalBackupScheduler} from './deploy/local-backups.mjs';
 import {startDriveBackupScheduler} from './deploy/drive-backup.mjs';
 import http from 'node:http';
