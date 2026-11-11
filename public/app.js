@@ -4,7 +4,7 @@ const PHONE="917708830513";
 const P=[
 {id:"whey",name:"Potency Whey",cat:"whey",size:"5 lbs",featuredIndex:1,variants:[{label:"Chocolate · 5 lbs",price:5500,mrp:8599,img:null},{label:"Coffee · 5 lbs",price:5500,mrp:8599,img:"assets/potency-whey-coffee-5lb.webp"}],desc:"Premium whey protein for daily training and recovery.",img:""},
 {id:"mass",name:"Nitro Mass",cat:"mass",featuredIndex:1,variants:[{label:"3 kg · Double Rich Chocolate",price:2599,img:"assets/nitro-mass-3kg-double-rich-chocolate.webp"},{label:"5 kg · Bucket",price:3499,img:"assets/Screenshot_2026_1103_003852.jpg"}],desc:"Mass gainer available in two pack sizes.",img:""},
-{id:"pre",name:"Sturdy Pre-Workout",cat:"pre",variants:[{label:"Watermelon · 250 g",price:1800,mrp:2199}],desc:"Pre-workout formula for your training routine.",img:""},
+{id:"pre",name:"Sturdy Pre-Workout",cat:"pre",variants:[{label:"Watermelon · 250 g",price:1800,mrp:2199,img:"assets/sturdy-watermelon-front.webp",images:[{src:"assets/sturdy-watermelon-front.webp",label:"Front"},{src:"assets/sturdy-watermelon-back.webp",label:"Original back label"}]}],desc:"Pre-workout formula for your training routine.",img:""},
 {id:"creatine",name:"Pro Creatine",cat:"creatine",featuredIndex:1,variants:[{label:"Blueberry · 250 g",price:899,mrp:1499,img:"https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png"},{label:"Cranberry · 250 g",price:899,mrp:1499,img:"assets/pro-creatine.png"}],desc:"Creatine supplement in two flavour options.",img:""},
 {id:"vitamins",name:"Musclevite Multivitamin",cat:"vitamins",variants:[{label:"Multivitamin · 1 pack",price:699}],desc:"Daily multivitamin supplement.",img:""}
 ];
@@ -388,19 +388,25 @@ refreshRetailPrices().then(()=>{render();drawCart();renderRecent()}).catch(error
 
 /* Website-only premium product detail. The installed app intentionally retains its own layout. */
 function showWebsiteProductDetail(p,options,initialIndex,dlg,root){
- let current=initialIndex,quantity=1;
+ let current=initialIndex,quantity=1,photoIndex=0;
+ const productPhotos=index=>{
+  const variant=p.variants[index],primary=coverImage(p,index);
+  const images=(Array.isArray(variant?.images)?variant.images:[]).map(photo=>typeof photo==='string'?{src:photo,label:'Product view'}:photo).filter(photo=>photo?.src);
+  if(primary&&!images.some(photo=>photo.src===primary))images.unshift({src:primary,label:'Front'});
+  return images;
+ };
  const optionButtons=options.map(({v,i})=>
   '<button type="button" class="mvn-pack-choice" data-mvn-pack="'+i+'" aria-pressed="'+(i===initialIndex)+'"><span>'+safe(v.label)+'</span><strong>'+money(v.price)+'</strong></button>'
  ).join('');
- const photoButtons=options.filter(({i})=>Boolean(coverImage(p,i))).map(({v,i})=>
-  '<button type="button" class="mvn-photo-choice" data-mvn-photo="'+i+'" aria-label="View '+safe(v.label)+' pack"><img src="'+safe(coverImage(p,i))+'" alt="" loading="lazy"></button>'
+ const photoButtons=productPhotos(initialIndex).map((photo,i)=>
+  '<button type="button" class="mvn-photo-choice" data-mvn-photo="'+i+'" aria-label="View '+safe(photo.label||'pack photo')+'"><img src="'+safe(photo.src)+'" alt="" loading="lazy"></button>'
  ).join('');
  root.innerHTML=
   '<div class="mvn-detail-assurance" aria-label="Ordering information"><span>Clear retail prices</span><span>Choose the exact pack</span><span>WhatsApp order confirmation</span></div>'+
   '<div class="mvn-detail-layout">'+
    '<section class="mvn-detail-gallery" aria-label="Product photographs">'+
     '<div class="mvn-detail-stage detail-photo"></div>'+
-    (photoButtons?'<div class="mvn-detail-thumbnails" aria-label="Available pack photos">'+photoButtons+'</div>':'')+
+    '<div class="mvn-detail-thumbnails" aria-label="Available pack photos">'+photoButtons+'</div>'+
     '<p class="mvn-detail-gallery-note">Photos display the selected pack only. Ask our team for current front and back label images.</p>'+
    '</section>'+
    '<section class="mvn-detail-content">'+
@@ -421,18 +427,22 @@ function showWebsiteProductDetail(p,options,initialIndex,dlg,root){
   '</div>';
  const stage=root.querySelector('.mvn-detail-stage');
  const packButtons=[...root.querySelectorAll('[data-mvn-pack]')];
- const photoChoices=[...root.querySelectorAll('[data-mvn-photo]')];
+ const photoHost=root.querySelector('.mvn-detail-thumbnails');
  const update=()=>{
-  const variant=p.variants[current];
-  swapPhoto(stage,coverImage(p,current),p.name+' — '+variant.label);
+  const variant=p.variants[current],photos=productPhotos(current);
+  photoIndex=Math.min(photoIndex,Math.max(0,photos.length-1));
+  swapPhoto(stage,photos[photoIndex]?.src||coverImage(p,current),p.name+' — '+variant.label);
   root.querySelector('#detail-price').innerHTML=priceMarkup(variant);
   root.querySelector('#mvn-detail-quantity').textContent=quantity;
   root.querySelector('#detail-add').textContent='ADD TO CART · '+money(variant.price*quantity);
   packButtons.forEach(button=>button.setAttribute('aria-pressed',String(Number(button.dataset.mvnPack)===current)));
-  photoChoices.forEach(button=>button.setAttribute('aria-current',String(Number(button.dataset.mvnPhoto)===current)));
+  photoHost.hidden=photos.length<2;
+  photoHost.innerHTML=photos.map((photo,i)=>
+   '<button type="button" class="mvn-photo-choice" data-mvn-photo="'+i+'" aria-current="'+(i===photoIndex)+'" aria-label="View '+safe(photo.label||'product image')+'"><img src="'+safe(photo.src)+'" alt="" loading="lazy"></button>'
+  ).join('');
+  photoHost.querySelectorAll('[data-mvn-photo]').forEach(button=>button.onclick=()=>{photoIndex=Number(button.dataset.mvnPhoto);update()});
  };
- packButtons.forEach(button=>button.addEventListener('click',()=>{current=Number(button.dataset.mvnPack);update()}));
- photoChoices.forEach(button=>button.addEventListener('click',()=>{current=Number(button.dataset.mvnPhoto);update()}));
+ packButtons.forEach(button=>button.addEventListener('click',()=>{current=Number(button.dataset.mvnPack);photoIndex=0;update()}));
  root.querySelectorAll('[data-mvn-qty]').forEach(button=>button.addEventListener('click',()=>{quantity=Math.max(1,Math.min(99,quantity+Number(button.dataset.mvnQty)));update()}));
  const addToOrder=(review)=>{
   const key=p.id+'|'+current;
