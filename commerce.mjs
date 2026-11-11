@@ -76,6 +76,23 @@ if(!setting('retail-whey-5500-nov2026'))tx(()=>{
  set('retail-whey-5500-nov2026',true);
 });
 
+// Owner-approved 11 November 2026 Sturdy Pre-Workout retail price and MRP.
+// One-time update for the persistent SQLite catalogue; preserve trade tiers, stock and media.
+if(!setting('retail-sturdy-pre-1800-mrp2199-nov2026'))tx(()=>{
+ const row=db.prepare("SELECT data FROM products WHERE id='sturdy-pre'").get();
+ if(row){
+  const p=JSON.parse(row.data),v=p.variants?.find(v=>v.id==='pre-watermelon');
+  if(v&&(v.pricePaise!==180000||v.mrpPaise!==219900)){
+   const previous={pricePaise:v.pricePaise,mrpPaise:v.mrpPaise??null};
+   v.pricePaise=180000;
+   v.mrpPaise=219900;
+   db.prepare("UPDATE products SET data=? WHERE id='sturdy-pre'").run(JSON.stringify(p));
+   audit('system','retail.price.mrp.update','sturdy-pre',{variantId:v.id,previous,pricePaise:180000,mrpPaise:219900});
+  }
+ }
+ set('retail-sturdy-pre-1800-mrp2199-nov2026',true);
+});
+
 // Correct Pro Creatine packs in persistent stores created before the verified 250 g photos were available.
 tx(()=>{const row=db.prepare("SELECT data FROM products WHERE id='pro-creatine'").get();if(!row)return;const p=JSON.parse(row.data);let changed=false;const description='Unicorn Pro Series Pro Creatine in 250 g packs. Choose Blueberry or Cranberry. Read the pack label for ingredients and directions.';if(p.description!==description){p.description=description;changed=true;}if(p.image!==null){p.image=null;changed=true;}for(const v of p.variants){const image=v.id==='creatine-blueberry'?'https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png':'assets/pro-creatine.png';const label=v.id==='creatine-blueberry'?'250 g · Blueberry':'250 g · Cranberry';if(v.label!==label){v.label=label;changed=true;}if(v.image!==image){v.image=image;changed=true;}}if(changed)db.prepare("UPDATE products SET data=? WHERE id='pro-creatine'").run(JSON.stringify(p));});
 function reserved(){const amounts=new Map();for(const row of db.prepare("SELECT payload FROM orders WHERE status IN ('preparing','pending','provider_review')").all())for(const l of JSON.parse(row.payload).lines)amounts.set(l.variantId,(amounts.get(l.variantId)||0)+l.quantity);return amounts;}
