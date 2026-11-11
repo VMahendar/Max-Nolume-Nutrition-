@@ -42,10 +42,9 @@ const priceLabels={all:"All prices",under1000:"Under ₹1,000","1000to3000":"₹
 function matchesPrice(v){return priceRange==="all"||(priceRange==="under1000"&&v.price<1000)||(priceRange==="1000to3000"&&v.price>=1000&&v.price<=3000)||(priceRange==="over3000"&&v.price>3000)}
 const failedPackPhotos=new Set();
 function visiblePackOptions(p){
- return p.variants.map((v,i)=>({v,i})).filter(({i})=>{
-  const src=coverImage(p,i);
-  return src&&!failedPackPhotos.has(src);
- });
+ // A missing or broken photograph must not hide a real, priced supplement.
+ // Keep exact-size/flavour product photos optional; never substitute another pack.
+ return p.variants.map((v,i)=>({v,i})).filter(({v})=>Number.isFinite(v.price)&&v.price>0);
 }
 function displayVariant(p){
  const options=visiblePackOptions(p),matching=options.filter(({v})=>matchesPrice(v));
@@ -114,7 +113,7 @@ function appPriceMarkup(v){
 }
 function purchasedPack(variantId){for(const p of P){const i=retailVariantIds[p.id]?.indexOf(variantId);if(i!==undefined&&i>=0&&p.variants[i])return {p,i,v:p.variants[i]};}return null;}
 function card(p){
-const featured=displayVariant(p);const cover=coverImage(p,featured);const pic=cover?'<img loading="lazy" src="'+safe(cover)+'" alt="'+safe(p.name)+'"><div class="placeholder" hidden><b>'+safe(p.name)+'</b>Photo coming soon</div>':'<div class="placeholder"><b>'+safe(p.name)+'</b>Correct pack photo being verified</div>';
+const featured=displayVariant(p);const originalCover=coverImage(p,featured);const cover=failedPackPhotos.has(originalCover)?'':originalCover;const pic=cover?'<img loading="lazy" src="'+safe(cover)+'" alt="'+safe(p.name)+'"><div class="placeholder" hidden><b>'+safe(p.name)+'</b>Photo coming soon</div>':'<div class="placeholder"><b>'+safe(p.name)+'</b>Correct pack photo being verified</div>';
 return '<article class="card"><div class="photo">'+pic+'</div><div class="info"><small>'+safe(p.brand||'Unicorn Pro Series')+'</small><h3>'+safe(p.name)+'</h3><p>'+safe(p.desc)+'</p><label class="variant-label" for="v-'+p.id+'">FLAVOUR / PACK SIZE</label><select id="v-'+p.id+'" class="variant">'+visiblePackOptions(p).map(({v,i})=>'<option value="'+i+'"'+(i===featured?' selected':'')+'>'+safe(v.label)+'</option>').join("")+'</select><div class="price" id="price-'+p.id+'">'+priceMarkup(p.variants[featured])+'</div><button class="details-link" type="button" data-detail="'+p.id+'">VIEW PRODUCT DETAILS →</button><button class="add" data-id="'+p.id+'">ADD TO CART +</button></div></article>';
 }
 
@@ -239,12 +238,12 @@ function renderAppProduct(){
 let spotlightProduct='whey',spotlightVariant=null,spotlightQty=1;
 function renderSpotlight(){
  const section=$('mvnSpotlight');if(!section)return;
- const items=['whey','mass','creatine'].map(id=>P.find(p=>p.id===id)).filter(p=>p&&visiblePackOptions(p).length);
+ const items=['whey','mass','creatine'].map(id=>P.find(p=>p.id===id)).filter(p=>p&&visiblePackOptions(p).some(({i})=>{const src=coverImage(p,i);return src&&!failedPackPhotos.has(src)}));
  if(!items.length){section.hidden=true;return}
  section.hidden=false;
  const p=items.find(p=>p.id===spotlightProduct)||items[0];spotlightProduct=p.id;
- const options=visiblePackOptions(p);
- if(!options.some(item=>item.i===spotlightVariant))spotlightVariant=displayVariant(p);
+ const options=visiblePackOptions(p).filter(({i})=>{const src=coverImage(p,i);return src&&!failedPackPhotos.has(src)});
+ if(!options.some(item=>item.i===spotlightVariant))spotlightVariant=options.find(({i})=>i===(p.featuredIndex||0))?.i??options[0]?.i;
  const item=options.find(item=>item.i===spotlightVariant)||options[0];
  if(!item)return;
  const v=item.v,img=$('mvnSpotlightImage'),src=coverImage(p,item.i);
