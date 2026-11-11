@@ -93,6 +93,34 @@ if(!setting('retail-sturdy-pre-1800-mrp2199-nov2026'))tx(()=>{
  set('retail-sturdy-pre-1800-mrp2199-nov2026',true);
 });
 
+// Attach the owner's actual Watermelon pack photos to existing Render SQLite stores.
+// Only replace absent or retired placeholder media; do not touch prices, quantities or custom photos.
+if(!setting('sturdy-watermelon-photos-20261112'))tx(()=>{
+ const row=db.prepare("SELECT data FROM products WHERE id='sturdy-pre'").get();
+ if(row){
+  const p=JSON.parse(row.data),v=p.variants?.find(v=>v.id==='pre-watermelon');
+  const front='assets/sturdy-watermelon-front.webp',back='assets/sturdy-watermelon-back.webp';
+  const stale='assets/sturdy-pre-workout.png';
+  let changed=false;
+  if(v){
+   if(!p.image||p.image===stale){p.image=front;changed=true;}
+   if(!v.image||v.image===stale){v.image=front;changed=true;}
+   if(!Array.isArray(v.images)||!v.images.length||v.images.every(x=>(typeof x==='string'?x:x?.src)===stale)){
+    v.images=[
+     {src:front,label:'Front of tub',alt:'Sturdy Pre-Workout Watermelon 250 g front tub'},
+     {src:back,label:'Original back label',alt:'Original Sturdy Watermelon 250 g supplement facts and warnings'}
+    ];
+    changed=true;
+   }
+  }
+  if(changed){
+   db.prepare("UPDATE products SET data=? WHERE id='sturdy-pre'").run(JSON.stringify(p));
+   audit('system','product.media.update','sturdy-pre',{variantId:'pre-watermelon',front,back});
+  }
+ }
+ set('sturdy-watermelon-photos-20261112',true);
+});
+
 // Correct Pro Creatine packs in persistent stores created before the verified 250 g photos were available.
 tx(()=>{const row=db.prepare("SELECT data FROM products WHERE id='pro-creatine'").get();if(!row)return;const p=JSON.parse(row.data);let changed=false;const description='Unicorn Pro Series Pro Creatine in 250 g packs. Choose Blueberry or Cranberry. Read the pack label for ingredients and directions.';if(p.description!==description){p.description=description;changed=true;}if(p.image!==null){p.image=null;changed=true;}for(const v of p.variants){const image=v.id==='creatine-blueberry'?'https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png':'assets/pro-creatine.png';const label=v.id==='creatine-blueberry'?'250 g · Blueberry':'250 g · Cranberry';if(v.label!==label){v.label=label;changed=true;}if(v.image!==image){v.image=image;changed=true;}}if(changed)db.prepare("UPDATE products SET data=? WHERE id='pro-creatine'").run(JSON.stringify(p));});
 function reserved(){const amounts=new Map();for(const row of db.prepare("SELECT payload FROM orders WHERE status IN ('preparing','pending','provider_review')").all())for(const l of JSON.parse(row.payload).lines)amounts.set(l.variantId,(amounts.get(l.variantId)||0)+l.quantity);return amounts;}
