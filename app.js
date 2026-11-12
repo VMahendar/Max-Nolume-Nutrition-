@@ -391,7 +391,7 @@ function showWebsiteProductDetail(p,options,initialIndex,dlg,root){
  let current=initialIndex,quantity=1,photoIndex=0;
  const productPhotos=index=>{
   const variant=p.variants[index],primary=coverImage(p,index);
-  const images=(Array.isArray(variant?.images)?variant.images:[]).map(photo=>typeof photo==='string'?{src:photo,label:'Product view'}:photo).filter(photo=>photo?.src);
+  const images=(Array.isArray(variant?.images)?variant.images:[]).map(photo=>typeof photo==='string'?{src:photo,label:'Product view'}:photo).filter(photo=>photo?.src).map(photo=>photo.src==='assets/sturdy-watermelon-back.webp'?{...photo,src:'assets/sturdy-watermelon-back-studio.svg',label:'Back label — authentic photo'}:photo);
   if(primary&&!images.some(photo=>photo.src===primary))images.unshift({src:primary,label:'Front'});
   return images;
  };
