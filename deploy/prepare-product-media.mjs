@@ -29,7 +29,7 @@ const backSource=resolve('data/image-assets/sturdy-watermelon-back.webp.b64');
 const studioTarget=resolve('public/assets/sturdy-watermelon-back-studio.svg');
 if(existsSync(backSource)){
  const pixels=readFileSync(backSource,'utf8').trim();
- const studioSvg=\`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" width="1200" height="1200" role="img" aria-label="Original Sturdy Pre-Workout back label photographed on a softly lit studio surface">
+ const studioSvg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" width="1200" height="1200" role="img" aria-label="Original Sturdy Pre-Workout back label photographed on a softly lit studio surface">
 <defs>
  <radialGradient id="ambient"><stop offset="0" stop-color="#d8d1c7" stop-opacity=".35"/><stop offset="1" stop-color="#d8d1c7" stop-opacity="0"/></radialGradient>
  <filter id="softShadow" x="-50%" y="-250%" width="200%" height="600%"><feGaussianBlur stdDeviation="23"/></filter>
@@ -41,8 +41,8 @@ if(existsSync(backSource)){
 </defs>
 <ellipse cx="598" cy="565" rx="500" ry="490" fill="url(#ambient)"/>
 <ellipse cx="625" cy="1119" rx="380" ry="44" fill="#22252b" opacity=".25" filter="url(#softShadow)"/>
-<image width="1200" height="1200" href="data:image/webp;base64,\${pixels}" mask="url(#cleanJar)" />
-</svg>\`;
+<image width="1200" height="1200" href="data:image/webp;base64,${pixels}" mask="url(#cleanJar)" />
+</svg>`;
  mkdirSync(dirname(studioTarget),{recursive:true});
  if(!existsSync(studioTarget)||readFileSync(studioTarget,'utf8')!==studioSvg)writeFileSync(studioTarget,studioSvg);
 }
