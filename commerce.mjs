@@ -121,6 +121,35 @@ if(!setting('sturdy-watermelon-photos-20261112'))tx(()=>{
  set('sturdy-watermelon-photos-20261112',true);
 });
 
+// Add the verified Musclevite bottle to existing catalogues without changing stock or prices.
+tx(()=>{
+ const key='musclevite-60-tablet-photos';
+ if(setting(key))return;
+ const row=db.prepare("SELECT data FROM products WHERE id='musclevite'").get();
+ const product=row&&JSON.parse(row.data);
+ const variant=product?.variants.find(v=>v.id==='musclevite-pack');
+ if(!variant)return;
+ const reference=referenceVariants.get(variant.id);
+ const description=seedProducts.find(p=>p.id==='musclevite').description;
+ let changed=false;
+ if(!product.image){product.image=reference.image;changed=true;}
+ if(!variant.image){variant.image=reference.image;changed=true;}
+ if(!variant.images?.length){variant.images=reference.images;changed=true;}
+ if(['Pack details to confirm','Multivitamin · 1 pack'].includes(variant.label)){
+  variant.label=reference.label;
+  changed=true;
+ }
+ if(product.description==='Unicorn Pro Series multivitamin. Confirm pack count, ingredients and availability with the store.'){
+  product.description=description;
+  changed=true;
+ }
+ if(changed){
+  db.prepare("UPDATE products SET data=? WHERE id='musclevite'").run(JSON.stringify(product));
+  audit('system','product.media.update','musclevite',{variantId:variant.id});
+ }
+ set(key,true);
+});
+
 // Correct Pro Creatine packs in persistent stores created before the verified 250 g photos were available.
 tx(()=>{const row=db.prepare("SELECT data FROM products WHERE id='pro-creatine'").get();if(!row)return;const p=JSON.parse(row.data);let changed=false;const description='Unicorn Pro Series Pro Creatine in 250 g packs. Choose Blueberry or Cranberry. Read the pack label for ingredients and directions.';if(p.description!==description){p.description=description;changed=true;}if(p.image!==null){p.image=null;changed=true;}for(const v of p.variants){const image=v.id==='creatine-blueberry'?'https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png':'assets/pro-creatine.png';const label=v.id==='creatine-blueberry'?'250 g · Blueberry':'250 g · Cranberry';if(v.label!==label){v.label=label;changed=true;}if(v.image!==image){v.image=image;changed=true;}}if(changed)db.prepare("UPDATE products SET data=? WHERE id='pro-creatine'").run(JSON.stringify(p));});
 function reserved(){const amounts=new Map();for(const row of db.prepare("SELECT payload FROM orders WHERE status IN ('preparing','pending','provider_review')").all())for(const l of JSON.parse(row.payload).lines)amounts.set(l.variantId,(amounts.get(l.variantId)||0)+l.quantity);return amounts;}

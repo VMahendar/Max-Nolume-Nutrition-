@@ -137,14 +137,32 @@
     "name": "Musclevite Multivitamin",
     "category": "Vitamins",
     "subtitle": "Everyday nutritional support",
-    "description": "Unicorn Pro Series multivitamin. Confirm pack count, ingredients and availability with the store.",
-    "image": null,
+    "description": "Unicorn Pro Series Musclevite multivitamin and multimineral supplement. Each bottle contains 60 tablets. See the pack photos for supplement facts and directions.",
+    "image": "assets/musclevite-front.webp",
     "variants": [
       {
         "id": "musclevite-pack",
-        "label": "Pack details to confirm",
+        "label": "60 tablets",
         "pricePaise": 69900,
-        "stock": null
+        "stock": null,
+        "image": "assets/musclevite-front.webp",
+        "images": [
+          {
+            "src": "assets/musclevite-front.webp",
+            "label": "Front of bottle",
+            "alt": "Unicorn Pro Series Musclevite Multivitamin 60 tablets front bottle"
+          },
+          {
+            "src": "assets/musclevite-facts.webp",
+            "label": "Supplement facts",
+            "alt": "Original Musclevite 60-tablet supplement facts panel"
+          },
+          {
+            "src": "assets/musclevite-back.webp",
+            "label": "Directions and batch label",
+            "alt": "Original Musclevite directions, batch and printed MRP label"
+          }
+        ]
       }
     ],
     "brand": "Unicorn Pro Series"
