@@ -33,12 +33,13 @@ initializeOwnerWork(C);
 initializeLeadInbox(C);
 const origin=process.env.PUBLIC_ORIGIN||'http://localhost:3000',production=process.env.NODE_ENV==='production';
 const previousStoreOrigin='https://max-volume-nutrition-preview.onrender.com';
+const officialStoreOrigin='https://maxvolumenutriton.shop';
 const publicLaunchAt=Date.parse('2026-11-08T11:00:00+05:30');
 const publicLaunchHost=new URL(previousStoreOrigin).host;
 const launchStorePages=new Set(['/','/index.html','/mobile-app.html','/account.html','/wholesale-account.html','/dealer.html']);
 function canonicalStoreOrigin(){
   const configured=process.env.STORE_PUBLIC_URL;
-  if(!configured)return previousStoreOrigin;
+  if(!configured)return officialStoreOrigin;
   let parsed;
   try{parsed=new URL(configured)}catch{throw Error('STORE_PUBLIC_URL must be a valid HTTPS origin.')}
   if(parsed.protocol!=='https:'||parsed.username||parsed.password||parsed.pathname!=='/'||parsed.search||parsed.hash||!parsed.hostname||parsed.port)
@@ -393,7 +394,7 @@ if(path==='/api/admin/shipment'){if(!shippingReady())fail(503,'Shiprocket is dis
 if(path==='/api/admin/tracking'){const row=db.prepare('SELECT * FROM shipments WHERE order_id=?').get(String(b.id));const shipment=row?JSON.parse(row.data):null;if(!shipment?.shipmentId)fail(409,'No provider shipment to track.');const tracking=await ship.track(shipment.shipmentId);C.tx(()=>{const latest=JSON.parse(db.prepare('SELECT data FROM shipments WHERE order_id=?').get(b.id).data);db.prepare('UPDATE shipments SET data=? WHERE order_id=?').run(JSON.stringify({...latest,tracking}),b.id);});return json(res,200,{tracking});}
 fail(404,'Endpoint not found.');}
 fail(404,'Endpoint not found.');}
-if(!['GET','HEAD'].includes(req.method))fail(405,'Method not allowed.');const path=resolve(root,'.'+decodeURIComponent(u.pathname==='/'?'/index.html':u.pathname));if(!path.startsWith(root+sep))fail(403,'Forbidden');let file;try{if(!realpathSync(path).startsWith(root+sep))fail(403,'Forbidden');file=readFileSync(path);if(storePublicUrl!==previousStoreOrigin&&['/','/index.html','/robots.txt','/sitemap.xml'].includes(u.pathname))file=Buffer.from(file.toString('utf8').replaceAll(previousStoreOrigin,storePublicUrl));// Keep the staging status visible to operators, away from customer pages.
+if(!['GET','HEAD'].includes(req.method))fail(405,'Method not allowed.');const path=resolve(root,'.'+decodeURIComponent(u.pathname==='/'?'/index.html':u.pathname));if(!path.startsWith(root+sep))fail(403,'Forbidden');let file;try{if(!realpathSync(path).startsWith(root+sep))fail(403,'Forbidden');file=readFileSync(path);if(storePublicUrl!==previousStoreOrigin&&['/','/index.html','/robots.txt','/sitemap.xml'].includes(u.pathname))file=Buffer.from(file.toString('utf8').replaceAll(previousStoreOrigin,storePublicUrl).replaceAll(officialStoreOrigin,storePublicUrl));// Keep the staging status visible to operators, away from customer pages.
 if(process.env.STAGING_MODE==='true'&&u.pathname==='/admin.html'){
  const banner='PRIVATE STAGING · TEST DATA ONLY · PAYMENTS AND SHIPPING DISABLED';
  file=Buffer.from(file.toString('utf8').replace(/<body(?:\s[^>]*)?>/i,openTag=>`${openTag}<div class="staging-banner owner-preview-status" role="status" title="${banner}" aria-label="${banner}">Preview</div>`));
