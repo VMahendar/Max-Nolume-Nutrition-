@@ -27,7 +27,7 @@ try{
  await page.locator('#priceRange').selectOption('under1000');
  assert.equal(await page.locator('#grid .card').count(),1);
  await page.locator('#priceRange').selectOption('1000to3000');
- assert.equal(await page.locator('#grid .card').count(),1);
+ assert.equal(await page.locator('#grid .card').count(),2);
  assert.match(await page.locator('#v-mass option:checked').textContent(),/3 kg/);
  assert.match(await page.locator('#price-mass').textContent(),/2,599/);
  await page.locator('#resetFilters').click();
@@ -36,14 +36,14 @@ try{
  await page.locator('#q').fill('zzzz-no-match');
  assert.equal(await page.getByRole('heading',{name:'No matching products'}).count(),1);
  await page.getByRole('button',{name:'View all products'}).click();
- assert.equal(await page.locator('#grid .card').count(),3);
+ assert.equal(await page.locator('#grid .card').count(),5);
  await page.locator('#q').fill('<img src=x onerror=alert(1)>');
  assert.equal(await page.locator('#activeFilters img').count(),0);
  await page.locator('#resetFilters').click();
  await page.locator('.cats [data-cat="mass"]').click();
  assert.equal(await page.locator('#grid .card').count(),1);
  await page.locator('.nav [data-cat="all"]').click();
- assert.equal(await page.locator('#grid .card').count(),3);
+ assert.equal(await page.locator('#grid .card').count(),5);
  await page.locator('[data-detail="whey"]').click();
  await page.locator('#detailClose').click();
  assert.equal(await page.locator('#recentProducts button').count(),1);
@@ -79,10 +79,10 @@ try{
  let whatsappRequested;const sentToWhatsApp=new Promise(done=>whatsappRequested=done);
  await app.route('https://wa.me/**',async route=>{whatsapp=route.request().url();whatsappRequested();await route.abort();});
  await app.goto(base+'/mobile-app.html');
- await app.waitForFunction(()=>document.querySelector('#price-whey').textContent.includes('5,123'));
+ await app.waitForFunction(()=>document.querySelector('[data-purchase-pack="whey-coffee"]')?.textContent.includes('5,123'));
  assert.equal(await app.locator('body.app-store').count(),1);
  assert.equal(await app.locator('.hero').isVisible(),false);
- assert.equal(await app.locator('#grid .card').count(),3);
+ assert.equal(await app.locator('#grid .card').count(),0);
  const manifest=await (await app.request.get(base+'/manifest.webmanifest')).json();assert.equal(manifest.start_url,'/mobile-app.html');
  await app.locator('[data-add="whey-coffee"]').click();
  await app.locator('[data-plus]').click();

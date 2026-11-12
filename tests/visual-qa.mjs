@@ -32,7 +32,7 @@ try {
     const response=await page.goto(origin+'/',{waitUntil:'domcontentloaded',timeout:25000});
     assert.equal(response.status(),200,preset.name+' homepage HTTP status');
     await page.locator('#grid article.card').first().waitFor({timeout:10000});
-    assert.equal(await page.locator('#grid article.card').count(),3,preset.name+' product family count');
+    assert.equal(await page.locator('#grid article.card').count(),5,preset.name+' product family count');
     assert.ok(await page.locator('.hero h1').isVisible(),preset.name+' hero visible');
     assert.match(await page.locator('.hero h1').innerText(),/FUEL EVERY\s+REP/i,preset.name+' product-first hero headline');
     assert.match(await page.locator('.hero-declaration').innerText(),/AUTHORIZED UNICORN PRO SERIES DISTRIBUTOR/i,preset.name+' distribution identity');
@@ -114,13 +114,10 @@ try {
     });
     assert.ok(bucket.naturalWidth>0&&!bucket.hidden,preset.name+' 5kg bucket photo must load');
     await page.locator('#v-mass').selectOption('0');
-    await page.waitForFunction(()=>{const img=document.querySelector('.add[data-id="mass"]').closest('.card').querySelector('.photo img');return img&&img.complete&&img.naturalWidth>0;});
-    const jar=await page.locator('.add[data-id="mass"]').evaluate(btn=>{const img=btn.closest('.card').querySelector('.photo img');return {src:img.src,loaded:img.naturalWidth>0,hidden:img.hidden};});
-    assert.ok(jar.loaded&&!jar.hidden&&jar.src!==bucket.src,preset.name+' confirmed 3kg jar uses its own image, not the 5kg bucket');
-    console.log('NITRO_IMAGES',preset.name,JSON.stringify({bucket,jar}));
+    assert.equal(await page.locator('#v-mass').locator('xpath=ancestor::article').locator('.photo .placeholder').isVisible(),true,preset.name+' 3 kg box has no verified photo');
     await page.locator('button[data-detail="mass"]').click();
     assert.ok(await page.locator('#productDialog').isVisible(),preset.name+' product details dialog');
-    assert.equal(await page.locator('#detail-variant').inputValue(),'0',preset.name+' product details preserve selected 3kg pack');
+    assert.equal(await page.locator('[data-mvn-pack][aria-pressed=true]').getAttribute('data-mvn-pack'),'0',preset.name+' product details preserve selected 3kg pack');
     assert.match(await page.locator('#detail-price').innerText(),/2,599/,preset.name+' selected 3kg price preserved');
     await page.locator('#detailClose').click();
     const cards=await page.locator('#grid article.card').evaluateAll(nodes=>nodes.map(n=>({name:n.querySelector('h3')?.textContent,photo:(()=>{const x=n.querySelector('.photo img');return x?{loaded:x.naturalWidth>0,complete:x.complete,hidden:x.hidden,src:x.src}:null})(),placeholder:!!n.querySelector('.photo .placeholder')})));
@@ -134,8 +131,8 @@ try {
   const withoutJs=await browser.newPage({javaScriptEnabled:false,viewport:{width:390,height:844}});
   const noJsResponse=await withoutJs.goto(origin+'/',{waitUntil:'domcontentloaded'});
   assert.equal(noJsResponse.status(),200,'JavaScript-disabled homepage responds');
-  assert.equal(await withoutJs.locator('#grid article.card').count(),5,'five product cards render before JavaScript');
-  assert.equal(await withoutJs.locator('#grid a.add[href^="https://wa.me/"]').count(),5,'every fallback card offers a real enquiry action');
+  assert.equal(await withoutJs.locator('#grid article.card').count(),10,'all ten variants render before JavaScript');
+  assert.equal(await withoutJs.locator('#grid a.add[href^="https://wa.me/"]').count(),10,'every fallback card offers a real enquiry action');
   assert.match(await withoutJs.locator('#grid').textContent(),/5,500/,'retail prices remain visible without JavaScript');
   await withoutJs.close();
   const page=await browser.newPage();

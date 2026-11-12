@@ -40,7 +40,7 @@
     "name": "Nitro Mass",
     "category": "Mass Gainer",
     "subtitle": "Build your nutrition routine",
-    "description": "Unicorn Pro Series Nitro Mass Double Rich Chocolate, available in a 3 kg jar and a 5 kg bucket. Always check the received label for ingredients and nutrition.",
+    "description": "Unicorn Pro Series Nitro Mass Double Rich Chocolate, available in a 3 kg box and a 5 kg bucket. Always check the received label for ingredients and nutrition.",
     "image": "assets/Screenshot_2026_1103_003852.jpg",
     "variants": [
       {
@@ -62,14 +62,8 @@
         "label": "3 kg · Double Rich Chocolate",
         "pricePaise": 259900,
         "stock": null,
-        "image": "assets/nitro-mass-3kg-double-rich-chocolate.webp",
-        "images": [
-          {
-            "src": "assets/nitro-mass-3kg-double-rich-chocolate.webp",
-            "label": "3 kg jar — front",
-            "alt": "Unicorn Pro Series Nitro Mass Double Rich Chocolate 3 kg jar"
-          }
-        ]
+        "image": null,
+        "images": []
       }
     ],
     "brand": "Unicorn Pro Series"
@@ -79,7 +73,7 @@
     "name": "Pro Creatine",
     "category": "Creatine",
     "subtitle": "Make every session count",
-    "description": "Unicorn Pro Series Pro Creatine in 250 g packs. Choose Blueberry or Cranberry. Read the pack label for ingredients and directions.",
+    "description": "Unicorn Pro Series Pro Creatine in 100 g and 250 g packs. Choose Blueberry or Cranberry. Read the pack label for ingredients and directions.",
     "image": null,
     "variants": [
       {
@@ -97,6 +91,22 @@
         "stock": null,
         "mrpPaise": 149900,
         "image": "assets/pro-creatine.png"
+      },
+      {
+        "id": "creatine-blueberry-100g",
+        "label": "100 g · Blueberry",
+        "pricePaise": 89900,
+        "stock": null,
+        "image": null,
+        "images": []
+      },
+      {
+        "id": "creatine-cranberry-100g",
+        "label": "100 g · Cranberry",
+        "pricePaise": 89900,
+        "stock": null,
+        "image": null,
+        "images": []
       }
     ],
     "brand": "Unicorn Pro Series"

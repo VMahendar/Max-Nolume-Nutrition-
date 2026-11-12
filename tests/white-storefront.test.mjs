@@ -44,7 +44,7 @@ test('homepage excludes demonstrably incorrect product photos and retains verifi
  assert.ok(existsSync(new URL('../data/image-assets/sturdy-watermelon-front.webp.b64',import.meta.url)),'isolated Sturdy front is stored in repo');
  assert.ok(existsSync(new URL('../data/image-assets/sturdy-watermelon-back.webp.b64',import.meta.url)),'isolated original back is stored in repo');
  assert.ok(app.includes('assets/sturdy-watermelon-front.webp'));
- assert.match(app,/3 kg · Double Rich Chocolate",price:2599,img:"assets\/nitro-mass-3kg-double-rich-chocolate\.webp"/,'3 kg must use its own verified jar photo');
+ assert.match(app,/3 kg · Double Rich Chocolate",price:2599,img:null/,'Do not use the jar photo for the 3 kg box');
  assert.match(app,/Chocolate · 5 lbs.*?img:null/,'Chocolate must not use Coffee photo');
  assert.match(app,/Blueberry · 250 g.*?img:\"https:\/\/unicornproseries.com\/wp-content\/uploads\/2026\/05\/Pro-Creatine-Blueberry-1.png\"/,'Blueberry must use the official Blueberry photo');
 });
@@ -59,4 +59,30 @@ test('public retail offers use verified MRP and keep confidential wholesale pric
  assert.deepEqual(whey.map(v=>v.pricePaise),[550000,550000]);
  assert.ok(seed.find(p=>p.id==='nitro-mass').variants.every(v=>v.mrpPaise===undefined),'never invent Nitro MRP');
  assert.ok(!app.includes('wholesale":'),'wholesale prices cannot ship in public JS');
+});
+
+test('retail refresh merges new packs by ID without repeating a product family or shifting existing packs',async()=>{
+ const {runInNewContext}=await import('node:vm');
+ const products=JSON.parse(read('public/catalog.json'));
+ const creatine=products.find(p=>p.id==='pro-creatine');
+ const newPack={id:'creatine-extra',label:'New pack',pricePaise:99900,image:null};
+ creatine.variants.reverse();
+ creatine.variants.push(newPack,{...newPack,label:'Duplicate'});
+ const app=read('public/app.js').split('const $=id=>')[0];
+ const result=await runInNewContext(app+`
+  (async()=>{
+   await refreshRetailPrices();
+   await refreshRetailPrices();
+   return JSON.stringify(P.filter(p=>p.id.includes('creatine')).map(p=>({
+    id:p.id,
+    packs:retailVariantIds[p.id],
+    labels:p.variants.map(v=>v.label)
+   })));
+  })()
+ `,{AbortSignal,fetch:async()=>({ok:true,json:async()=>({tier:'retail',products})})});
+ assert.deepEqual(JSON.parse(result),[{
+  id:'creatine',
+  packs:['creatine-blueberry','creatine-cranberry','creatine-blueberry-100g','creatine-cranberry-100g','creatine-extra'],
+  labels:['250 g · Blueberry','250 g · Cranberry','100 g · Blueberry','100 g · Cranberry','New pack']
+ }]);
 });

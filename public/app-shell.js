@@ -1,7 +1,6 @@
 const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
 if(standalone){
  document.body.classList.add('standalone-app');
- document.getElementById('appInstallGate').hidden=true;
  const screens=['shop','offers','brands','certificate'];
  function showAppScreen(){
   const requested=location.hash.slice(1),active=screens.includes(requested)?requested:'shop';
