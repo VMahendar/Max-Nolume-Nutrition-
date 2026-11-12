@@ -3,32 +3,48 @@
 const PHONE="917708830513";
 const P=[
 {id:"whey",name:"Potency Whey",cat:"whey",size:"5 lbs",featuredIndex:1,variants:[{label:"Chocolate · 5 lbs",price:5500,mrp:8599,img:null},{label:"Coffee · 5 lbs",price:5500,mrp:8599,img:"assets/potency-whey-coffee-5lb.webp"}],desc:"Premium whey protein for daily training and recovery.",img:""},
-{id:"mass",name:"Nitro Mass",cat:"mass",featuredIndex:1,variants:[{label:"3 kg · Double Rich Chocolate",price:2599,img:"assets/nitro-mass-3kg-double-rich-chocolate.webp"},{label:"5 kg · Bucket",price:3499,img:"assets/Screenshot_2026_1103_003852.jpg"}],desc:"Mass gainer available in two pack sizes.",img:""},
+{id:"mass",name:"Nitro Mass",cat:"mass",featuredIndex:1,variants:[{label:"3 kg · Double Rich Chocolate",price:2599,img:null},{label:"5 kg · Bucket",price:3499,img:"assets/Screenshot_2026_1103_003852.jpg"}],desc:"Mass gainer available in a 3 kg box and 5 kg bucket.",img:""},
 {id:"pre",name:"Sturdy Pre-Workout",cat:"pre",variants:[{label:"Watermelon · 250 g",price:1800,mrp:2199,img:"assets/sturdy-watermelon-front.webp",images:[{src:"assets/sturdy-watermelon-front.webp",label:"Front"},{src:"assets/sturdy-watermelon-back.webp",label:"Original back label"}]}],desc:"Pre-workout formula for your training routine.",img:""},
-{id:"creatine",name:"Pro Creatine",cat:"creatine",featuredIndex:1,variants:[{label:"Blueberry · 250 g",price:899,mrp:1499,img:"https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png"},{label:"Cranberry · 250 g",price:899,mrp:1499,img:"assets/pro-creatine.png"}],desc:"Creatine supplement in two flavour options.",img:""},
+{id:"creatine",name:"Pro Creatine",cat:"creatine",featuredIndex:1,variants:[{label:"Blueberry · 250 g",price:899,mrp:1499,img:"https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png"},{label:"Cranberry · 250 g",price:899,mrp:1499,img:"assets/pro-creatine.png"},{label:"Blueberry · 100 g",price:899,img:null},{label:"Cranberry · 100 g",price:899,img:null}],desc:"Creatine in 100 g and 250 g packs.",img:""},
 {id:"vitamins",name:"Musclevite Multivitamin",cat:"vitamins",variants:[{label:"60 tablets",price:699,img:"assets/musclevite-front.webp",images:[{src:"assets/musclevite-front.webp",label:"Front of bottle",alt:"Unicorn Pro Series Musclevite Multivitamin 60 tablets front bottle"},{src:"assets/musclevite-facts.webp",label:"Supplement facts",alt:"Original Musclevite 60-tablet supplement facts panel"},{src:"assets/musclevite-back.webp",label:"Directions and batch label",alt:"Original Musclevite directions, batch and printed MRP label"}]}],desc:"Multivitamin and multimineral supplement. Each bottle contains 60 tablets.",img:""}
 ];
 
-/* The eight invoice-verified packs only; current stock remains subject to confirmation. */
-const retailVariantIds={whey:['whey-chocolate','whey-coffee'],mass:['mass-3kg','mass-5kg'],pre:['pre-watermelon'],creatine:['creatine-blueberry','creatine-cranberry'],vitamins:['musclevite-pack']};
+/* Stable IDs for the built-in offline catalogue. */
+const retailVariantIds={whey:['whey-chocolate','whey-coffee'],mass:['mass-3kg','mass-5kg'],pre:['pre-watermelon'],creatine:['creatine-blueberry','creatine-cranberry','creatine-blueberry-100g','creatine-cranberry-100g'],vitamins:['musclevite-pack']};
+let currentRetailIds=null;
 async function refreshRetailPrices(){
  const response=await fetch('/api/retail/catalog',{cache:'no-store',signal:AbortSignal.timeout(8000)});
  if(!response.ok)throw Error('Current prices are unavailable. Please reconnect and try again.');
  const data=await response.json();
  if(!Array.isArray(data.products)||data.tier!=='retail')throw Error('Current retail prices could not be verified.');
- const mappedIds=new Set(Object.entries(retailVariantIds).filter(([id])=>!id.startsWith('catalog-')).flatMap(([,ids])=>ids));
+ const familyIds={'potency-whey':'whey','nitro-mass':'mass','sturdy-pre':'pre','pro-creatine':'creatine','musclevite':'vitamins'};
+ const seen=new Set();
+ const available=new Set();
  for(const product of data.products){
-  const packs=(product.variants||[]).filter(v=>Number.isSafeInteger(v.pricePaise)&&v.pricePaise>0);
-  if(!packs.length||packs.every(v=>mappedIds.has(v.id)))continue;
-  const id='catalog-'+product.id;if(!/^[a-z0-9-]+$/.test(id))continue;
-  let item=P.find(p=>p.id===id);if(!item){item={id,name:product.name,brand:product.brand,cat:['whey','mass','pre','creatine','vitamins'].includes(product.category)?product.category:'other',desc:product.description||product.subtitle||'',img:product.image||'',variants:[]};P.push(item);}
-  item.name=product.name;item.brand=product.brand;item.desc=product.description||product.subtitle||'';item.img=product.image||'';
-  const previous=new Map(item.variants.map((v,i)=>[retailVariantIds[id]?.[i],v]));
-  item.variants=packs.map(v=>({...previous.get(v.id),label:v.label,price:v.pricePaise/100,img:v.image||product.image||'',...(Number.isSafeInteger(v.mrpPaise)?{mrp:v.mrpPaise/100}:{})}));retailVariantIds[id]=packs.map(v=>v.id);
+  const id=familyIds[product.id]||'catalog-'+product.id;
+  if(!/^[a-z0-9-]+$/.test(id))continue;
+  let item=P.find(p=>p.id===id);
+  for(const pack of product.variants||[]){
+   if(!/^[a-z0-9-]+$/.test(pack.id)||seen.has(pack.id)||!Number.isSafeInteger(pack.pricePaise)||pack.pricePaise<=0)continue;
+   const owner=P.find(p=>retailVariantIds[p.id].includes(pack.id));
+   if(owner&&owner.id!==id)continue;
+   seen.add(pack.id);
+   if(!item){
+    item={id,cat:['whey','mass','pre','creatine','vitamins'].includes(product.category)?product.category:'other',variants:[]};
+    P.push(item);
+    retailVariantIds[id]=[];
+   }
+   item.name=product.name;item.brand=product.brand;item.desc=product.description||product.subtitle||'';
+   const ids=retailVariantIds[id];
+   let index=ids.indexOf(pack.id);
+   if(index===-1){index=ids.length;ids.push(pack.id);}
+   const image=Object.hasOwn(pack,'image')?pack.image:product.image;
+   item.variants[index]={label:pack.label,price:pack.pricePaise/100,img:image||'',images:pack.images,
+    ...(Number.isSafeInteger(pack.mrpPaise)&&pack.mrpPaise>pack.pricePaise?{mrp:pack.mrpPaise/100}:{})};
+   available.add(pack.id);
+  }
  }
- const variants=new Map(data.products.flatMap(p=>p.variants||[]).map(v=>[v.id,v]));
- const updates=P.flatMap(p=>p.variants.map((v,index)=>{const current=variants.get(retailVariantIds[p.id][index]);if(!current||!Number.isSafeInteger(current.pricePaise)||current.pricePaise<=0)throw Error('A selected pack needs price confirmation. Please contact our team.');return {v,current}}));
- for(const {v,current} of updates){v.price=current.pricePaise/100;delete v.mrp;if(Number.isSafeInteger(current.mrpPaise)&&current.mrpPaise>current.pricePaise)v.mrp=current.mrpPaise/100;}
+ currentRetailIds=available;
 }
 const $=id=>document.getElementById(id);
 const safe=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -44,7 +60,7 @@ const failedPackPhotos=new Set();
 function visiblePackOptions(p){
  // A missing or broken photograph must not hide a real, priced supplement.
  // Keep exact-size/flavour product photos optional; never substitute another pack.
- return p.variants.map((v,i)=>({v,i})).filter(({v})=>Number.isFinite(v.price)&&v.price>0);
+ return p.variants.map((v,i)=>({v,i})).filter(({v,i})=>Number.isFinite(v.price)&&v.price>0&&(!currentRetailIds||currentRetailIds.has(retailVariantIds[p.id][i])));
 }
 function displayVariant(p){
  const options=visiblePackOptions(p),matching=options.filter(({v})=>matchesPrice(v));
@@ -55,7 +71,6 @@ function hideFailedPackPhoto(img){
  if(!src||failedPackPhotos.has(src))return;
  failedPackPhotos.add(src);
  render();
- renderPurchasedPacks();
  renderPurchasedPromos();
  renderRecent();
 }
@@ -74,10 +89,24 @@ function renderRecent(){
   button.append(name,price);button.onclick=()=>showDetail(id);return button;
  }));
 }
-try{const v=JSON.parse(localStorage.getItem("mvn-cart-v2")||"{}");if(v&&typeof v==="object")cart=v}catch(e){}
-function getItem(k){if(!/^[a-z0-9-]+\|[0-9]+$/.test(k))return null;const [id,i]=k.split("|");const p=P.find(x=>x.id===id),v=p&&p.variants[Number(i)];return p&&v?{p,v}:null}
-cart=Object.fromEntries(Object.entries(cart).filter(([k,v])=>/^[a-z0-9-]+\|[0-9]+$/.test(k)&&Number.isSafeInteger(v)&&v>0&&v<=999));
-function persist(){try{localStorage.setItem("mvn-cart-v2",JSON.stringify(cart))}catch{}drawCart()}
+function getItem(id){
+ for(const p of P){
+  const index=retailVariantIds[p.id].indexOf(id);
+  if(index!==-1)return {p,v:p.variants[index],variantId:id};
+ }
+ return null;
+}
+try{
+ const stored=localStorage.getItem("mvn-cart-v3");
+ const saved=JSON.parse(stored??localStorage.getItem("mvn-cart-v2")??"{}");
+ for(const [key,qty] of Object.entries(saved||{})){
+  if(!Number.isSafeInteger(qty)||qty<1||qty>999)continue;
+  const [family,index]=key.split("|");
+  const id=stored===null?retailVariantIds[family]?.[Number(index)]:key;
+  if(id&&/^[a-z0-9-]+$/.test(id))cart[id]=qty;
+ }
+}catch{}
+function persist(){try{localStorage.setItem("mvn-cart-v3",JSON.stringify(cart))}catch{}drawCart()}
 function coverImage(p,i){const v=p.variants[Number(i)];return v&&Object.prototype.hasOwnProperty.call(v,"img")?(v.img||""):(p.img||"")}
 function swapPhoto(host,src,name){
  if(!host)return;
@@ -145,7 +174,7 @@ function renderPurchasedPacks(){
  layout.after(section);
  section.querySelector('h2').textContent='Shop supplements';
  section.querySelector('.mvn-purchased-heading p').textContent='Choose your pack and flavour.';
- const all=P.flatMap(p=>p.variants.map((v,i)=>({p,v,i})));
+ const all=P.flatMap(p=>visiblePackOptions(p).map(({v,i})=>({p,v,i})));
  const filtered=all.filter(({p,v})=>(cat==='all'||p.cat===cat)&&matchesPrice(v)&&(p.name+' '+v.label).toLowerCase().includes(q.toLowerCase()));
  const sort=$('sort')?.value||'default';
  if(sort==='low')filtered.sort((a,b)=>a.v.price-b.v.price);
@@ -168,9 +197,9 @@ function renderPurchasedPacks(){
     return '<section class="mvn-product-group" data-group="'+safe(group)+'" aria-label="'+safe(title)+'"><header class="mvn-product-group-heading"><span>UNICORN PRO SERIES</span><h2>'+safe(title)+'</h2><p>'+safe(note)+'</p></header><div class="mvn-product-group-grid">'+grouped.map(item=>item.markup).join('')+'</div></section>';
    }).join('')
   : cards.map(item=>item.markup).join('');
- section.querySelector('#mvn-purchased-grid').innerHTML=html||'<p class="mvn-empty-packs">No purchased variants match this filter.</p>';
- document.body.classList.toggle('app-catalog-ready',all.length>0);
- section.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const pack=purchasedPack(b.dataset.add);if(!pack)return;const key=pack.p.id+'|'+pack.i;cart[key]=Math.min(999,(cart[key]||0)+1);persist();openBag()});
+ section.querySelector('#mvn-purchased-grid').innerHTML=html||'<p class="mvn-empty-packs">'+(all.length?'No packs match these filters.':'No packs are available right now.')+'</p>';
+ document.body.classList.add('app-catalog-ready');
+ section.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const pack=purchasedPack(b.dataset.add);if(!pack)return;const key=b.dataset.add;cart[key]=Math.min(999,(cart[key]||0)+1);persist();openBag()});
  section.querySelectorAll('[data-details]').forEach(b=>b.onclick=()=>{const pack=purchasedPack(b.dataset.details);if(pack)showDetail(pack.p.id,pack.i)});
  section.querySelectorAll('.mvn-purchased-photo img').forEach(img=>img.addEventListener('error',()=>hideFailedPackPhoto(img)));
 }
@@ -225,7 +254,7 @@ function renderAppProduct(){
   stage.querySelector('[aria-pressed="true"]')?.focus();
  });
  stage.querySelector(".app-product-add").onclick=()=>{
-  const cartKey=p.id+"|"+i;
+  const cartKey=retailVariantIds[p.id][i];
   cart[cartKey]=Math.min(999,(cart[cartKey]||0)+1);
   persist();
   openBag();
@@ -235,42 +264,7 @@ function renderAppProduct(){
 
 
 /* Distinct product-first website landing; mobile app retains its own layout. */
-let spotlightProduct='whey',spotlightVariant=null,spotlightQty=1;
-function renderSpotlight(){
- const section=$('mvnSpotlight');if(!section)return;
- const items=['whey','mass','creatine'].map(id=>P.find(p=>p.id===id)).filter(p=>p&&visiblePackOptions(p).some(({i})=>{const src=coverImage(p,i);return src&&!failedPackPhotos.has(src)}));
- if(!items.length){section.hidden=true;return}
- section.hidden=false;
- const p=items.find(p=>p.id===spotlightProduct)||items[0];spotlightProduct=p.id;
- const options=visiblePackOptions(p).filter(({i})=>{const src=coverImage(p,i);return src&&!failedPackPhotos.has(src)});
- if(!options.some(item=>item.i===spotlightVariant))spotlightVariant=options.find(({i})=>i===(p.featuredIndex||0))?.i??options[0]?.i;
- const item=options.find(item=>item.i===spotlightVariant)||options[0];
- if(!item)return;
- const v=item.v,img=$('mvnSpotlightImage'),src=coverImage(p,item.i);
- if(img.getAttribute('src')!==src)img.src=src;
- img.alt=p.name+' '+v.label;
- img.onerror=()=>hideFailedPackPhoto(img);
- $('mvnSpotlightTitle').textContent=p.name;
- $('mvnSpotlightDescription').textContent=p.desc||'Choose your correct pack and order through WhatsApp.';
- $('mvnSpotlightPrice').innerHTML=priceMarkup(v);
- $('mvnSpotlightQty').textContent=spotlightQty;
- $('mvnSpotlightAdd').textContent='ADD TO CART · '+money(v.price*spotlightQty);
- $('mvnSpotlightTabs').innerHTML=items.map(product=>{
-  const i=displayVariant(product),photo=coverImage(product,i);
-  return '<button type="button" data-mvn-product="'+safe(product.id)+'" aria-pressed="'+String(product.id===p.id)+'">'+
-    (photo?'<img src="'+safe(photo)+'" alt="" loading="lazy">':'')+'<span>'+safe(product.name)+'</span></button>';
- }).join('');
- $('mvnSpotlightTabs').querySelectorAll('[data-mvn-product]').forEach(button=>button.onclick=()=>{spotlightProduct=button.dataset.mvnProduct;spotlightVariant=null;spotlightQty=1;renderSpotlight()});
- $('mvnSpotlightVariants').innerHTML=options.map(({v,i})=>'<button type="button" data-mvn-variant="'+i+'" aria-pressed="'+String(i===item.i)+'"><span>'+safe(v.label)+'</span><b>'+money(v.price)+'</b></button>').join('');
- $('mvnSpotlightVariants').querySelectorAll('[data-mvn-variant]').forEach(button=>button.onclick=()=>{spotlightVariant=Number(button.dataset.mvnVariant);spotlightQty=1;renderSpotlight()});
- $('mvnSpotlightMinus').onclick=()=>{spotlightQty=Math.max(1,spotlightQty-1);renderSpotlight()};
- $('mvnSpotlightPlus').onclick=()=>{spotlightQty=Math.min(99,spotlightQty+1);renderSpotlight()};
- $('mvnSpotlightAdd').onclick=()=>{const key=p.id+'|'+item.i;cart[key]=Math.min(999,(cart[key]||0)+spotlightQty);persist();openBag()};
- $('mvnSpotlightDetails').onclick=()=>showDetail(p.id,item.i);
-}
-
 function render(){
- renderSpotlight();
  renderPurchasedPacks();
  renderAppProduct();
 // The website uses this product-family grid. The app displays the individual packs.
@@ -279,27 +273,28 @@ if($("sort").value==="default")items.sort((a,b)=>Number(Boolean(coverImage(b,b.f
 if($("sort").value==="name")items.sort((a,b)=>a.name.localeCompare(b.name));
 if($("sort").value==="low")items.sort((a,b)=>a.variants[displayVariant(a)].price-b.variants[displayVariant(b)].price);
 if($("sort").value==="high")items.sort((a,b)=>b.variants[displayVariant(b)].price-a.variants[displayVariant(a)].price);
-$("grid").innerHTML=items.length?items.map(card).join(""):'<div class="no-products"><h3>No matching products</h3><p>Try clearing your search and filters.</p><button type="button" id="emptyReset">View all products</button></div>';
+$("grid").innerHTML=document.body.classList.contains("app-store")?"":items.length?items.map(card).join(""):'<div class="no-products"><h3>No matching products</h3><p>Try clearing your search and filters.</p><button type="button" id="emptyReset">View all products</button></div>';
 if($("emptyReset"))$("emptyReset").onclick=resetFilters;
 if($("collectionTitle"))$("collectionTitle").textContent=categoryNames[cat];
 document.querySelectorAll("[data-cat]").forEach(button=>{const active=button.dataset.cat===cat;button.classList.toggle("active",active);if(button.tagName==="BUTTON")button.setAttribute("aria-pressed",String(active));});
 const filters=$("activeFilters");if(filters){filters.replaceChildren();for(const [label,clear] of [[q?"Search: "+q:"",()=>{q="";$("q").value="";}],[priceRange!=="all"?priceLabels[priceRange]:"",()=>{priceRange="all";$("priceRange").value="all";}]]){if(!label)continue;const button=document.createElement("button");button.type="button";button.textContent=label+" ×";button.setAttribute("aria-label","Clear "+label);button.onclick=()=>{clear();render()};filters.append(button)}filters.hidden=!filters.childElementCount;}
  document.querySelectorAll(".photo img").forEach(img=>img.addEventListener("error",()=>hideFailedPackPhoto(img)));
-$("resultText").textContent=items.length+" product range"+(items.length===1?"":"s")+" · choose pack and flavour";
+$("resultText").textContent=document.body.classList.contains("app-store")?"Choose your pack and flavour":items.length+" product range"+(items.length===1?"":"s")+" · choose pack and flavour";
 document.querySelectorAll(".variant").forEach(s=>s.addEventListener("change",()=>{const p=P.find(x=>x.id===s.id.slice(2));$("price-"+p.id).innerHTML=priceMarkup(p.variants[Number(s.value)]);swapPhoto(s.closest(".card").querySelector(".photo"),coverImage(p,s.value),p.name)}));
 document.querySelectorAll(".details-link").forEach(b=>b.addEventListener("click",()=>showDetail(b.dataset.detail)));
-document.querySelectorAll(".add").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.id+"|"+$("v-"+b.dataset.id).value;cart[k]=Math.min(999,(cart[k]||0)+1);persist();openBag()}));
+document.querySelectorAll(".add").forEach(b=>b.addEventListener("click",()=>{const k=retailVariantIds[b.dataset.id][$("v-"+b.dataset.id).value];cart[k]=Math.min(999,(cart[k]||0)+1);persist();openBag()}));
 }
 function setCat(c){if(!Object.hasOwn(categoryNames,c))return;cat=c;document.querySelectorAll(".cats [data-cat],.mvn-quick-track [data-cat]").forEach(b=>b.classList.toggle("active",b.dataset.cat===c));render();$("shop").scrollIntoView({behavior:"smooth"})}
 function totals(){let n=0,subtotal=0;for(const [k,qty] of Object.entries(cart)){const item=getItem(k);if(!item)continue;const quantity=Math.min(999,Math.max(0,Number(qty)||0));n+=quantity;subtotal+=item.v.price*quantity;}const discount=appliedOffer?.signature===cartSignature()&&appliedOffer.campaign.code===$("offerCode").value.trim().toUpperCase()&&Date.parse(appliedOffer.campaign.endsAt)>Date.now()?appliedOffer.discountPaise/100:0;return{n,subtotal,discount,total:subtotal-discount}}
 function drawCart(){
 const {n,subtotal,discount,total}=totals();$("count").textContent=n;if($("floatingCount"))$("floatingCount").textContent=n;if($("floatingCart"))$("floatingCart").hidden=!n;
 let html=n?"":'<p class="empty-cart">Your cart is empty. Choose your supplements to get started.</p>';
-for(const [k,qty] of Object.entries(cart)){const item=getItem(k);if(!item)continue;html+='<div class="row"><b>'+safe(item.p.name)+'</b><small>'+safe(item.v.label)+' · '+money(item.v.price)+'</small><div class="qty"><button data-minus="'+k+'" aria-label="Decrease quantity">−</button><span>'+qty+'</span><button data-plus="'+k+'" aria-label="Increase quantity">+</button><strong>'+money(item.v.price*qty)+'</strong></div></div>'}
+for(const [k,qty] of Object.entries(cart)){const item=getItem(k);if(!item){html+='<div class="row"><b>Unavailable pack</b><button type="button" data-remove-pack="'+safe(k)+'">Remove</button></div>';continue;}html+='<div class="row"><b>'+safe(item.p.name)+'</b><small>'+safe(item.v.label)+' · '+money(item.v.price)+'</small><div class="qty"><button data-minus="'+k+'" aria-label="Decrease quantity">−</button><span>'+qty+'</span><button data-plus="'+k+'" aria-label="Increase quantity">+</button><strong>'+money(item.v.price*qty)+'</strong></div></div>'}
 $("items").innerHTML=html;
 $("cart-totals").innerHTML=n?'<div><span>Subtotal</span><b>'+money(subtotal)+'</b></div>'+(discount?'<div><span>Offer savings</span><b>−'+money(discount)+'</b></div><div><span>Products total</span><b>'+money(total)+'</b></div>':''):"";
 $("send").disabled=!n;
 document.querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>{const k=b.dataset.minus;cart[k]-=1;if(cart[k]<=0)delete cart[k];persist()});
+document.querySelectorAll("[data-remove-pack]").forEach(b=>b.onclick=()=>{delete cart[b.dataset.removePack];persist()});
 document.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>{const k=b.dataset.plus;cart[k]=Math.min(999,cart[k]+1);persist()});
 }
 let bagOpener=null;
@@ -313,7 +308,7 @@ const address=$("customerAddress").value.trim(),city=$("customerCity").value.tri
 for(const id of ['customerName','customerAddress','customerCity','customerState'])$(id).setCustomValidity($(id).value.trim()?'':'Please complete this field.');
 if(!$("checkoutFields").reportValidity()||!name||!/^[0-9]{10}$/.test(phone)||!address||!city||!state||!/^[1-9][0-9]{5}$/.test(pincode))return;
 const message=$("priceMessage");const previous=totals().total;$("send").disabled=true;message.textContent="Checking current prices…";
-try{await refreshRetailPrices();if($("offerCode").value.trim())await quoteOffer();drawCart();renderRecent();document.querySelectorAll('.variant').forEach(select=>{const p=P.find(item=>item.id===select.id.slice(2));$("price-"+p.id).innerHTML=priceMarkup(p.variants[Number(select.value)])});}catch(error){message.textContent=error.message;$("send").disabled=false;return;}
+try{await refreshRetailPrices();if(entries.some(([key])=>!currentRetailIds.has(getItem(key)?.variantId)))throw Error('A pack in your cart is unavailable. Remove it before confirming your order.');if($("offerCode").value.trim())await quoteOffer();drawCart();renderRecent();document.querySelectorAll('.variant').forEach(select=>{const p=P.find(item=>item.id===select.id.slice(2));$("price-"+p.id).innerHTML=priceMarkup(p.variants[Number(select.value)])});}catch(error){message.textContent=error.message;$("send").disabled=false;return;}
 if(totals().total!==previous){message.textContent="Prices have been updated. Please review your cart total and confirm again.";$("send").disabled=false;return;}
 message.textContent="";
 entries=Object.entries(cart).filter(([k])=>getItem(k));if(!entries.length)return;
@@ -323,7 +318,7 @@ const offerText=discount?"\nOffer code: "+appliedOffer.campaign.code+"\nOffer sa
 const msg="Hello Max Volume Nutrition, I would like to confirm my order request via WhatsApp:\n\nSelected products:\n"+lines.join("\n")+"\n\nProducts total: "+money(subtotal)+offerText+"\n\nCustomer name: "+name+"\nMobile number: "+phone+"\n\nDelivery address: "+address+"\nCity: "+city+"\nState: "+state+"\nPIN code: "+pincode+"\nPayment preference: "+payment+"\n\nPlease confirm stock, delivery availability, shipping charges and final payable total. Share the payment instructions or payment link on WhatsApp. This message is an order request; payment and shipment are confirmed separately by your team.";
 let whatsappMessage=msg;
  try{
-  const items=entries.map(([k,quantity])=>{const [id,index]=k.split('|');return {variantId:retailVariantIds[id][Number(index)],quantity};});
+  const items=entries.map(([variantId,quantity])=>({variantId,quantity}));
   const response=await fetch('/api/enquiries',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requestKey:retailLeadKey,kind:'retail',name,phone,address,city,state,pincode,paymentPreference:payment,items,offerCode:$("offerCode").value.trim(),acknowledgeStorage:$("leadConsent").checked}),signal:AbortSignal.timeout(10000)});
   const result=await response.json();if(!response.ok||!result.recorded)throw Error(result.error||'Enquiry not saved');
   whatsappMessage+='\n\nEnquiry reference: '+result.id;
@@ -336,7 +331,7 @@ let whatsappMessage=msg;
 }
 async function quoteOffer(){
  const code=$("offerCode").value.trim();
- const requestItems=Object.entries(cart).filter(([key])=>getItem(key)).map(([key,quantity])=>{const [id,index]=key.split('|');return {variantId:retailVariantIds[id][Number(index)],quantity}});
+ const requestItems=Object.entries(cart).filter(([key])=>getItem(key)).map(([variantId,quantity])=>({variantId,quantity}));
  const signature=cartSignature();
  const response=await fetch('/api/promotion-quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,items:requestItems,surface:offerSurface}),signal:AbortSignal.timeout(8000)});
  const data=await response.json();
@@ -386,12 +381,11 @@ installCategoryShortcuts();render();drawCart();renderRecent();
 refreshRetailPrices().then(()=>{render();drawCart();renderRecent()}).catch(error=>{if($("priceMessage"))$("priceMessage").textContent=error.message});
 
 
-/* Website-only premium product detail. The installed app intentionally retains its own layout. */
-function showWebsiteProductDetail(p,options,initialIndex,dlg,root){
+function showProductDetail(p,options,initialIndex,dlg,root){
  let current=initialIndex,quantity=1,photoIndex=0;
  const productPhotos=index=>{
   const variant=p.variants[index],primary=coverImage(p,index);
-  const images=(Array.isArray(variant?.images)?variant.images:[]).map(photo=>typeof photo==='string'?{src:photo,label:'Product view'}:photo).filter(photo=>photo?.src).map(photo=>photo.src==='assets/sturdy-watermelon-back.webp'?{...photo,src:'assets/sturdy-watermelon-back-studio.svg',label:'Back label — authentic photo'}:photo);
+  const images=(Array.isArray(variant?.images)?variant.images:[]).map(photo=>typeof photo==='string'?{src:photo,label:'Product view'}:photo).filter(photo=>photo?.src);
   if(primary&&!images.some(photo=>photo.src===primary))images.unshift({src:primary,label:'Front'});
   return images;
  };
@@ -445,7 +439,7 @@ function showWebsiteProductDetail(p,options,initialIndex,dlg,root){
  packButtons.forEach(button=>button.addEventListener('click',()=>{current=Number(button.dataset.mvnPack);photoIndex=0;update()}));
  root.querySelectorAll('[data-mvn-qty]').forEach(button=>button.addEventListener('click',()=>{quantity=Math.max(1,Math.min(99,quantity+Number(button.dataset.mvnQty)));update()}));
  const addToOrder=(review)=>{
-  const key=p.id+'|'+current;
+  const key=retailVariantIds[p.id][current];
   cart[key]=Math.min(999,(cart[key]||0)+quantity);
   persist();dlg.close();openBag();
   if(review)$('customerName')?.focus();
@@ -461,16 +455,11 @@ function showDetail(id,chosenIndex){
  recent=[id,...recent.filter(value=>value!==id)].slice(0,4);try{localStorage.setItem("mvn-recent-v1",JSON.stringify(recent))}catch{}renderRecent();
  const dlg=$("productDialog"),root=$("productDetail");
  const selected=Number(chosenIndex ?? $("v-"+id)?.value ?? displayVariant(p));
- const options=document.body.classList.contains('app-store')?p.variants.map((v,i)=>({v,i})):visiblePackOptions(p);
+ const options=visiblePackOptions(p);
  const initialIndex=options.some(({i})=>i===selected)?selected:options[0]?.i;
  if(initialIndex===undefined)return;
- if(!document.body.classList.contains('app-store'))return showWebsiteProductDetail(p,options,initialIndex,dlg,root);
- const cover=coverImage(p,initialIndex);const photo=cover?'<img src="'+safe(cover)+'" alt="'+safe(p.name)+'" loading="lazy"><div class="placeholder" hidden>Verified product image pending</div>':'<div class="placeholder"><b>'+safe(p.name)+'</b>Verified product image pending</div>';
- root.innerHTML='<div class="detail-layout"><div class="detail-photo">'+photo+'</div><div class="detail-copy"><span class="eyebrow dark">'+safe(p.brand||'Unicorn Pro Series')+'</span><h2>'+safe(p.name)+'</h2><p>'+safe(p.desc)+'</p><p class="detail-note">Product pack and flavour availability are confirmed before fulfilment. Front/back pack-label and ingredient photos will be added after verification; please request the current label when ordering.</p><label for="detail-variant">FLAVOUR / PACK SIZE</label><select id="detail-variant">'+options.map(({v,i})=>'<option value="'+i+'"'+(i===initialIndex?' selected':'')+'>'+safe(v.label)+'</option>').join("")+'</select><div class="price detail-price" id="detail-price">'+priceMarkup(p.variants[initialIndex])+'</div><button class="primary" id="detail-add">ADD TO CART +</button></div></div>';
- swapPhoto(root.querySelector(".detail-photo"),coverImage(p,initialIndex),p.name);
- const sel=$("detail-variant");sel.onchange=()=>{$("detail-price").innerHTML=priceMarkup(p.variants[Number(sel.value)]);swapPhoto(root.querySelector(".detail-photo"),coverImage(p,sel.value),p.name)};
- $("detail-add").onclick=()=>{const k=p.id+"|"+sel.value;cart[k]=Math.min(999,(cart[k]||0)+1);persist();dlg.close();openBag()};
- if(typeof dlg.showModal==="function")dlg.showModal();else dlg.setAttribute("open","");
+ return showProductDetail(p,options,initialIndex,dlg,root);
+
 }
 $("detailClose").onclick=()=>$("productDialog").close();
 

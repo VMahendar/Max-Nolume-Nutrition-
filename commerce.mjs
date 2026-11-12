@@ -150,8 +150,48 @@ tx(()=>{
  set(key,true);
 });
 
-// Correct Pro Creatine packs in persistent stores created before the verified 250 g photos were available.
-tx(()=>{const row=db.prepare("SELECT data FROM products WHERE id='pro-creatine'").get();if(!row)return;const p=JSON.parse(row.data);let changed=false;const description='Unicorn Pro Series Pro Creatine in 250 g packs. Choose Blueberry or Cranberry. Read the pack label for ingredients and directions.';if(p.description!==description){p.description=description;changed=true;}if(p.image!==null){p.image=null;changed=true;}for(const v of p.variants){const image=v.id==='creatine-blueberry'?'https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png':'assets/pro-creatine.png';const label=v.id==='creatine-blueberry'?'250 g · Blueberry':'250 g · Cranberry';if(v.label!==label){v.label=label;changed=true;}if(v.image!==image){v.image=image;changed=true;}}if(changed)db.prepare("UPDATE products SET data=? WHERE id='pro-creatine'").run(JSON.stringify(p));});
+// Backfill missing SKUs without changing existing order IDs, stock or owner pricing.
+if(!setting('retail-catalogue-packs-20261112'))tx(()=>{
+ const read=db.prepare('SELECT data FROM products WHERE id=?');
+ const insert=db.prepare('INSERT INTO products VALUES(?,?)');
+ const update=db.prepare('UPDATE products SET data=? WHERE id=?');
+ const inventory=db.prepare('INSERT OR IGNORE INTO inventory(variant_id,on_hand) VALUES(?,?)');
+ for(const seed of seedProducts){
+  const row=read.get(seed.id);
+  if(!row){
+   insert.run(seed.id,JSON.stringify(seed));
+   for(const variant of seed.variants)inventory.run(variant.id,variant.stock);
+   continue;
+  }
+  const product=JSON.parse(row.data);
+  let changed=false;
+  for(const variant of seed.variants){
+   if(product.variants.some(existing=>existing.id===variant.id))continue;
+   product.variants.push(variant);
+   inventory.run(variant.id,variant.stock);
+   changed=true;
+  }
+  if(seed.id==='pro-creatine'&&product.description?.includes('in 250 g packs')){
+   product.description=seed.description;
+   changed=true;
+  }
+  if(seed.id==='nitro-mass'){
+   const variant=product.variants.find(v=>v.id==='mass-3kg');
+   const jar='assets/nitro-mass-3kg-double-rich-chocolate.webp';
+   if(variant.image===jar){variant.image=null;changed=true;}
+   if(variant.images?.some(entry=>(typeof entry==='string'?entry:entry.src)===jar)){
+    variant.images=variant.images.filter(entry=>(typeof entry==='string'?entry:entry.src)!==jar);
+    changed=true;
+   }
+   if(product.description?.includes('3 kg jar')){
+    product.description=product.description.replace('3 kg jar','3 kg box');
+    changed=true;
+   }
+  }
+  if(changed)update.run(JSON.stringify(product),seed.id);
+ }
+ set('retail-catalogue-packs-20261112',true);
+});
 function reserved(){const amounts=new Map();for(const row of db.prepare("SELECT payload FROM orders WHERE status IN ('preparing','pending','provider_review')").all())for(const l of JSON.parse(row.payload).lines)amounts.set(l.variantId,(amounts.get(l.variantId)||0)+l.quantity);return amounts;}
 function catalogue(user,admin=false){const held=reserved(),tier=pricingTier(user);return db.prepare('SELECT data FROM products ORDER BY rowid').all().map(row=>{const p=JSON.parse(row.data);if(p.id==='potency-whey'){if(retiredWheySources.has(p.image))p.image=null;if(Array.isArray(p.images))p.images=p.images.filter(removeOldWheyPhoto);}if(p.id==='potency-whey'&&approvedWheyImage&&p.image==='assets/potency-whey.png')p.image=approvedWheyImage;if(p.id==='nitro-mass'&&approvedMassImage&&(!p.image||p.image==='assets/nitro-mass-5kg.jpg'))p.image=approvedMassImage;if(p.id==='pro-creatine'&&p.image==='assets/pro-creatine.png')p.image=null;if(p.id==='sturdy-pre'&&p.image==='assets/sturdy-pre-workout.png')p.image=null;p.brand ||= ['potency-whey','nitro-mass','pro-creatine','sturdy-pre','musclevite'].includes(p.id)?'Unicorn Pro Series':'Brand to confirm';p.variants=p.variants.map(v=>{if(p.id==='potency-whey'){if(retiredWheySources.has(v.image))v={...v,image:null};if(Array.isArray(v.images))v={...v,images:v.images.filter(removeOldWheyPhoto)};}if(p.id==='pro-creatine'){
  if(v.id==='creatine-blueberry'&&(!v.image||v.image==='assets/pro-creatine.png'))v={...v,image:'https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png'};
@@ -163,7 +203,7 @@ if(p.id==='sturdy-pre'&&v.id==='pre-watermelon'&&v.image==='assets/sturdy-pre-wo
   const legacyPrices=!Object.hasOwn(v,'prices')&&reference.prices?{prices:{...reference.prices}}:{};
   v={...v,...legacyPrices,label:reference.label};
  }
- if(!v.image||v.image===approvedMassImage)v={...v,image:reference.image,images:reference.images};
+ if(!v.image||v.image===approvedMassImage)v={...v,image:reference.image,images:v.images?.length?v.images:reference.images};
  }if(!Object.hasOwn(v,'mrpPaise')&&reference?.productId===p.id&&reference.label===v.label&&Number.isSafeInteger(reference.mrpPaise)&&reference.mrpPaise>=Math.max(v.pricePaise||0,...Object.values(v.prices||{})))v={...v,mrpPaise:reference.mrpPaise};const inv=db.prepare('SELECT * FROM inventory WHERE variant_id=?').get(v.id);let price=v.pricePaise;if(!admin&&tier!=='retail')price=v.prices?.[tier]??null;const result={...v,pricePaise:price,stock:inv?.on_hand===null?null:Math.max(0,(inv?.on_hand??0)-(held.get(v.id)||0))};if(admin)return {...result,onHand:inv?.on_hand,reserved:held.get(v.id)||0,version:inv?.version??0};delete result.prices;return result;});return p;});}
 function pricingTier(user){if(!user)return 'retail';const d=db.prepare("SELECT kind FROM dealers WHERE user_id=? AND status='approved'").get(user.id);return d?.kind||'retail';}
 function session(req){const raw=req.headers.cookie?.split(';').map(x=>x.trim()).find(x=>x.startsWith('mvn_session='))?.slice(12);if(!raw)return null;return db.prepare('SELECT u.* FROM users u JOIN sessions s ON u.id=s.user_id WHERE s.token=? AND s.expires>?').get(hash(raw),Date.now())||null;}

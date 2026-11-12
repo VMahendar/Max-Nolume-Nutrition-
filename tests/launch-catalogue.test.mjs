@@ -5,17 +5,17 @@ import {tmpdir} from 'node:os';
 import {resolve} from 'node:path';
 import {openCommerce} from '../commerce.mjs';
 
-test('eight verified retail variants retain published customer prices and private approved dealer tiers',()=>{
+test('ten retail variants retain published customer prices and private approved dealer tiers',()=>{
  const dir=mkdtempSync(resolve(tmpdir(),'mvn-launch-prices-'));
  let c;
  try{
   c=openCommerce(dir);
   const guest=c.catalogue(null);
   const variants=guest.flatMap(p=>p.variants);
-  assert.equal(variants.length,8);
+  assert.equal(variants.length,10);
   const retail={
    'whey-chocolate':550000,'whey-coffee':550000,'mass-5kg':349900,'mass-3kg':259900,
-   'creatine-blueberry':89900,'creatine-cranberry':89900,'pre-watermelon':180000,'musclevite-pack':69900
+   'creatine-blueberry':89900,'creatine-cranberry':89900,'creatine-blueberry-100g':89900,'creatine-cranberry-100g':89900,'pre-watermelon':180000,'musclevite-pack':69900
   };
   for(const v of variants){assert.equal(v.pricePaise,retail[v.id],v.id+' retail price');assert.equal(Object.hasOwn(v,'prices'),false,'never expose private rates to guest');}
   for(const [id,kind] of [['gym','gym'],['wholesale','wholesale'],['pending','wholesale']]){
@@ -31,6 +31,7 @@ test('eight verified retail variants retain published customer prices and privat
    'whey-chocolate':[385000,420000],'whey-coffee':[385000,420000],
    'mass-5kg':[265000,285000],'mass-3kg':[195000,215000],
    'creatine-blueberry':[65000,75000],'creatine-cranberry':[65000,75000],
+   'creatine-blueberry-100g':[65000,75000],'creatine-cranberry-100g':[65000,75000],
    'pre-watermelon':[105000,115000],'musclevite-pack':[45000,50000]
   };
   for(const [id,[bulk,studio]]of Object.entries(expected)){
@@ -51,7 +52,7 @@ test('eight verified retail variants retain published customer prices and privat
  }finally{try{c?.db.close()}finally{rmSync(dir,{recursive:true,force:true})}}
 });
 
-test('public catalogue matches both Pro Creatine 250 g flavour photos, and keeps the 5kg bucket separate from the 3kg jar',()=>{
+test('public catalogue matches both Pro Creatine 250 g flavour photos, and keeps the 5 kg bucket photo off the 3 kg box',()=>{
  const dir=mkdtempSync(resolve(tmpdir(),'mvn-launch-media-'));
  let c;
  try{
@@ -60,7 +61,7 @@ test('public catalogue matches both Pro Creatine 250 g flavour photos, and keeps
   assert.equal(creatine.image,null);
   assert.equal(creatine.variants.find(v=>v.id==='creatine-blueberry').image,'https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png');
   assert.equal(creatine.variants.find(v=>v.id==='creatine-cranberry').image,'assets/pro-creatine.png');
-  assert.equal(mass.variants.find(v=>v.id==='mass-3kg').image,'assets/nitro-mass-3kg-double-rich-chocolate.webp');
+  assert.equal(mass.variants.find(v=>v.id==='mass-3kg').image,null);
   assert.equal(mass.variants.find(v=>v.id==='mass-5kg').image,'assets/Screenshot_2026_1103_003852.jpg');
   assert.equal(mass.variants.find(v=>v.id==='mass-5kg').images[0].src,'assets/Screenshot_2026_1103_003852.jpg');
   const whey=all.find(p=>p.id==='potency-whey');
@@ -75,4 +76,33 @@ test('public catalogue matches both Pro Creatine 250 g flavour photos, and keeps
   assert.equal(corrected.variants[0].image,'https://unicornproseries.com/wp-content/uploads/2026/05/Pro-Creatine-Blueberry-1.png');
   assert.equal(corrected.variants[1].image,'assets/pro-creatine.png','legacy generic image must be assigned only to Cranberry');
  }finally{try{c?.db.close()}finally{rmSync(dir,{recursive:true,force:true})}}
+});
+
+test('catalogue backfill adds both 100 g packs once and preserves existing inventory and retail prices',()=>{
+ const dir=mkdtempSync(resolve(tmpdir(),'mvn-pack-backfill-'));
+ let c;
+ try{
+  c=openCommerce(dir);
+  const id='pro-creatine';
+  const product=JSON.parse(c.db.prepare('SELECT data FROM products WHERE id=?').get(id).data);
+  product.description=product.description.replace('100 g and 250 g','250 g');
+  product.variants=product.variants.filter(pack=>!pack.id.endsWith('-100g'));
+  product.variants[0].pricePaise=94900;
+  c.db.prepare('UPDATE products SET data=? WHERE id=?').run(JSON.stringify(product),id);
+  c.db.prepare("DELETE FROM inventory WHERE variant_id LIKE 'creatine-%-100g'").run();
+  c.db.prepare("UPDATE inventory SET on_hand=7 WHERE variant_id='creatine-blueberry'").run();
+  c.db.prepare("DELETE FROM settings WHERE key='retail-catalogue-packs-20261112'").run();
+  c.db.close();
+  for(let restart=0;restart<2;restart++){
+   c=openCommerce(dir);
+   const packs=c.catalogue(null).find(p=>p.id===id).variants;
+   assert.equal(new Set(packs.map(pack=>pack.id)).size,4);
+   assert.equal(packs.length,4);
+   assert.equal(packs.find(pack=>pack.id==='creatine-blueberry').stock,7);
+   assert.equal(packs.find(pack=>pack.id==='creatine-blueberry').pricePaise,94900);
+   assert.equal(packs.find(pack=>pack.id==='creatine-blueberry-100g').stock,null);
+   assert.equal(packs.find(pack=>pack.id==='creatine-cranberry-100g').image,null);
+   c.db.close();
+  }
+ }finally{try{if(c?.db.isOpen)c.db.close()}finally{rmSync(dir,{recursive:true,force:true})}}
 });

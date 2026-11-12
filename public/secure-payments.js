@@ -48,7 +48,7 @@
   try{
    const response=await fetch('/api/retail/catalog',{cache:'no-store'});if(!response.ok)throw Error('Current payment readiness could not be checked.');const current=await response.json();if(current.paymentReady!==true)throw Error('Online payments are unavailable. No payment has been taken.');
    const snapshot=Object.fromEntries(Object.entries(cart).filter(([key])=>getItem(key)));
-   const items=Object.entries(snapshot).map(([key,quantity])=>{const [id,index]=key.split('|');return {variantId:retailVariantIds[id]?.[Number(index)],quantity};});if(!items.length)throw Error('Add products to your cart first.');
+   const items=Object.entries(snapshot).map(([variantId,quantity])=>({variantId,quantity}));if(!items.length)throw Error('Add products to your cart first.');
    const customer=Object.fromEntries([['name','customerName'],['phone','customerPhone'],['address','customerAddress'],['city','customerCity'],['state','customerState'],['pincode','customerPincode']].map(([key,id])=>[key,document.getElementById(id).value.trim()]));customer.email=email.value.trim();
    const payload={items,customer,acceptedTerms:terms.checked,pricing:'retail'};
    const digest=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(payload))))].map(n=>n.toString(16).padStart(2,'0')).join('');

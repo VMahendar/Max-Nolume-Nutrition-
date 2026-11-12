@@ -3,7 +3,7 @@
   "appName": "MVN Store Preview",
   "webDir": "www",
   "server": {
-    "url": "https://max-volume-nutrition-preview.onrender.com",
+    "url": "https://max-volume-nutrition-preview.onrender.com/mobile-app.html",
     "cleartext": false
   }
 }
