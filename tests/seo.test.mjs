@@ -16,7 +16,7 @@ const publicPages=[
 const productPages=publicPages.filter(path=>path.includes('whey')||path.includes('mass.')||path.includes('creatine.')||path.includes('pre-workout.')||path.includes('multivitamin.'));
 const htmlFile=path=>'public/'+(path==='/'?'index.html':path.slice(1));
 const page=path=>readFileSync(htmlFile(path),'utf8');
-const structuredData=html=>[...html.matchAll(/<script type="application\\/ld\\+json">([\\s\\S]*?)<\\/script>/g)].map(match=>JSON.parse(match[1]));
+const structuredData=html=>[...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(match=>JSON.parse(match[1]));
 const sitemap=readFileSync('public/sitemap.xml','utf8');
 const robots=readFileSync('public/robots.txt','utf8');
 
@@ -24,14 +24,14 @@ test('public SEO URLs have unique titles, descriptions, canonicals and sitemap e
   const titles=new Set();
   for(const path of publicPages){
     const html=page(path);
-    const title=html.match(/<title>([\\s\\S]*?)<\\/title>/i)?.[1];
+    const title=html.match(/<title>([\s\S]*?)<\/title>/i)?.[1];
     assert.ok(title?.trim(),path+' missing title');
     assert.ok(!titles.has(title),path+' duplicate title');titles.add(title);
     assert.match(html,/<meta name="description" content="[^"]{40,}"/i,path);
     assert.ok(html.includes('rel="canonical" href="'+domain+path+'"'),path+' canonical mismatch');
     assert.ok(html.includes('name="robots" content="index, follow'),path+' missing index setting');
     assert.ok(sitemap.includes('<loc>'+domain+path+'</loc>'),path+' missing from sitemap');
-    assert.match(html,/<h1[\\s>]/i,path+' has no visible heading');
+    assert.match(html,/<h1[\s>]/i,path+' has no visible heading');
   }
   assert.equal((sitemap.match(/<loc>/g)||[]).length,publicPages.length,'sitemap entries should not contain private pages');
   assert.ok(robots.includes('Sitemap: '+domain+'/sitemap.xml'));
@@ -50,7 +50,7 @@ test('product detail pages expose truthful Product and BreadcrumbList data with 
     assert.equal(breadcrumbs?.itemListElement?.[0]?.item,domain+'/',path+' missing home breadcrumb');
     assert.equal(breadcrumbs?.itemListElement?.[1]?.item,domain+path,path+' missing product breadcrumb');
     assert.ok(html.includes('id="mvnRelatedProducts"'),path+' missing related products');
-    assert.ok((html.match(/<li><a href="\\/(?:potency-whey|nitro-mass|pro-creatine|sturdy-pre-workout|musclevite-multivitamin)\\.html">/g)||[]).length>=2,path+' needs related product links');
+    assert.ok((html.match(/<li><a href="\/(?:potency-whey|nitro-mass|pro-creatine|sturdy-pre-workout|musclevite-multivitamin)\.html">/g)||[]).length>=2,path+' needs related product links');
     assert.ok(!product.offers,'Do not imply an unverified online checkout/price');
   }
 });
