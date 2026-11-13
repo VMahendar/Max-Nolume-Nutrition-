@@ -20,7 +20,13 @@ export function stagingGate(env=process.env){
       '/','/index.html','/robots.txt','/sitemap.xml','/dealer.html','/support.html',
       '/potency-whey.html','/nitro-mass.html','/pro-creatine.html',
       '/sturdy-pre-workout.html','/musclevite-multivitamin.html',
-      '/icons/app-192.png','/favicon.ico'
+      '/icons/app-192.png','/favicon.ico',
+      // Public, approved product images and brand artwork only; private assets remain noindex.
+      '/max-volume-logo-wide.png','/max-volume-logo.png',
+      '/assets/potency-whey-coffee-5lb.webp',
+      '/assets/Screenshot_2026_1103_003852.jpg',
+      '/assets/sturdy-watermelon-front.webp',
+      '/assets/musclevite-front.webp'
     ]);
     const publicIndexing=publicBrowsing&&env.STAGING_PUBLIC_INDEXING==='true'&&
       ['GET','HEAD'].includes(req.method)&&publiclyIndexable.has(new URL(req.url,'http://localhost').pathname);
