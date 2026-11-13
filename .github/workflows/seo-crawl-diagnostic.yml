@@ -1,0 +1,39 @@
+name: MVN public Google crawl readiness probe
+on:
+  push:
+    branches:
+      - seo/live-readiness-check-20261114
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check public DNS, TLS, pages and Googlebot headers
+        shell: bash
+        run: |
+          set -uo pipefail
+          echo '### Resolve the official domain'
+          getent ahostsv4 maxvolumenutriton.shop | head -3 || true
+          echo '### Check canonical public URLs'
+          BASE=https://maxvolumenutriton.shop
+          for path in / /robots.txt /sitemap.xml /dealer.html /support.html /potency-whey.html /nitro-mass.html /pro-creatine.html /sturdy-pre-workout.html /musclevite-multivitamin.html /admin.html /account.html /owner-preview; do
+            echo "--- URL: ${BASE}${path}"
+            headers=$(mktemp)
+            body=$(mktemp)
+            status=$(curl --silent --show-error --location --max-redirs 3 --connect-timeout 12 --max-time 28 --user-agent 'Googlebot' --dump-header "$headers" --output "$body" --write-out '%{http_code}' "${BASE}${path}") || status="CURL_ERROR"
+            echo "STATUS=$status"
+            grep -iE '^(HTTP/|location:|x-robots-tag:|content-type:|www-authenticate:|cache-control:)' "$headers" | head -12 || true
+            if [[ "$path" == "/robots.txt" || "$path" == "/sitemap.xml" ]]; then head -c 1600 "$body"; echo; fi
+            if [[ "$path" == "/" ]]; then
+              grep -ioE '<title>[^<]*|<link rel="canonical"[^>]*' "$body" | head -4 || true
+            fi
+            rm -f "$headers" "$body"
+          done
+          echo "### Check historical alias responses"
+          for host in https://max-volume-nutrition-preview.onrender.com https://max-volume-nutrition.wrydegu128.chatgpt.site; do
+            code=$(curl --silent --show-error --location --max-redirs 2 --connect-timeout 8 --max-time 18 --output /dev/null --write-out '%{http_code}' "$host/" || true)
+            echo "$host -> ${code:-CURL_ERROR}"
+          done
+          echo "Read-only public probe complete."
