@@ -187,6 +187,7 @@
 </style>
 <link rel="stylesheet" href="product-experience.css?v=20261110-visualfix2">
 <link rel="stylesheet" href="mvn-spotlight.css?v=20261113-headerfix">
+<link rel="stylesheet" href="option-two-product-store.css?v=20261113-option2-a">
 </head>
 <body class="retail-home">
 <!-- Keep original MVN artwork; remove only its dark rectangle at display time. -->
@@ -201,6 +202,13 @@
 </div>
 <header class="storehead">
   <a class="brand brand-identity" href="index.html" aria-label="Max Volume Nutrition home"><img class="original-brand-logo" src="max-volume-logo-wide.png" alt="Max Volume Nutrition — original business logo"><span class="mvn-header-wordmark" aria-hidden="true"><strong>MAX VOLUME</strong><span>NUTRITION</span></span></a>
+  <nav class="option2-site-nav" aria-label="Store navigation" style="display:none">
+    <a href="#shop" data-cat="all">PRODUCTS</a>
+    <a href="#shop" data-cat="whey">WHEY PROTEIN</a>
+    <a href="#shop" data-cat="mass">MASS GAINERS</a>
+    <a href="dealer.html">WHOLESALE</a>
+    <a href="support.html">SUPPORT</a>
+  </nav>
   <div class="header-search">
     <span class="header-descriptor">SPORTS NUTRITION • RETAIL & DISTRIBUTION</span>
     <form id="search" role="search"><span aria-hidden="true">⌕</span><input id="q" autocomplete="off" aria-label="Search products" placeholder="Search supplements"><button type="submit">SEARCH</button></form>
@@ -260,11 +268,18 @@
   <button type="button" data-cat="creatine"><b>CREATINE</b><small>Shop creatine →</small></button>
 </section>
 <main id="shop">
+  <div class="option2-shop-heading" style="display:none">SHOP OUR<br>PRODUCTS</div>
   <div class="section-title"><div><span class="eyebrow dark">SPORTS NUTRITION · CURATED FOR YOU</span><h2>SHOP THE <strong>COLLECTION.</strong></h2></div><p>Explore verified pack variants and customer selling prices. Order requests are confirmed directly with our team.</p></div>
   <div class="productbar"><div><span class="eyebrow dark">AVAILABLE TO ORDER</span><h3 id="collectionTitle">ALL PRODUCTS</h3><span id="resultText" role="status" aria-live="polite">Current collection</span></div><label class="sort-label">SORT BY <select id="sort"><option value="default">Featured</option><option value="name">Name A–Z</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option></select></label></div>
   <div class="cats"><button class="active" data-cat="all" type="button">ALL PRODUCTS</button><button data-cat="whey" type="button">WHEY</button><button data-cat="mass" type="button">MASS GAINER</button><button data-cat="creatine" type="button">CREATINE</button><button data-cat="pre" type="button">PRE-WORKOUT</button><button data-cat="vitamins" type="button">VITAMINS</button></div>
   <div class="shopping-layout">
   <aside class="collection-filters" aria-label="Collection filters">
+    <div class="option2-goal-filters" style="display:none" aria-label="Shop by goal">
+      <strong>GOAL</strong>
+      <button type="button" data-cat="whey">BUILD MUSCLE</button>
+      <button type="button" data-cat="mass">WEIGHT GAIN</button>
+      <button type="button" data-cat="creatine">PERFORMANCE</button>
+    </div>
     <div class="filter-heading"><h3>Refine your selection</h3><button type="button" id="resetFilters">Reset</button></div>
     <label for="priceRange">PRICE PER PACK</label>
     <select id="priceRange"><option value="all">All prices</option><option value="under1000">Under ₹1,000</option><option value="1000to3000">₹1,000 – ₹3,000</option><option value="over3000">Over ₹3,000</option></select>
