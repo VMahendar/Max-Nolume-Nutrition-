@@ -40,6 +40,9 @@ jobs:
       - name: Verify disabled-provider checkout safety
         if: ${{ !cancelled() && steps.chromium.outcome == 'success' }}
         run: node tests/secure-payments-qa.mjs
+      - name: Verify public official domain, Option 2 layout and retail catalogue
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: node tests/live-http-smoke.mjs
       - name: Preserve browser screenshots and QA report
         if: always()
         uses: actions/upload-artifact@v4
