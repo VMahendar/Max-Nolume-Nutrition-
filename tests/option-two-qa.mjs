@@ -82,6 +82,35 @@ try {
    assert.ok(measurements.firstProduct.y-measurements.categories.bottom<=92,
      'no oversized blank area between categories and product cards');
   }
+  const visual=await page.evaluate(()=>{
+   const style=selector=>getComputedStyle(document.querySelector(selector));
+   const image=document.querySelector('#grid article.card .photo img');
+   return {
+    headerBackground:style('.storehead').backgroundImage,
+    logoLoaded:document.querySelector('.storehead .original-brand-logo').naturalWidth>0,
+    accountColor:style('.storehead .account-link').color,
+    cartColor:style('.storehead #bag').color,
+    nameColor:style('#grid article.card .info h3').color,
+    nameFontSize:parseFloat(style('#grid article.card .info h3').fontSize),
+    nameFontWeight:Number(style('#grid article.card .info h3').fontWeight),
+    sellingFontSize:parseFloat(style('#grid article.card .selling-price').fontSize),
+    priceColor:style('#grid article.card .selling-price').color,
+    photoBackground:style('#grid article.card .photo').backgroundImage,
+    photoNaturalWidth:image.naturalWidth
+   };
+  });
+  console.log('OPTION2_CHARCOAL_VISUAL',size.name,JSON.stringify(visual));
+  assert.match(visual.headerBackground,/linear-gradient/,'charcoal header gradient');
+  assert.ok(visual.headerBackground.includes('rgb(43, 46, 51)') || visual.headerBackground.includes('rgb(37, 40, 45)'),
+    'approved charcoal-grey appears in the header');
+  assert.ok(visual.logoLoaded,'original gold MVN header artwork loads');
+  assert.equal(visual.accountColor,'rgb(255, 255, 255)','account icon is white on charcoal');
+  assert.equal(visual.cartColor,'rgb(255, 255, 255)','cart icon is white on charcoal');
+  assert.ok(visual.nameFontSize>=15,'product titles are legible and prominent');
+  assert.ok(visual.nameFontWeight>=800,'product titles use strong weight');
+  assert.ok(visual.sellingFontSize>=19,'retail selling price stands out');
+  assert.ok(visual.photoBackground.includes('linear-gradient'),'product image area has a clean premium backdrop');
+  assert.ok(visual.photoNaturalWidth>0,'real merchandise photography loads');
   assert.equal(geometry.columns,size.columns,size.name+' expected product columns');
   assert.ok(geometry.titleBackground.includes('linear-gradient'),size.name+' navy/cyan header');
   assert.ok(geometry.heroHidden,size.name+' old hero must not interrupt product-first display');
