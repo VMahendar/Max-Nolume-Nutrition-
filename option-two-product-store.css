@@ -948,3 +948,184 @@ body.retail-home:not(.app-store) .storehead .brand-identity .original-brand-logo
     min-height:0!important;
   }
 }
+
+
+/* MVN approved 14 Nov charcoal-grey + gold visual finish.
+   Website-only presentation: no catalogue, orders, checkout, or app changes. */
+body.retail-home:not(.app-store) .storehead {
+  background:linear-gradient(118deg,#25282d 0%,#35393f 56%,#292c31 100%)!important;
+  border-bottom:1px solid #444951!important;
+  box-shadow:0 2px 9px rgba(16,20,26,.12)!important;
+}
+body.retail-home:not(.app-store) .storehead .brand-identity {
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  filter:none!important;
+  mix-blend-mode:normal!important;
+}
+body.retail-home:not(.app-store) .storehead .brand-identity .original-brand-logo {
+  object-fit:contain!important;
+  object-position:left center!important;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.25))!important;
+  mix-blend-mode:normal!important;
+}
+body.retail-home:not(.app-store) .storehead .option2-site-nav a,
+body.retail-home:not(.app-store) .storehead .head-actions a.account-link,
+body.retail-home:not(.app-store) .storehead .head-actions #bag {
+  color:#fff!important;
+}
+body.retail-home:not(.app-store) .storehead .option2-site-nav a:hover,
+body.retail-home:not(.app-store) .storehead .option2-site-nav a:focus-visible {
+  color:#efcc88!important;
+}
+body.retail-home:not(.app-store) .storehead .head-actions svg {
+  stroke:#fff!important;
+}
+body.retail-home:not(.app-store) .storehead .head-actions #bag {
+  background:transparent!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
+body.retail-home:not(.app-store) .storehead .head-actions #bag em {
+  background:#13a5dd!important;
+  color:#fff!important;
+  font-weight:900!important;
+}
+body.retail-home:not(.app-store) .storehead #search {
+  background:#fff!important;
+  border:1px solid #d7dce2!important;
+  border-radius:5px!important;
+  padding:0 9px!important;
+}
+body.retail-home:not(.app-store) .storehead #search input {
+  color:#17202a!important;
+  font-size:13px!important;
+}
+body.retail-home:not(.app-store) #shop .collection-results .card {
+  border:1px solid #e2e7ee!important;
+  border-radius:9px!important;
+  box-shadow:0 4px 15px rgba(20,34,48,.08)!important;
+  background:#fff!important;
+}
+body.retail-home:not(.app-store) #shop .collection-results .card .photo {
+  background:linear-gradient(155deg,#f7f9fc 0%,#eff3f8 100%)!important;
+  padding:8px!important;
+  overflow:hidden!important;
+}
+body.retail-home:not(.app-store) #shop .collection-results .card .photo img {
+  width:100%!important;
+  height:100%!important;
+  max-height:100%!important;
+  max-width:100%!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  padding:0!important;
+  filter:drop-shadow(0 7px 8px rgba(12,25,39,.10))!important;
+  image-rendering:auto!important;
+}
+body.retail-home:not(.app-store) #shop .collection-results .card .info {
+  padding:14px 13px 15px!important;
+}
+body.retail-home:not(.app-store) #shop .collection-results .card .info > small:first-child {
+  background:#ec7a1b!important;
+  color:#fff!important;
+  font-size:9px!important;
+  font-weight:850!important;
+  padding:4px 7px!important;
+  border-radius:3px!important;
+  margin-bottom:9px!important;
+}
+body.retail-home:not(.app-store) #shop .collection-results .card .info > h3 {
+  font-size:17px!important;
+  font-weight:900!important;
+  line-height:1.15!important;
+  letter-spacing:-.018em!important;
+  color:#151d28!important;
+  text-wrap:balance;
+}
+body.retail-home:not(.app-store) #shop .collection-results .card .selling-price {
+  font-size:21px!important;
+  font-weight:900!important;
+  line-height:1.15!important;
+  color:#111d2b!important;
+  letter-spacing:-.025em!important;
+  font-variant-numeric:tabular-nums!important;
+}
+body.retail-home:not(.app-store) #shop .collection-results .card .mrp-value {
+  font-size:11px!important;
+  color:#737b86!important;
+}
+body.retail-home:not(.app-store) #shop .collection-results .card .info > p {
+  color:#525e6c!important;
+  font-size:12px!important;
+  line-height:1.4!important;
+}
+body.retail-home:not(.app-store) #shop .collection-results .card .variant-label {
+  color:#303c49!important;
+  font-size:10px!important;
+  font-weight:850!important;
+}
+body.retail-home:not(.app-store) #shop .collection-results .card select.variant {
+  color:#253340!important;
+  border:1px solid #d8dfe6!important;
+  background:#fff!important;
+  border-radius:4px!important;
+}
+body.retail-home:not(.app-store) #shop .collection-results .card .add {
+  background:#122b3d!important;
+  color:#fff!important;
+  border-radius:6px!important;
+  min-height:43px!important;
+  font-weight:850!important;
+  font-size:12px!important;
+}
+body.retail-home:not(.app-store) #shop .collection-results .card .add:hover,
+body.retail-home:not(.app-store) #shop .collection-results .card .add:focus-visible {
+  background:#21526e!important;
+}
+@media(max-width:650px) {
+  /* Charcoal only above the separate, light search row — exactly as approved. */
+  body.retail-home:not(.app-store) .storehead {
+    background:linear-gradient(to bottom,#2b2e33 0px,#34373c 88px,#fff 88px,#fff 100%)!important;
+    border-bottom:1px solid #e5e9ec!important;
+    box-shadow:none!important;
+  }
+  body.retail-home:not(.app-store) .storehead .brand-identity {
+    height:80px!important;
+    max-height:80px!important;
+  }
+  body.retail-home:not(.app-store) .storehead .head-actions .account-link,
+  body.retail-home:not(.app-store) .storehead .head-actions #bag {
+    color:#fff!important;
+    background:transparent!important;
+    border:0!important;
+  }
+  body.retail-home:not(.app-store) #shop .collection-results .card .photo {
+    aspect-ratio:1.03/1!important;
+    padding:5px!important;
+  }
+  body.retail-home:not(.app-store) #shop .collection-results .card .info {
+    padding:11px 10px 13px!important;
+  }
+  body.retail-home:not(.app-store) #shop .collection-results .card .info > h3 {
+    font-size:15px!important;
+    line-height:1.17!important;
+    letter-spacing:-.03em!important;
+  }
+  body.retail-home:not(.app-store) #shop .collection-results .card .selling-price {
+    font-size:19px!important;
+    letter-spacing:-.02em!important;
+  }
+  body.retail-home:not(.app-store) #shop .collection-results .card .info > p {
+    font-size:11px!important;
+    line-height:1.35!important;
+  }
+  body.retail-home:not(.app-store) #shop .collection-results .card .variant-label {
+    font-size:10px!important;
+  }
+  body.retail-home:not(.app-store) #shop .collection-results .card .add {
+    min-height:43px!important;
+    font-size:11px!important;
+  }
+}
