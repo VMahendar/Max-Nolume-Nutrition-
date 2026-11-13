@@ -1,5 +1,10 @@
 User-agent: *
 Allow: /
+# Public, read-only resources required to render the storefront catalogue and offers.
+# These endpoints return published retail information, not customer or dealer data.
+Allow: /api/retail/catalog
+Allow: /api/promotions
+Allow: /api/store-updates
 Disallow: /api/
 Disallow: /admin.html
 Disallow: /account.html
