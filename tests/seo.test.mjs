@@ -64,3 +64,21 @@ test('homepage contains verified service areas and consistent branding',()=>{
   assert.ok(existsSync('public/icons/app-192.png'),'icon asset missing');
   assert.ok(page('/support.html').includes('mailto:maxvolumenutrition@gmail.com'),'public support email mismatch');
 });
+
+
+test('Google Image sitemap points to approved public product photos only',()=>{
+  const staging=readFileSync('staging.mjs','utf8');
+  const imagePages=[
+    ['/potency-whey.html','/assets/potency-whey-coffee-5lb.webp'],
+    ['/nitro-mass.html','/assets/Screenshot_2026_1103_003852.jpg'],
+    ['/sturdy-pre-workout.html','/assets/sturdy-watermelon-front.webp'],
+    ['/musclevite-multivitamin.html','/assets/musclevite-front.webp']
+  ];
+  assert.ok(sitemap.includes('xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"'),'missing Google image sitemap namespace');
+  for(const [path,image] of imagePages){
+    assert.ok(page(path).includes('src="'+image+'"'),path+' does not display declared product photo');
+    assert.ok(sitemap.includes('<image:loc>'+domain+image+'</image:loc>'),path+' missing search image entry');
+    assert.ok(staging.includes("'"+image+"'"),path+' image is still marked noindex by staging');
+  }
+  assert.equal((sitemap.match(/<image:loc>/g)||[]).length,imagePages.length,'do not publish unverified extra product images');
+});
