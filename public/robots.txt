@@ -3,5 +3,9 @@ Allow: /
 Disallow: /api/
 Disallow: /admin.html
 Disallow: /account.html
-Disallow: /dealer.html
+Disallow: /wholesale-account.html
+Disallow: /invoice.html
+Disallow: /owner-preview
+Disallow: /unsubscribe.html
+Disallow: /mobile-app.html
 Sitemap: https://maxvolumenutriton.shop/sitemap.xml

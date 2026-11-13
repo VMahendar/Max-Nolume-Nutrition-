@@ -16,7 +16,14 @@ export function stagingGate(env=process.env){
   return async(req,res)=>{
     // Only the public storefront may be indexed when explicitly opted in. All account,
     // admin, dealer and API routes remain noindex, including when browsing is public.
-    const publicIndexing=publicBrowsing&&env.STAGING_PUBLIC_INDEXING==='true'&&['GET','HEAD'].includes(req.method)&&['/','/index.html','/robots.txt','/sitemap.xml','/icons/app-192.png','/favicon.ico'].includes(new URL(req.url,'http://localhost').pathname);
+    const publiclyIndexable=new Set([
+      '/','/index.html','/robots.txt','/sitemap.xml','/dealer.html','/support.html',
+      '/potency-whey.html','/nitro-mass.html','/pro-creatine.html',
+      '/sturdy-pre-workout.html','/musclevite-multivitamin.html',
+      '/icons/app-192.png','/favicon.ico'
+    ]);
+    const publicIndexing=publicBrowsing&&env.STAGING_PUBLIC_INDEXING==='true'&&
+      ['GET','HEAD'].includes(req.method)&&publiclyIndexable.has(new URL(req.url,'http://localhost').pathname);
     if(!publicIndexing)res.setHeader('X-Robots-Tag','noindex, nofollow, noarchive');
     res.setHeader('Cache-Control','no-store');
     // Customer/admin authorization remains enforced by the application's own routes.
