@@ -24,12 +24,12 @@ test('public indexing allows the square MV favicon but keeps private routes noin
   try{
     writeFileSync(resolve(dir,'staging-only.json'),JSON.stringify({purpose:'mvn-staging-test-data',version:1}));
     const gate=stagingGate({STAGING_MODE:'true',DATA_DIR:dir,STAGING_PUBLIC_BROWSING:'true',STAGING_PUBLIC_INDEXING:'true'});
-    for(const path of ['/','/index.html','/icons/app-192.png','/favicon.ico']){
+    for(const path of ['/','/index.html','/icons/app-192.png','/favicon.ico','/max-volume-logo-wide.png','/max-volume-logo.png','/assets/potency-whey-coffee-5lb.webp','/assets/Screenshot_2026_1103_003852.jpg','/assets/sturdy-watermelon-front.webp','/assets/musclevite-front.webp']){
       const res=response();
       assert.equal(await gate(request(path),res),true);
       assert.equal(res.headers['X-Robots-Tag'],undefined);
     }
-    for(const path of ['/admin.html','/api/catalog','/icons/app-512.png']){
+    for(const path of ['/admin.html','/api/catalog','/icons/app-512.png','/assets/IMG-20261102-WA0019.jpg','/assets/sturdy-watermelon-back.webp']){
       const res=response();
       assert.equal(await gate(request(path),res),true);
       assert.equal(res.headers['X-Robots-Tag'],'noindex, nofollow, noarchive');
