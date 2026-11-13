@@ -54,6 +54,34 @@ try {
     priceFilterVisible:get('#priceRange').getClientRects().length>0
    };
   });
+  if(size.name==='android'){
+   const measurements=await page.evaluate(()=>{
+    const rect=selector=>{
+     const element=document.querySelector(selector),r=element.getBoundingClientRect();
+     return {x:r.x,y:r.y,width:r.width,height:r.height,bottom:r.bottom};
+    };
+    const logo=document.querySelector('header .original-brand-logo');
+    return {
+     logoSource:logo.getAttribute('src'),
+     logoLoaded:logo.complete&&logo.naturalWidth>0,
+     logo:rect('header .original-brand-logo'),
+     categories:rect('#shop .cats'),
+     filter:rect('#shop .collection-filters'),
+     selector:rect('#shop #priceRange'),
+     firstProduct:rect('#shop #grid article.card')
+    };
+   });
+   console.log('OPTION2_MOBILE_SPACING',JSON.stringify(measurements));
+   assert.equal(measurements.logoSource,'mvn-app-header-logo.webp','use the transparent, genuine MVN header artwork');
+   assert.ok(measurements.logoLoaded,'header image loaded');
+   assert.ok(measurements.logo.width>=145&&measurements.logo.height>=60,'brand clearly sized for phone');
+   assert.ok(measurements.filter.height<=55,'price filter cannot create a large empty panel');
+   assert.ok(measurements.selector.height<=45,'price selector is compact');
+   assert.ok(measurements.firstProduct.y-measurements.filter.bottom<=24,
+     'product cards directly follow filter controls');
+   assert.ok(measurements.firstProduct.y-measurements.categories.bottom<=92,
+     'no oversized blank area between categories and product cards');
+  }
   assert.equal(geometry.columns,size.columns,size.name+' expected product columns');
   assert.ok(geometry.titleBackground.includes('linear-gradient'),size.name+' navy/cyan header');
   assert.ok(geometry.heroHidden,size.name+' old hero must not interrupt product-first display');

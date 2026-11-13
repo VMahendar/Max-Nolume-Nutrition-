@@ -12,9 +12,16 @@ test('the storefront displays the exact uploaded MVN logo in Codex and Render',(
     'public/index.html','public/dealer.html','public/account.html','public/admin.html',
     'public/privacy.html','public/shipping.html','public/returns.html','public/terms.html'
   ];
+  const transparentLogo=readFileSync('public/mvn-app-header-logo.webp');
+  assert.ok(transparentLogo.length>10000&&transparentLogo.toString('ascii',0,4)==='RIFF',
+    'The existing transparent MVN header artwork must remain a real WebP image');
   for(const file of htmlFiles){
     const html=readFileSync(file,'utf8');
-    assert.match(html,/class="original-brand-logo" src="max-volume-logo-wide.png"/,file+' must use existing full-lettering logo PNG');
+    const homepage=file==='index.html'||file==='public/index.html';
+    const approvedHeader=homepage?'mvn-app-header-logo.webp':'max-volume-logo-wide.png';
+    assert.ok(html.includes('class="original-brand-logo" src="'+approvedHeader+'"'),
+      file+' must use the existing owner-approved MVN artwork');
+
     assert.doesNotMatch(html,/<span class="mvmark">MV<\/span>/,file+' must not recreate the logo with text');
   }
 });
