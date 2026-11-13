@@ -27,6 +27,9 @@ jobs:
       - name: Install Chromium browser
         id: chromium
         run: npx playwright install --with-deps chromium
+      - name: Check Option 2 product-first reference on desktop and Android
+        if: ${{ !cancelled() && steps.chromium.outcome == 'success' }}
+        run: node tests/option-two-qa.mjs
       - name: Run desktop, mobile and commerce browser checks
         if: ${{ !cancelled() && steps.chromium.outcome == 'success' }}
         run: node tests/visual-qa.mjs
