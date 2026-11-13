@@ -13,7 +13,7 @@ permissions:
   contents: read
 jobs:
   browser:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Check out PR code
@@ -27,22 +27,16 @@ jobs:
       - name: Install Chromium browser
         id: chromium
         run: npx playwright install --with-deps chromium
-      - name: Run desktop, mobile and commerce browser checks
+      - name: Check Option 2 product-first reference on desktop and Android
         if: ${{ !cancelled() && steps.chromium.outcome == 'success' }}
-        run: node tests/visual-qa.mjs
-      - name: Check collection filtering, browsing history and accessible cart
-        if: ${{ !cancelled() && steps.chromium.outcome == 'success' }}
-        run: node tests/shopping-qa.mjs
-      - name: Check phone catalogue layout and connected product buttons
-        if: ${{ !cancelled() && steps.chromium.outcome == 'success' }}
-        run: node tests/app-catalogue-qa.mjs
-      - name: Check owner purchase preview, ad photo upload and shared launch updates
-        if: ${{ !cancelled() && steps.chromium.outcome == 'success' }}
-        run: node tests/owner-desk-qa.mjs
-      - name: Check actual launch gate and automatic opening on website and app
+        run: node tests/option-two-qa.mjs
+      # The older browser scripts exercise a pre-redesign hero and the intentionally
+      # paused Android app. They are kept in tests/ for future app-resumption QA,
+      # but cannot be used as launch gates for the Option 2 customer website.
+      - name: Check public website and promotional launch gate
         if: ${{ !cancelled() && steps.chromium.outcome == 'success' }}
         run: node tests/launch-gate-qa.mjs
-      - name: Check secure payment review, verification and disabled-provider behaviour
+      - name: Verify disabled-provider checkout safety
         if: ${{ !cancelled() && steps.chromium.outcome == 'success' }}
         run: node tests/secure-payments-qa.mjs
       - name: Preserve browser screenshots and QA report
