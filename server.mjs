@@ -80,6 +80,11 @@ function fulfil(row,payment){return C.tx(()=>{row=db.prepare('SELECT * FROM orde
 function checkoutResponse(row){const p=JSON.parse(row.payload);if(row.status==='paid')fail(409,'This order is already paid. View your order history.');if(!row.provider_id)fail(409,'Payment creation needs reconciliation. Do not create another order.');if(row.status!=='pending')fail(409,'This checkout is no longer payable.');return {id:row.id,token:row.token,key:process.env.RAZORPAY_KEY_ID,providerOrderId:row.provider_id,amount:p.totalPaise,currency:'INR'};}
 const server=http.createServer(async(req,res)=>{res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','DENY');res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline'; img-src 'self' https://revakanya.com https://unicornproseries.com https://www.unicornproseries.com data: https://static.wixstatic.com; connect-src 'self' https://*.razorpay.com; frame-src https://*.razorpay.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'");if(production)res.setHeader('Strict-Transport-Security','max-age=31536000; includeSubDomains');
 try{if(!await allowStaging(req,res))return;const u=new URL(req.url,'http://localhost');if(u.pathname==='/healthz')return json(res,200,{ok:true});
+// Temporarily pause the app entry point while keeping the website available.
+if(posix.normalize(decodeURIComponent(u.pathname))==='/mobile-app.html'&&['GET','HEAD'].includes(req.method)){
+  res.writeHead(302,{'Location':'/','X-Robots-Tag':'noindex, follow','Cache-Control':'no-store'});
+  return res.end();
+}
 if(u.pathname==='/owner-preview'&&['GET','HEAD'].includes(req.method)){
   // Private, no-login owner viewing uses a 256-bit environment-only bearer link.
   // The public site and its launch countdown are not changed.

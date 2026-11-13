@@ -6,6 +6,13 @@ writeFileSync(resolve(dir,'data/store.json'),JSON.stringify({address:'Test busin
 const port=34871,origin='http://localhost:'+port;
 const child=spawn(process.execPath,['--import',resolve('tests/mock-provider.mjs'),resolve('server.mjs')],{cwd:dir,env:{...process.env,PORT:String(port),PUBLIC_ORIGIN:origin,PAYMENTS_ENABLED:'true',POLICIES_APPROVED:'true',RAZORPAY_KEY_ID:'rzp_test_fixture',RAZORPAY_TESTED:'true',RAZORPAY_KEY_SECRET:'fixture-secret',RAZORPAY_WEBHOOK_SECRET:'fixture-webhook',DATA_DIR:resolve(dir,'runtime')},stdio:['ignore','pipe','pipe']});
 try{await new Promise((ok,no)=>{const timer=setTimeout(()=>no(Error('Server startup timeout')),5000);child.stdout.once('data',()=>{clearTimeout(timer);ok();});child.once('exit',()=>no(Error('Server exited')));});
+for(const method of ['GET','HEAD']){
+ const paused=await fetch(origin+'/mobile-app.html?source=google',{method,redirect:'manual'});
+ assert.equal(paused.status,302);
+ assert.equal(paused.headers.get('location'),'/');
+ assert.equal(paused.headers.get('x-robots-tag'),'noindex, follow');
+ assert.equal(paused.headers.get('cache-control'),'no-store');
+}
 const post=async(path,body,headers={})=>{const r=await fetch(origin+path,{method:'POST',headers:{Origin:origin,'Content-Type':'application/json',...headers},body:typeof body==='string'?body:JSON.stringify(body)});return {status:r.status,body:await r.json()};};
 const customer={name:'Test Customer',phone:'9876543210',email:'test@example.com',address:'12 Test Street',city:'Chennai',pincode:'603103',state:'Tamil Nadu'};
 const payload={items:[{variantId:'a',quantity:1,pricePaise:1}],customer,acceptedTerms:true};
