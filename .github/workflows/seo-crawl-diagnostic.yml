@@ -37,3 +37,26 @@ jobs:
             echo "$host -> ${code:-CURL_ERROR}"
           done
           echo "Read-only public probe complete."
+
+      - name: Assert deployed Google crawler rules are safe
+        shell: bash
+        run: |
+          set -euo pipefail
+          base=https://maxvolumenutriton.shop
+          rules=$(curl --fail --silent --show-error --retry 3 "$base/robots.txt")
+          for rule in \
+            'Allow: /api/retail/catalog' \
+            'Allow: /api/promotions' \
+            'Allow: /api/store-updates' \
+            'Disallow: /api/' \
+            'Disallow: /admin.html' \
+            'Disallow: /account.html' \
+            'Disallow: /wholesale-account.html'; do
+             grep -Fqx "$rule" <<< "$rules" || { echo "MISSING: $rule"; exit 1; }
+             echo "CONFIRMED: $rule"
+          done
+          for path in / /sitemap.xml /api/retail/catalog '/api/promotions?surface=web' '/api/store-updates?surface=web'; do
+            result=$(curl --fail --silent --show-error --output /dev/null --write-out '%{http_code}' "$base$path")
+            [[ "$result" == "200" ]] || exit 1
+            echo "HTTP $result $path"
+          done
