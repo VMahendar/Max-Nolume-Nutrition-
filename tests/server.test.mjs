@@ -13,6 +13,11 @@ for(const method of ['GET','HEAD']){
  assert.equal(paused.headers.get('x-robots-tag'),'noindex, follow');
  assert.equal(paused.headers.get('cache-control'),'no-store');
 }
+for(const method of ['GET','HEAD']){
+ const favicon=await fetch(origin+'/favicon.ico',{method,redirect:'manual'});
+ assert.equal(favicon.status,302);
+ assert.equal(favicon.headers.get('location'),'/icons/app-192.png');
+}
 const post=async(path,body,headers={})=>{const r=await fetch(origin+path,{method:'POST',headers:{Origin:origin,'Content-Type':'application/json',...headers},body:typeof body==='string'?body:JSON.stringify(body)});return {status:r.status,body:await r.json()};};
 const customer={name:'Test Customer',phone:'9876543210',email:'test@example.com',address:'12 Test Street',city:'Chennai',pincode:'603103',state:'Tamil Nadu'};
 const payload={items:[{variantId:'a',quantity:1,pricePaise:1}],customer,acceptedTerms:true};
