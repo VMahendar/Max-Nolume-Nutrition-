@@ -24,7 +24,7 @@ test('public indexing allows the square MV favicon but keeps private routes noin
   try{
     writeFileSync(resolve(dir,'staging-only.json'),JSON.stringify({purpose:'mvn-staging-test-data',version:1}));
     const gate=stagingGate({STAGING_MODE:'true',DATA_DIR:dir,STAGING_PUBLIC_BROWSING:'true',STAGING_PUBLIC_INDEXING:'true'});
-    for(const path of ['/','/index.html','/icons/app-192.png']){
+    for(const path of ['/','/index.html','/icons/app-192.png','/favicon.ico']){
       const res=response();
       assert.equal(await gate(request(path),res),true);
       assert.equal(res.headers['X-Robots-Tag'],undefined);
