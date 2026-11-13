@@ -372,7 +372,7 @@ body.retail-home:not(.app-store) #shop .collection-results .card .details-link {
   min-height: 0 !important;
   margin: 0 !important;
 }
-body.retail-home:not(.app-store) #shop .collection-results .card button.add {
+body.retail-home:not(.app-store) #shop .collection-results .card .add {
   order: 1 !important;
   width: 100% !important;
   min-height: 44px !important;
@@ -388,7 +388,7 @@ body.retail-home:not(.app-store) #shop .collection-results .card button.add {
   text-align: center !important;
   cursor: pointer !important;
 }
-body.retail-home:not(.app-store) #shop .collection-results .card button.add:hover {
+body.retail-home:not(.app-store) #shop .collection-results .card .add:hover {
   background: #333 !important;
 }
 body.retail-home:not(.app-store) #shop .collection-results .card .placeholder {
@@ -458,7 +458,23 @@ body.retail-home:not(.app-store) #shop .collection-results .no-products {
     display: block !important;
   }
   body.retail-home:not(.app-store) #shop .collection-filters {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 9px !important;
+    align-items: center !important;
+    padding: 0 0 15px !important;
+    margin: 0 !important;
+    border: 0 !important;
+  }
+  body.retail-home:not(.app-store) #shop .collection-filters .filter-heading {
     display: none !important;
+  }
+  body.retail-home:not(.app-store) #shop .collection-filters label {
+    margin: 0 !important;
+  }
+  body.retail-home:not(.app-store) #shop #priceRange {
+    width: auto !important;
+    min-width: 160px !important;
   }
   body.retail-home:not(.app-store) #shop .collection-results #grid {
     grid-template-columns: repeat(2,minmax(0,1fr)) !important;
@@ -488,7 +504,7 @@ body.retail-home:not(.app-store) #shop .collection-results .no-products {
   body.retail-home:not(.app-store) #shop .collection-results .card .selling-price {
     font-size: 19px !important;
   }
-  body.retail-home:not(.app-store) #shop .collection-results .card button.add {
+  body.retail-home:not(.app-store) #shop .collection-results .card .add {
     min-height: 42px !important;
     font-size: 10px !important;
     padding: 10px 5px !important;
