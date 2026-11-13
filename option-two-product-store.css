@@ -797,3 +797,154 @@ body.retail-home:not(.app-store) #shop .collection-results .card .placeholder{
     font-size:10px!important;
   }
 }
+
+/* 14 Nov mobile reference correction: use the cropped transparent, original
+   MVN artwork and keep the filter bar compact. This affects the website only. */
+body.retail-home:not(.app-store) .storehead .brand-identity {
+  background:transparent!important;
+  box-shadow:none!important;
+  border:0!important;
+}
+body.retail-home:not(.app-store) .storehead .brand-identity .original-brand-logo {
+  filter:none!important;
+  mix-blend-mode:normal!important;
+  object-fit:contain!important;
+}
+@media (min-width:651px) {
+  body.retail-home:not(.app-store) .storehead .brand-identity {
+    height:76px!important;
+    max-height:76px!important;
+  }
+  body.retail-home:not(.app-store) .storehead .brand-identity .original-brand-logo {
+    height:76px!important;
+    max-height:76px!important;
+  }
+}
+@media (max-width:650px) {
+  body.retail-home:not(.app-store) .storehead {
+    grid-template-rows:80px 38px!important;
+    gap:2px 10px!important;
+    padding:5px 14px 9px!important;
+    align-items:center!important;
+  }
+  body.retail-home:not(.app-store) .storehead .brand-identity {
+    grid-column:1!important;
+    grid-row:1!important;
+    width:176px!important;
+    max-width:100%!important;
+    height:80px!important;
+    max-height:80px!important;
+    min-height:0!important;
+    padding:0!important;
+    margin:0!important;
+    justify-self:start!important;
+    overflow:visible!important;
+  }
+  body.retail-home:not(.app-store) .storehead .brand-identity .original-brand-logo {
+    display:block!important;
+    flex:0 1 176px!important;
+    width:176px!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:80px!important;
+    max-height:80px!important;
+    object-fit:contain!important;
+    object-position:left center!important;
+    filter:none!important;
+    mix-blend-mode:normal!important;
+  }
+  body.retail-home:not(.app-store) .storehead .header-search {
+    grid-column:1/-1!important;
+    grid-row:2!important;
+    height:38px!important;
+    align-self:center!important;
+  }
+  body.retail-home:not(.app-store) .storehead #search {
+    height:38px!important;
+    min-height:38px!important;
+    border:1px solid #e5e8eb!important;
+    padding:0 8px!important;
+  }
+  body.retail-home:not(.app-store) .storehead .head-actions {
+    grid-column:2!important;
+    grid-row:1!important;
+    align-self:center!important;
+    justify-self:end!important;
+    gap:9px!important;
+  }
+  /* Single vertical flow prevents the hidden desktop sidebar grid track from
+     reserving hundreds of pixels above the actual products. */
+  body.retail-home:not(.app-store) main#shop {
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    gap:0!important;
+    min-height:0!important;
+    padding:12px 12px 48px!important;
+  }
+  body.retail-home:not(.app-store) #shop .shopping-layout {
+    display:contents!important;
+  }
+  body.retail-home:not(.app-store) #shop .productbar {
+    flex:0 0 auto!important;
+    margin:0 0 9px!important;
+  }
+  body.retail-home:not(.app-store) #shop .cats {
+    flex:0 0 auto!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0 0 6px!important;
+    padding:0 0 8px!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    scrollbar-width:none!important;
+    -webkit-overflow-scrolling:touch;
+  }
+  body.retail-home:not(.app-store) #shop .cats::-webkit-scrollbar {
+    display:none!important;
+  }
+  body.retail-home:not(.app-store) #shop .collection-filters {
+    position:static!important;
+    transform:none!important;
+    flex:0 0 44px!important;
+    display:flex!important;
+    flex-direction:row!important;
+    flex-wrap:nowrap!important;
+    justify-content:flex-end!important;
+    align-items:center!important;
+    height:44px!important;
+    min-height:0!important;
+    max-height:44px!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:0 0 8px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+  body.retail-home:not(.app-store) #shop .collection-filters #priceRange {
+    display:block!important;
+    flex:0 0 142px!important;
+    width:142px!important;
+    max-width:142px!important;
+    height:35px!important;
+    min-height:35px!important;
+    max-height:35px!important;
+    padding:4px 8px!important;
+    margin:0!important;
+    border:1px solid #dce4e8!important;
+    border-radius:2px!important;
+    background:#fff!important;
+    font-size:11px!important;
+  }
+  body.retail-home:not(.app-store) #shop .collection-results {
+    flex:0 0 auto!important;
+    align-self:stretch!important;
+    margin:0!important;
+    padding:0!important;
+    min-height:0!important;
+  }
+}
