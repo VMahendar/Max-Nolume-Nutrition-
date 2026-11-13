@@ -1,0 +1,34 @@
+name: MVN SEO resource availability
+on:
+  push:
+    branches: [seo/live-readiness-check-20261114]
+permissions:
+  contents: read
+jobs:
+  public-resources:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check image files and crawler resources
+        shell: bash
+        run: |
+          set -uo pipefail
+          BASE=https://maxvolumenutriton.shop
+          for path in \
+            /assets/IMG-20261102-WA0019.jpg \
+            /assets/Screenshot_2026_1103_003852.jpg \
+            /assets/musclevite-front.webp \
+            /assets/potency-whey-coffee-5lb.webp \
+            /assets/pro-creatine.png \
+            /assets/sturdy-watermelon-front.webp \
+            /max-volume-logo-wide.png \
+            /api/retail/catalog \
+            '/api/promotions?surface=web' \
+            '/api/store-updates?surface=web' \
+            /api/session; do
+             printf '\nRESOURCE: %s\n' "$path"
+             for agent in Googlebot 'Mozilla/5.0 (compatible; Googlebot-Image/1.0)' 'Mozilla/5.0'; do
+               metrics=$(curl --silent --show-error --location --max-redirs 2 --connect-timeout 10 --max-time 20 --user-agent "$agent" --output /dev/null --write-out 'HTTP=%{http_code} TYPE=%{content_type} BYTES=%{size_download} TIME=%{time_total} REDIRECTS=%{num_redirects}' "$BASE$path") || metrics="CURL_ERROR"
+               printf '%s -> %s\n' "$agent" "$metrics"
+             done
+          done
