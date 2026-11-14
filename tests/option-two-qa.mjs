@@ -44,7 +44,7 @@ try {
   // and usable, non-duplicated category cards BEFORE the existing cart catalogue.
   const showcase=page.locator('#mvnEditorial');
   assert.ok(await showcase.isVisible(),size.name+' premium marketing hero must be visible');
-  assert.match(await showcase.locator('h1').innerText(),/FUEL EVERY\\s*REP/i,'performance headline is visible');
+  assert.match(await showcase.locator('h1').innerText(),/FUEL EVERY\s*REP/i,'performance headline is visible');
   const campaignImg=showcase.locator('.mvn-editorial-packpanel img');
   await campaignImg.waitFor({state:'visible'});
   assert.ok(await campaignImg.evaluate(img=>img.complete&&img.naturalWidth>0),size.name+' original whey hero photo loads');
@@ -59,6 +59,8 @@ try {
   assert.ok(campaignGeometry.categoryBottom<=campaignGeometry.shopY+20,size.name+' visual categories precede retail collection');
   assert.ok(campaignGeometry.scrollWidth<=size.width+10,size.name+' campaign does not overflow viewport');
   assert.equal(await page.locator('.mvn-editorial-category').count(),4,'show four photo-led verified categories');
+  await page.locator('.mvn-editorial-categories').scrollIntoViewIfNeeded();
+  await page.waitForFunction(()=>[...document.querySelectorAll('.mvn-editorial-category img')].every(img=>img.complete&&img.naturalWidth>0),{timeout:12000});
   const categoryPhotos=await page.locator('.mvn-editorial-category img').evaluateAll(images=>images.map(img=>({src:img.getAttribute('src'),loaded:img.complete&&img.naturalWidth>0})));
   assert.ok(categoryPhotos.every(img=>img.loaded),size.name+' all category photographs load: '+JSON.stringify(categoryPhotos));
   await page.screenshot({path:folder+'/'+size.name+'-campaign.png',animations:'disabled'});
