@@ -1160,6 +1160,7 @@ body.retail-home:not(.app-store) .storehead .head-actions .mvn-header-more[open]
 body.retail-home:not(.app-store) .storehead .head-actions .mvn-header-more summary:focus-visible{
   outline:2px solid #dfbe86!important;outline-offset:3px!important;
 }
+body.retail-home:not(.app-store) .storehead .head-actions .mvn-header-more:not([open]) .mvn-more-panel{display:none!important}
 body.retail-home:not(.app-store) .storehead .head-actions .mvn-more-panel{
   box-sizing:border-box!important;position:absolute!important;z-index:100!important;
   right:0!important;top:calc(100% + 10px)!important;display:flex!important;
