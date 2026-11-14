@@ -99,7 +99,7 @@ try {
   await page.keyboard.press('Escape');
   assert.equal(await menuPanel.isVisible(),false,size.name+' Escape closes menu');
   await more.locator('summary').click();
-  await page.locator('#shop .productbar').click();
+  await page.mouse.click(10,170); // visible page area left of the dropdown on both viewports
   assert.equal(await menuPanel.isVisible(),false,size.name+' outside click closes menu');
   const visual=await page.evaluate(()=>{
    const style=selector=>getComputedStyle(document.querySelector(selector));
