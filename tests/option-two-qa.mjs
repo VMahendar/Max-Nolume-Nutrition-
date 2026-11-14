@@ -82,6 +82,25 @@ try {
    assert.ok(measurements.firstProduct.y-measurements.categories.bottom<=92,
      'no oversized blank area between categories and product cards');
   }
+
+  const more=page.locator('.mvn-header-more');
+  const menuPanel=page.locator('.mvn-more-panel');
+  const email=page.locator('.mvn-header-email');
+  assert.equal(await more.count(),1,size.name+' has a single accessible three-dot menu');
+  assert.equal(await menuPanel.isVisible(),false,size.name+' menu closed by default');
+  assert.equal(await email.getAttribute('href'),'mailto:maxvolumenutrition@gmail.com');
+  assert.equal(await email.isVisible(),size.name==='desktop',size.name+' desktop email and compact mobile menu');
+  await more.locator('summary').click();
+  assert.equal(await menuPanel.isVisible(),true,size.name+' three-dot menu opens');
+  assert.equal(await menuPanel.locator('a[href="mailto:maxvolumenutrition@gmail.com"]').count(),1,'menu includes support email');
+  assert.equal(await menuPanel.locator('a[href="dealer.html"]').count(),1,'menu includes wholesale enquiries');
+  assert.equal(await menuPanel.locator('a[href="support.html"]').count(),1,'menu includes support');
+  assert.equal(await menuPanel.locator('a[href="https://wa.me/917708830513"]').count(),1,'menu includes WhatsApp support');
+  await page.keyboard.press('Escape');
+  assert.equal(await menuPanel.isVisible(),false,size.name+' Escape closes menu');
+  await more.locator('summary').click();
+  await page.locator('#shop .productbar').click();
+  assert.equal(await menuPanel.isVisible(),false,size.name+' outside click closes menu');
   const visual=await page.evaluate(()=>{
    const style=selector=>getComputedStyle(document.querySelector(selector));
    const image=document.querySelector('#grid article.card .photo img');
