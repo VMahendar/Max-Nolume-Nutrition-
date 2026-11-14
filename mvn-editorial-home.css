@@ -441,3 +441,91 @@ body.retail-home:not(.app-store) .mvn-editorial-category img{
    padding:6px 8px!important;
  }
 }
+
+/* Product-led landscape banner: balanced multi-pack merchandise lineup.
+   Sources are original photographs already verified in the MVN catalogue. */
+body.retail-home:not(.app-store) .mvn-editorial-feature{
+ background:
+  radial-gradient(ellipse 43% 75% at 63% 61%,rgba(98,22,26,.25),transparent 76%),
+  radial-gradient(ellipse 55% 55% at 78% 100%,rgba(176,51,31,.20),transparent 78%),
+  linear-gradient(105deg,#100c10 0%,#230c11 46%,#1a0f17 77%,#0b0c11 100%)!important;
+}
+body.retail-home:not(.app-store) .mvn-editorial-copy{
+ max-width:42%!important;padding:76px 4px 28px 39px!important;
+}
+body.retail-home:not(.app-store) .mvn-editorial-copy h1{
+ font-size:clamp(46px,4.5vw,68px)!important;
+}
+body.retail-home:not(.app-store) .mvn-editorial-packstage{
+ width:61%!important;right:10px!important;top:0!important;height:100%!important;
+}
+body.retail-home:not(.app-store) .mvn-editorial-packpanel{
+ position:relative!important;display:block!important;
+ width:100%!important;max-width:585px!important;height:85%!important;
+ aspect-ratio:auto!important;overflow:visible!important;
+ transform:none!important;background:transparent!important;border:0!important;box-shadow:none!important;
+}
+body.retail-home:not(.app-store) .mvn-editorial-packpanel .mvn-hero-pack{
+ position:absolute!important;display:block!important;object-fit:contain!important;
+ width:auto!important;max-width:none!important;
+ height:auto!important;padding:0!important;margin:0!important;border:0!important;
+ background:transparent!important;box-shadow:none!important;
+ -webkit-mask-image:radial-gradient(ellipse 57% 61% at 50% 50%,#000 69%,transparent 99%)!important;
+ mask-image:radial-gradient(ellipse 57% 61% at 50% 50%,#000 69%,transparent 99%)!important;
+ filter:drop-shadow(0 20px 12px rgba(0,0,0,.55))!important;
+}
+body.retail-home:not(.app-store) .mvn-editorial-packpanel .mvn-hero-pack-main{
+ z-index:4!important;width:55%!important;height:94%!important;left:22%!important;bottom:0!important;
+ transform:scale(1.19)!important;
+}
+body.retail-home:not(.app-store) .mvn-editorial-packpanel .mvn-hero-pack-creatine{
+ z-index:2!important;width:41%!important;height:71%!important;left:-1%!important;bottom:2%!important;
+ transform:rotate(-7deg)!important;
+}
+body.retail-home:not(.app-store) .mvn-editorial-packpanel .mvn-hero-pack-mass{
+ z-index:3!important;width:40%!important;height:77%!important;right:1%!important;bottom:0!important;
+ transform:rotate(6deg)!important;
+}
+body.retail-home:not(.app-store) .mvn-editorial-packlabel{
+ z-index:7!important;bottom:14px!important;right:3%!important;min-width:0!important;
+ background:rgba(8,8,10,.88)!important;padding:7px 10px!important;
+}
+body.retail-home:not(.app-store) .mvn-editorial-packlabel strong{font-size:11px!important}
+body.retail-home:not(.app-store) .mvn-editorial-packlabel span{font-size:8px!important}
+@media(min-width:1100px){
+ body.retail-home:not(.app-store) .mvn-editorial-layout{
+  grid-template-columns:minmax(0,2.35fr) minmax(250px,.78fr)!important;
+ }
+}
+@media(min-width:861px) and (max-width:1100px){
+ body.retail-home:not(.app-store) .mvn-editorial-copy{padding:52px 2px 20px 26px!important;max-width:43%!important}
+ body.retail-home:not(.app-store) .mvn-editorial-copy h1{font-size:49px!important}
+ body.retail-home:not(.app-store) .mvn-editorial-packstage{width:60%!important}
+}
+@media(max-width:860px){
+ body.retail-home:not(.app-store) .mvn-editorial-copy{max-width:51%!important}
+ body.retail-home:not(.app-store) .mvn-editorial-packstage{width:53%!important}
+}
+@media(max-width:650px){
+ body.retail-home:not(.app-store) .mvn-editorial-copy{
+  max-width:none!important;padding:26px 18px 195px!important;
+ }
+ body.retail-home:not(.app-store) .mvn-editorial-packstage{
+  width:91%!important;right:3%!important;bottom:3px!important;top:auto!important;height:200px!important;
+ }
+ body.retail-home:not(.app-store) .mvn-editorial-packpanel{
+  height:100%!important;width:100%!important;
+ }
+ body.retail-home:not(.app-store) .mvn-editorial-packpanel .mvn-hero-pack-main{
+  width:42%!important;height:100%!important;left:30%!important;transform:scale(1.15)!important;
+ }
+ body.retail-home:not(.app-store) .mvn-editorial-packpanel .mvn-hero-pack-creatine{
+  width:31%!important;height:76%!important;left:8%!important;
+ }
+ body.retail-home:not(.app-store) .mvn-editorial-packpanel .mvn-hero-pack-mass{
+  width:31%!important;height:82%!important;right:6%!important;
+ }
+ body.retail-home:not(.app-store) .mvn-editorial-packlabel{
+  right:0!important;bottom:3px!important;
+ }
+}

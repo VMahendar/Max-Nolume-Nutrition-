@@ -45,9 +45,11 @@ try {
   const showcase=page.locator('#mvnEditorial');
   assert.ok(await showcase.isVisible(),size.name+' premium marketing hero must be visible');
   assert.match(await showcase.locator('h1').innerText(),/FUEL EVERY\s*REP/i,'performance headline is visible');
-  const campaignImg=showcase.locator('.mvn-editorial-packpanel img');
+  const campaignImg=showcase.locator('.mvn-editorial-packpanel img.mvn-hero-pack-main');
+  assert.equal(await showcase.locator('.mvn-editorial-packpanel img.mvn-hero-pack').count(),3,size.name+' three original supplements form a landscape lineup');
   await campaignImg.waitFor({state:'visible'});
   assert.ok(await campaignImg.evaluate(img=>img.complete&&img.naturalWidth>0),size.name+' original whey hero photo loads');
+  await page.waitForFunction(()=>[...document.querySelectorAll('.mvn-editorial-packpanel img')].every(img=>img.complete&&img.naturalWidth>0),{timeout:12000});
   const campaignGeometry=await page.evaluate(()=>{
     const feature=document.querySelector('.mvn-editorial-feature').getBoundingClientRect();
     const shop=document.querySelector('#shop').getBoundingClientRect();
