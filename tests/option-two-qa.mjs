@@ -56,6 +56,19 @@ try {
     return {heroHeight:feature.height,shopY:shop.y,promoWidth:promo.width,categoryBottom:cats.bottom,scrollWidth:document.documentElement.scrollWidth};
   });
   assert.ok(campaignGeometry.heroHeight>=420,'campaign hero must be substantial');
+  const heroSurface=await page.locator('.mvn-editorial-packpanel').evaluate(el=>({
+    background:getComputedStyle(el).backgroundColor,
+    border:getComputedStyle(el).borderTopWidth,
+    transform:getComputedStyle(el).transform,
+    visibleWidth:el.getBoundingClientRect().width,
+    imageMask:getComputedStyle(el.querySelector('img')).maskImage
+  }));
+  assert.equal(heroSurface.background,'rgba(0, 0, 0, 0)',size.name+' hero product is not pasted onto a white rectangle');
+  assert.equal(heroSurface.border,'0px',size.name+' hero image uses no artificial frame');
+  assert.equal(heroSurface.transform,'none',size.name+' hero product is not a tilted sticker');
+  assert.ok(heroSurface.visibleWidth>=180,size.name+' large product-centric image');
+  assert.ok(heroSurface.imageMask.includes('radial-gradient'),size.name+' source image edges fade naturally into the scene');
+
   assert.ok(campaignGeometry.categoryBottom<=campaignGeometry.shopY+20,size.name+' visual categories precede retail collection');
   assert.ok(campaignGeometry.scrollWidth<=size.width+10,size.name+' campaign does not overflow viewport');
   assert.equal(await page.locator('.mvn-editorial-category').count(),4,'show four photo-led verified categories');
