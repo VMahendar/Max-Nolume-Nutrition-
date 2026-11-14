@@ -57,7 +57,33 @@ try {
     const cats=document.querySelector('.mvn-editorial-categories').getBoundingClientRect();
     return {heroHeight:feature.height,shopY:shop.y,promoWidth:promo.width,categoryBottom:cats.bottom,scrollWidth:document.documentElement.scrollWidth};
   });
-  assert.ok(campaignGeometry.heroHeight>=420,'campaign hero must be substantial');
+  assert.ok(campaignGeometry.heroHeight>=330&&campaignGeometry.heroHeight<=430,
+    size.name+' campaign must remain a compact store banner, not a tall poster: '+campaignGeometry.heroHeight);
+  const proportions=await page.evaluate(()=>{
+    const feature=document.querySelector('.mvn-editorial-feature').getBoundingClientRect();
+    const headline=document.querySelector('.mvn-editorial-copy h1').getBoundingClientRect();
+    const copy=document.querySelector('.mvn-editorial-copy');
+    const image=document.querySelector('.mvn-editorial-packpanel .mvn-hero-pack-main').getBoundingClientRect();
+    const promos=document.querySelector('.mvn-editorial-promos').getBoundingClientRect();
+    const layout=document.querySelector('.mvn-editorial-layout').getBoundingClientRect();
+    return {feature:{x:feature.x,y:feature.y,w:feature.width,h:feature.height},
+      headline:{x:headline.x,y:headline.y,w:headline.width,h:headline.height},
+      image:{x:image.x,y:image.y,w:image.width,h:image.height},
+      promos:{x:promos.x,y:promos.y,w:promos.width,h:promos.height},
+      layout:{x:layout.x,y:layout.y,w:layout.width,h:layout.height},
+      leadDisplay:getComputedStyle(document.querySelector('.mvn-editorial-lead')).display};
+  });
+  assert.ok(proportions.headline.h<=75,size.name+' compact headline cannot consume hero');
+  assert.ok(proportions.image.h>=135,size.name+' whey remains a major product image');
+  assert.equal(proportions.leadDisplay,'none',size.name+' remove poster-like paragraphs');
+  if(size.name==='desktop'){
+    assert.ok(proportions.promos.x>proportions.feature.x+proportions.feature.w-3,
+      'two promo cards must stay to the right of main landscape banner');
+    assert.ok(proportions.feature.w/proportions.feature.h>1.5,'main desktop banner is landscape');
+  }else{
+    assert.ok(proportions.promos.y>=proportions.feature.y+proportions.feature.h-3,
+      'mobile stacks promotions only after compact banner');
+  }
   const heroSurface=await page.locator('.mvn-editorial-packpanel').evaluate(el=>({
     background:getComputedStyle(el).backgroundColor,
     border:getComputedStyle(el).borderTopWidth,
