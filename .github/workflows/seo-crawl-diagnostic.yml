@@ -60,3 +60,15 @@ jobs:
             [[ "$result" == "200" ]] || exit 1
             echo "HTTP $result $path"
           done
+
+      - name: Verify current live Potency Whey SEO publication
+        shell: bash
+        run: |
+          set -euo pipefail
+          p=https://maxvolumenutriton.shop/potency-whey.html
+          curl --fail --silent --show-error --location --max-redirs 2 "$p" -o /tmp/potency-live.html
+          grep -Fq '<title>Unicorn Pro Series Potency Whey Protein 5 lb Chennai | MVN</title>' /tmp/potency-live.html
+          grep -Fq '<h1>Unicorn Pro Series Potency Whey Protein – Coffee 5 lb</h1>' /tmp/potency-live.html
+          grep -Fq '<link rel="canonical" href="https://maxvolumenutriton.shop/potency-whey.html">' /tmp/potency-live.html
+          grep -Fq 'name="robots" content="index, follow' /tmp/potency-live.html
+          echo "LIVE WHEY: HTTP 200, SEO title, H1, canonical, indexability verified"
