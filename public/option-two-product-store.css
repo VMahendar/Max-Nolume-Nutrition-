@@ -950,11 +950,11 @@ body.retail-home:not(.app-store) .storehead .brand-identity .original-brand-logo
 }
 
 
-/* MVN approved 14 Nov charcoal-grey + gold visual finish.
+/* MVN owner-selected solid-black + gold visual finish.
    Website-only presentation: no catalogue, orders, checkout, or app changes. */
 body.retail-home:not(.app-store) .storehead {
-  background:linear-gradient(118deg,#25282d 0%,#35393f 56%,#292c31 100%)!important;
-  border-bottom:1px solid #444951!important;
+  background:#000!important;
+  border-bottom:1px solid #151515!important;
   box-shadow:0 2px 9px rgba(16,20,26,.12)!important;
 }
 body.retail-home:not(.app-store) .storehead .brand-identity {
@@ -1085,9 +1085,9 @@ body.retail-home:not(.app-store) #shop .collection-results .card .add:focus-visi
   background:#21526e!important;
 }
 @media(max-width:650px) {
-  /* Charcoal only above the separate, light search row — exactly as approved. */
+  /* Solid black header on mobile, including the row around the white search field. */
   body.retail-home:not(.app-store) .storehead {
-    background:linear-gradient(to bottom,#2b2e33 0px,#34373c 88px,#fff 88px,#fff 100%)!important;
+    background:#000!important;
     border-bottom:1px solid #e5e9ec!important;
     box-shadow:none!important;
   }
