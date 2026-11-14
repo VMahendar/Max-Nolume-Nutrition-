@@ -46,12 +46,12 @@ test('product detail pages expose truthful Product and BreadcrumbList data with 
     const json=structuredData(html);
     const product=json.find(x=>x['@type']==='Product');
     const breadcrumbs=json.find(x=>x['@type']==='BreadcrumbList');
-    assert.equal(product?.url,domain+path,path+' has wrong Product URL');
+    if(product) assert.equal(product.url,domain+path,path+' has wrong Product URL');
     assert.equal(breadcrumbs?.itemListElement?.[0]?.item,domain+'/',path+' missing home breadcrumb');
     assert.equal(breadcrumbs?.itemListElement?.[1]?.item,domain+path,path+' missing product breadcrumb');
     assert.ok(html.includes('id="mvnRelatedProducts"'),path+' missing related products');
     assert.ok((html.match(/<li><a href="\/(?:potency-whey|nitro-mass|pro-creatine|sturdy-pre-workout|musclevite-multivitamin)\.html">/g)||[]).length>=2,path+' needs related product links');
-    assert.ok(!product.offers,'Do not imply an unverified online checkout/price');
+    if(product) assert.ok(!product.offers,'Do not imply an unverified online checkout/price');
   }
 });
 
@@ -82,3 +82,6 @@ test('Google Image sitemap points to approved public product photos only',()=>{
   }
   assert.equal((sitemap.match(/<image:loc>/g)||[]).length,imagePages.length,'do not publish unverified extra product images');
 });
+
+
+test('Potency Whey avoids invalid Product rich result without verified offer or review',()=>{const html=page('/potency-whey.html');assert.ok(!structuredData(html).some(x=>x['@type']==='Product'));assert.match(html,/<h1>Potency Whey Protein – Coffee Flavour 5 lb<\/h1>/);});
