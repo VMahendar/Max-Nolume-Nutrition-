@@ -84,4 +84,4 @@ test('Google Image sitemap points to approved public product photos only',()=>{
 });
 
 
-test('Potency Whey avoids invalid Product rich result without verified offer or review',()=>{const html=page('/potency-whey.html');assert.ok(!structuredData(html).some(x=>x['@type']==='Product'));assert.match(html,/<h1>Potency Whey Protein – Coffee Flavour 5 lb<\/h1>/);});
+test('Potency Whey avoids invalid Product rich result without verified offer or review',()=>{const html=page('/potency-whey.html');assert.ok(!structuredData(html).some(x=>x['@type']==='Product'));assert.match(html,/<h1>Unicorn Pro Series Potency Whey Protein – Coffee 5 lb<\/h1>/);});
