@@ -374,22 +374,5 @@
 <button id="floatingCart" class="floating-cart" type="button" aria-label="View shopping cart"><span>🛒 VIEW CART</span><strong id="floatingCount" aria-live="polite">0</strong></button>
 <nav class="app-bottom-nav" aria-label="App navigation"><a href="#shop">Shop</a><a href="#offers">Offers</a><a href="#brands">Launches</a><a href="#certificate">Certificate</a><a href="account.html">Account</a></nav>
 <script src="app.js?v=20261112-musclevite-gallery" defer></script><script src="secure-payments.js" defer></script>
-<script>
-(function(){
-  const menu=document.querySelector('.mvn-header-more');
-  if(!menu)return;
-  document.addEventListener('pointerdown',function(event){
-    if(menu.open&&!menu.contains(event.target))menu.open=false;
-  });
-  document.addEventListener('keydown',function(event){
-    if(event.key==='Escape'&&menu.open){
-      menu.open=false;
-      menu.querySelector('summary').focus();
-    }
-  });
-  menu.querySelectorAll('a').forEach(function(link){
-    link.addEventListener('click',function(){menu.open=false;});
-  });
-})();
-</script>
+<script src="header-more.js?v=20261114-e" defer></script>
 </body></html>
