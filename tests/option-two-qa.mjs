@@ -86,7 +86,8 @@ try {
    const style=selector=>getComputedStyle(document.querySelector(selector));
    const image=document.querySelector('#grid article.card .photo img');
    return {
-    headerBackground:style('.storehead').backgroundImage,
+    headerBackground:style('.storehead').backgroundColor,
+    headerBackgroundImage:style('.storehead').backgroundImage,
     logoLoaded:document.querySelector('.storehead .original-brand-logo').naturalWidth>0,
     accountColor:style('.storehead .account-link').color,
     cartColor:style('.storehead #bag').color,
@@ -99,13 +100,12 @@ try {
     photoNaturalWidth:image.naturalWidth
    };
   });
-  console.log('OPTION2_CHARCOAL_VISUAL',size.name,JSON.stringify(visual));
-  assert.match(visual.headerBackground,/linear-gradient/,'charcoal header gradient');
-  assert.ok(visual.headerBackground.includes('rgb(43, 46, 51)') || visual.headerBackground.includes('rgb(37, 40, 45)'),
-    'approved charcoal-grey appears in the header');
+  console.log('OPTION2_SOLID_BLACK_VISUAL',size.name,JSON.stringify(visual));
+  assert.equal(visual.headerBackground,'rgb(0, 0, 0)','header must be solid black');
+  assert.equal(visual.headerBackgroundImage,'none','header must not display grey gradients');
   assert.ok(visual.logoLoaded,'original gold MVN header artwork loads');
-  assert.equal(visual.accountColor,'rgb(255, 255, 255)','account icon is white on charcoal');
-  assert.equal(visual.cartColor,'rgb(255, 255, 255)','cart icon is white on charcoal');
+  assert.equal(visual.accountColor,'rgb(255, 255, 255)','account icon is white on black');
+  assert.equal(visual.cartColor,'rgb(255, 255, 255)','cart icon is white on black');
   assert.ok(visual.nameFontSize>=15,'product titles are legible and prominent');
   assert.ok(visual.nameFontWeight>=800,'product titles use strong weight');
   assert.ok(visual.sellingFontSize>=19,'retail selling price stands out');
