@@ -40,6 +40,33 @@ try {
   await page.locator('#grid article.card .variant').first().waitFor({state:'visible',timeout:12000});
   const count=await page.locator('#grid article.card').count();
   assert.ok(count>=5,size.name+' all five current product families must be present, got '+count);
+  // Reference-inspired storefront should present substantial original merchandise imagery
+  // and usable, non-duplicated category cards BEFORE the existing cart catalogue.
+  const showcase=page.locator('#mvnEditorial');
+  assert.ok(await showcase.isVisible(),size.name+' premium marketing hero must be visible');
+  assert.match(await showcase.locator('h1').innerText(),/FUEL EVERY\s*REP/i,'performance headline is visible');
+  const campaignImg=showcase.locator('.mvn-editorial-packpanel img');
+  await campaignImg.waitFor({state:'visible'});
+  assert.ok(await campaignImg.evaluate(img=>img.complete&&img.naturalWidth>0),size.name+' original whey hero photo loads');
+  const campaignGeometry=await page.evaluate(()=>{
+    const feature=document.querySelector('.mvn-editorial-feature').getBoundingClientRect();
+    const shop=document.querySelector('#shop').getBoundingClientRect();
+    const promo=document.querySelector('.mvn-editorial-promos').getBoundingClientRect();
+    const cats=document.querySelector('.mvn-editorial-categories').getBoundingClientRect();
+    return {heroHeight:feature.height,shopY:shop.y,promoWidth:promo.width,categoryBottom:cats.bottom,scrollWidth:document.documentElement.scrollWidth};
+  });
+  assert.ok(campaignGeometry.heroHeight>=420,'campaign hero must be substantial');
+  assert.ok(campaignGeometry.categoryBottom<=campaignGeometry.shopY+20,size.name+' visual categories precede retail collection');
+  assert.ok(campaignGeometry.scrollWidth<=size.width+10,size.name+' campaign does not overflow viewport');
+  assert.equal(await page.locator('.mvn-editorial-category').count(),4,'show four photo-led verified categories');
+  await page.locator('.mvn-editorial-categories').scrollIntoViewIfNeeded();
+  await page.waitForFunction(()=>[...document.querySelectorAll('.mvn-editorial-category img')].every(img=>img.complete&&img.naturalWidth>0),{timeout:12000});
+  const categoryPhotos=await page.locator('.mvn-editorial-category img').evaluateAll(images=>images.map(img=>({src:img.getAttribute('src'),loaded:img.complete&&img.naturalWidth>0})));
+  assert.ok(categoryPhotos.every(img=>img.loaded),size.name+' all category photographs load: '+JSON.stringify(categoryPhotos));
+  await page.screenshot({path:folder+'/'+size.name+'-campaign.png',animations:'disabled'});
+  await page.locator('.mvn-editorial-category[data-cat="mass"]').click();
+  assert.equal(await page.locator('#grid article.card').count(),1,size.name+' hero category card filters mass gainer');
+  await page.locator('.cats [data-cat="all"]').click();
   const geometry=await page.evaluate(()=>{
    const get=x=>document.querySelector(x);
    const grid=get('#grid');
