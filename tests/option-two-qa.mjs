@@ -92,10 +92,11 @@ try {
   assert.equal(await email.isVisible(),size.name==='desktop',size.name+' desktop email and compact mobile menu');
   await more.locator('summary').click();
   assert.equal(await menuPanel.isVisible(),true,size.name+' three-dot menu opens');
-  assert.equal(await menuPanel.locator('a[href="mailto:maxvolumenutrition@gmail.com"]').count(),1,'menu includes support email');
+  assert.equal(await menuPanel.locator('a[href="mailto:maxvolumenutrition@gmail.com"]').count(),0,'do not duplicate contact methods in menu');
   assert.equal(await menuPanel.locator('a[href="dealer.html"]').count(),1,'menu includes wholesale enquiries');
   assert.equal(await menuPanel.locator('a[href="support.html"]').count(),1,'menu includes support');
-  assert.equal(await menuPanel.locator('a[href="https://wa.me/917708830513"]').count(),1,'menu includes WhatsApp support');
+  assert.equal(await menuPanel.locator('a[href="https://wa.me/917708830513"]').count(),0,'WhatsApp contact belongs on support page');
+  assert.equal(await menuPanel.locator('a[href="support.html"]').count(),1,'only one support destination');
   await page.keyboard.press('Escape');
   assert.equal(await menuPanel.isVisible(),false,size.name+' Escape closes menu');
   await more.locator('summary').click();
